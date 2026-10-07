@@ -1,0 +1,31 @@
+Rerun 2026-10-07T12:35Z on upstream e0bbb8b: main vs fix/prepare-16bit-layers a04fcf4
+
+## proof_fixed.txt
+INFO:processing:Creating surface volume zarr at /home/pi/scrollprize_work/runs/RB/C03/work_fixed/surface_volume.zarr (H,W,C=5360,5998,1 ~0.03 GiB uncompressed, ~0.01 GiB estimated with LZ4). Free on /home/pi/scrollprize_work/runs/RB/C03/work_fixed: 158.60 GiB.
+INFO:processing:Creating zarr array with LZ4 compression
+
+Building surface volume:   0%|          | 0/1 [00:00<?, ?layer/s]
+Building surface volume: 100%|██████████| 1/1 [00:00<00:00,  3.64layer/s]
+Building surface volume: 100%|██████████| 1/1 [00:00<00:00,  3.64layer/s]
+INFO:processing:Surface volume zarr created successfully at /home/pi/scrollprize_work/runs/RB/C03/work_fixed/surface_volume.zarr
+villa commit: 
+input layer:  uint16 (5360, 5998), values in segment 11349..65535
+prepared:     uint8, distinct values in segment: 197, pixels equal to 255: 0.02%
+equals raw >> 8:                 True
+equals cv2.IMREAD_GRAYSCALE read: True
+512 px crop written to /home/pi/scrollprize_work/runs/RB/C03/work_fixed/prepared_crop_.png
+
+## proof_main.txt
+INFO:processing:Creating surface volume zarr at /home/pi/scrollprize_work/runs/RB/C03/work_main/surface_volume.zarr (H,W,C=5360,5998,1 ~0.03 GiB uncompressed, ~0.01 GiB estimated with LZ4). Free on /home/pi/scrollprize_work/runs/RB/C03/work_main: 158.66 GiB.
+INFO:processing:Creating zarr array with LZ4 compression
+
+Building surface volume:   0%|          | 0/1 [00:00<?, ?layer/s]
+Building surface volume: 100%|██████████| 1/1 [00:00<00:00,  3.59layer/s]
+Building surface volume: 100%|██████████| 1/1 [00:00<00:00,  3.59layer/s]
+INFO:processing:Surface volume zarr created successfully at /home/pi/scrollprize_work/runs/RB/C03/work_main/surface_volume.zarr
+villa commit: 5a4388f
+input layer:  uint16 (5360, 5998), values in segment 11349..65535
+prepared:     uint8, distinct values in segment: 1, pixels equal to 255: 100.00%
+equals raw >> 8:                 False
+equals cv2.IMREAD_GRAYSCALE read: False
+512 px crop written to /home/pi/scrollprize_work/runs/RB/C03/work_main/prepared_crop_5a4388f.png

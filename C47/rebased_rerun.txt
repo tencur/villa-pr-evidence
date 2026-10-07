@@ -1,0 +1,36 @@
+Rerun 2026-10-07T12:35Z on upstream e0bbb8b: main vs fix/prepare-inference-layer-window 9ae6507
+
+## proof_fixed.txt
+INFO:processing:Creating surface volume zarr at /home/pi/scrollprize_work/runs/RB/C47/work_fixed/surface_volume_01_63.zarr (H,W,C=256,256,62 ~0.00 GiB uncompressed, ~0.00 GiB estimated with LZ4). Free on /home/pi/scrollprize_work/runs/RB/C47/work_fixed: 158.72 GiB.
+INFO:processing:Creating zarr array without compression
+
+Building surface volume:   0%|          | 0/62 [00:00<?, ?layer/s]
+Building surface volume: 100%|██████████| 62/62 [00:00<00:00, 654.02layer/s]
+INFO:processing:Surface volume zarr created successfully at /home/pi/scrollprize_work/runs/RB/C47/work_fixed/surface_volume_01_63.zarr
+INFO:inference:Loaded zarr: shape=(256, 256, 62), z-range=[0, 62), dtype=uint8
+prepare: zarr shape (256, 256, 62) holds source layers 1..62 (channel k = layer 1+k)
+fixed: requested layers [1, 63) -> zarr channels [0, 62)
+inference: LayersSource(start_z=0, end_z=62) -> 62 channels (model trained on 62)
+the first channel the model receives is source layer [1] (requested first layer: 1)
+
+## proof_main.txt
+INFO:processing:Creating surface volume zarr at /home/pi/scrollprize_work/runs/RB/C47/work_main/surface_volume_01_63.zarr (H,W,C=256,256,62 ~0.00 GiB uncompressed, ~0.00 GiB estimated with LZ4). Free on /home/pi/scrollprize_work/runs/RB/C47/work_main: 158.73 GiB.
+INFO:processing:Creating zarr array without compression
+
+Building surface volume:   0%|          | 0/62 [00:00<?, ?layer/s]
+Building surface volume: 100%|██████████| 62/62 [00:00<00:00, 645.75layer/s]
+INFO:processing:Surface volume zarr created successfully at /home/pi/scrollprize_work/runs/RB/C47/work_main/surface_volume_01_63.zarr
+WARNING:inference:Requested end_z=63 exceeds available channels=62, clamping
+INFO:inference:Loaded zarr: shape=(256, 256, 61), z-range=[1, 62), dtype=uint8
+prepare: zarr shape (256, 256, 62) holds source layers 1..62 (channel k = layer 1+k)
+inference: LayersSource(start_z=1, end_z=63) -> 61 channels (model trained on 62)
+the first channel the model receives is source layer [2] (requested first layer: 1)
+
+## tests_fixed.txt
+4 passed in 2.16s
+
+## tests_main.txt
+4 passed in 2.16s
+
+## tests_note.txt
+C47 tests main (rerun with the module imported from the main tree): 4 failed; fixed: 4 passed

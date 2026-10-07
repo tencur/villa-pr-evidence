@@ -1,0 +1,27 @@
+Rerun 2026-10-07T12:35Z on upstream e0bbb8b: main vs fix/flat-label-depth-window 35f9bbc
+
+## proof_fixed.txt
+segment w035
+1. published label stores
+   label store shape (28, 5820, 5240); training patches found: 1247
+   of 312 sampled patches, 312 carry any supervised pixel; supervised pixels 3454843, ink pixels 1055589
+2. labelling loop: label images saved as TIFF, then create_label_zarrs
+   Processed 2 image(s): 2 written, 0 skipped, 0 failed.
+   label store shape (65, 5820, 5240); training patches found: 1247
+   of 312 sampled patches, 312 carry any supervised pixel; supervised pixels 3454843, ink pixels 1055589
+
+## proof_main.txt
+segment w035
+1. published label stores
+   label store shape (28, 5820, 5240); training patches found: 1247
+   of 312 sampled patches, 312 carry any supervised pixel; supervised pixels 3454843, ink pixels 1055589
+2. labelling loop: label images saved as TIFF, then create_label_zarrs
+   Processed 2 image(s): 2 written, 0 skipped, 0 failed.
+   label store shape (65, 5820, 5240); training patches found: 1247
+   of 312 sampled patches, 0 carry any supervised pixel; supervised pixels 0, ink pixels 0
+
+## tests_fixed.txt
+25 passed in 8.38s
+
+## tests_main.txt
+2 failed, 23 passed in 3.19s

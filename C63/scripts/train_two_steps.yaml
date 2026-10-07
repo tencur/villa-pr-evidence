@@ -1,0 +1,33 @@
+dataset_config:
+  data_path: /home/pi/scrollprize_work/runs/B01/work_binary01/data
+  min_bbox_percent: 0.3
+  min_labeled_ratio: 0.02
+  normalization_scheme: zscore
+  targets:
+    surface:
+      activation: sigmoid
+      losses:
+      - name: BCEWithLogitsLoss
+        weight: 1.0
+      out_channels: 1
+  valid_patch_find_resolution: 1
+model_config:
+  features_per_stage:
+  - 8
+  - 16
+  - 32
+  - 64
+tr_config:
+  batch_size: 2
+  initial_lr: 0.01
+  max_epoch: 1
+  max_steps_per_epoch: 2
+  max_val_steps_per_epoch: 1
+  num_dataloader_workers: 0
+  patch_size:
+  - 48
+  - 48
+  - 48
+tr_setup:
+  model_name: s03
+  tr_val_split: 0.8

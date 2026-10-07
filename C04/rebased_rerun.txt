@@ -1,0 +1,21 @@
+Rerun 2026-10-07T12:35Z on upstream e0bbb8b: main vs fix/zarr-cache-per-volume 00ce90c
+
+## proof_fixed.txt
+shared dir, read A then B:
+INFO:inference:Loaded zarr: shape=(280, 340, 28), z-range=[0, 28), dtype=uint8
+{"url": "20250919184428-0500P2-wrap01_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 17, "pipeline_shape_HWC": [280, 340, 28], "true_shape_HWC": [280, 340, 28], "pipeline_sha": "66922df18a75", "true_sha": "66922df18a75", "matches_truth": true}
+INFO:inference:Loaded zarr: shape=(880, 680, 28), z-range=[0, 28), dtype=uint8
+{"url": "20250920020224-0500P2-wrap13_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 67, "pipeline_shape_HWC": [880, 680, 28], "true_shape_HWC": [880, 680, 28], "pipeline_sha": "6cf491f2e834", "true_sha": "6cf491f2e834", "matches_truth": true}
+fresh dir, read B:
+INFO:inference:Loaded zarr: shape=(880, 680, 28), z-range=[0, 28), dtype=uint8
+{"url": "20250920020224-0500P2-wrap13_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 50, "pipeline_shape_HWC": [880, 680, 28], "true_shape_HWC": [880, 680, 28], "pipeline_sha": "6cf491f2e834", "true_sha": "6cf491f2e834", "matches_truth": true}
+
+## proof_main.txt
+shared dir, read A then B:
+INFO:inference:Loaded zarr: shape=(280, 340, 28), z-range=[0, 28), dtype=uint8
+{"url": "20250919184428-0500P2-wrap01_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 17, "pipeline_shape_HWC": [280, 340, 28], "true_shape_HWC": [280, 340, 28], "pipeline_sha": "66922df18a75", "true_sha": "66922df18a75", "matches_truth": true}
+INFO:inference:Loaded zarr: shape=(280, 340, 28), z-range=[0, 28), dtype=uint8
+{"url": "20250920020224-0500P2-wrap13_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 17, "pipeline_shape_HWC": [280, 340, 28], "true_shape_HWC": [880, 680, 28], "pipeline_sha": "66922df18a75", "true_sha": "6cf491f2e834", "matches_truth": false}
+fresh dir, read B:
+INFO:inference:Loaded zarr: shape=(880, 680, 28), z-range=[0, 28), dtype=uint8
+{"url": "20250920020224-0500P2-wrap13_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 50, "pipeline_shape_HWC": [880, 680, 28], "true_shape_HWC": [880, 680, 28], "pipeline_sha": "6cf491f2e834", "true_sha": "6cf491f2e834", "matches_truth": true}

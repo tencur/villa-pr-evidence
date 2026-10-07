@@ -1,0 +1,43 @@
+Rerun 2026-10-07T12:35Z on upstream e0bbb8b: main vs fix/bg-sampling-ignore-label bc22adf
+
+## proof_fixed.txt
+label values (level 0): {0: 55211678, 1: 4788322, 2: 183376875}
+grid patches: 31 with surface, 17 background-only (annotated background next to unannotated), 48 entirely not annotated
+
+== config A (valid_patch_value 1, like ps128_dicece)
+   finder log           : Found 17 BG-only patches in 'PHerc0500P2' | Total BG-only patches found: 17 | Patch cache generation complete: 1 cache(s) written, 1 volumes scanned, 0 skipped. | Patches found: 19 FG, 17 BG, 0 unlabeled FG.
+   cache fg_patches     : 19  (of which entirely not annotated: 0, annotated background only: 0, with surface: 19)
+   cache bg_patches     : 17  (annotated background-only patches available: 17)
+   trainer dataset      : 36 patches, 19 FG, 17 BG, sampler weights
+   one training epoch   : 19 FG + 2 BG-only patches (all FG + bg_to_fg_ratio 0.10 of BG, split as train.py does without a validation hold-out)
+
+== config B (no valid_patch_value, like ps128_guided_*_ink)
+   finder log           : Found 17 BG-only patches in 'PHerc0500P2' | Total BG-only patches found: 17 | Patch cache generation complete: 1 cache(s) written, 1 volumes scanned, 0 skipped. | Patches found: 19 FG, 17 BG, 0 unlabeled FG.
+   cache fg_patches     : 19  (of which entirely not annotated: 0, annotated background only: 0, with surface: 19)
+   cache bg_patches     : 17  (annotated background-only patches available: 17)
+   trainer dataset      : 36 patches, 19 FG, 17 BG, sampler weights
+   one training epoch   : 19 FG + 2 BG-only patches (all FG + bg_to_fg_ratio 0.10 of BG, split as train.py does without a validation hold-out)
+
+## proof_main.txt
+label values (level 0): {0: 55211678, 1: 4788322, 2: 183376875}
+grid patches: 31 with surface, 17 background-only (annotated background next to unannotated), 48 entirely not annotated
+
+== config A (valid_patch_value 1, like ps128_dicece)
+   finder log           : Patch cache generation complete: 1 cache(s) written, 1 volumes scanned, 0 skipped. | Patches found: 19 FG, 0 BG, 0 unlabeled FG.
+   cache fg_patches     : 19  (of which entirely not annotated: 0, annotated background only: 0, with surface: 19)
+   cache bg_patches     : 0  (annotated background-only patches available: 17)
+   trainer dataset      : 19 patches, 19 FG, 0 BG, sampler no-weights
+   one training epoch   : 19 FG + 0 BG-only patches (all FG + bg_to_fg_ratio 0.10 of BG, split as train.py does without a validation hold-out)
+
+== config B (no valid_patch_value, like ps128_guided_*_ink)
+   finder log           : Patch cache generation complete: 1 cache(s) written, 1 volumes scanned, 0 skipped. | Patches found: 90 FG, 0 BG, 0 unlabeled FG.
+   cache fg_patches     : 90  (of which entirely not annotated: 48, annotated background only: 13, with surface: 29)
+   cache bg_patches     : 0  (annotated background-only patches available: 17)
+   trainer dataset      : 90 patches, 90 FG, 0 BG, sampler no-weights
+   one training epoch   : 90 FG + 0 BG-only patches (all FG + bg_to_fg_ratio 0.10 of BG, split as train.py does without a validation hold-out)
+
+## tests_fixed.txt
+6 passed in 2.90s
+
+## tests_main.txt
+5 failed, 1 passed in 2.81s
