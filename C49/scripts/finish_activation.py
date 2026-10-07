@@ -15,7 +15,7 @@ arr = b["0"] if hasattr(b, "keys") and "0" in b else b
 a = np.asarray(arr[:]).astype(np.float32); nz = a[a != 0]
 print(f"blended store: shape {a.shape}, non-zero range {nz.min():.4f}..{nz.max():.4f}, share of voxels < 0: {np.mean(a < 0):.3f}")
 # 2. documented: vesuvius.finalize_outputs <blended> <out> --mode binary [--threshold]
-for extra, label in ((["--threshold"], "binary --threshold 0.5"), ([], "binary probability map")):
+for extra, label in ((["--threshold"], "--mode binary --threshold (cutoff 0.5)"), ([], "binary probability map")):
     out = work / ("final_thr.zarr" if extra else "final_map.zarr")
     r2 = subprocess.run([sys.executable, "-m", "vesuvius.models.run.finalize_outputs", str(work / "blended.zarr"), str(out),
                          "--mode", "binary", *extra, "--num_workers", "1", "--quiet"], capture_output=True, text=True, env=env)

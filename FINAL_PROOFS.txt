@@ -1,13 +1,17 @@
+Final proof outputs, upstream main e0bbb8b vs each PR branch. Updated 2026-10-07 after the pre-release review fixes.
+
 == C47 on main  (code: /home/pi/scrollprize_work/repos/villa)
 WARNING:inference:Requested end_z=63 exceeds available channels=62, clamping
 prepare: zarr shape (256, 256, 62) holds source layers 1..62 (channel k = layer 1+k)
 inference: LayersSource(start_z=1, end_z=63) -> 61 channels (model trained on 62)
 the first channel the model receives is source layer [2] (requested first layer: 1)
+
 == C47 on fix  (code: /home/pi/scrollprize_work/runs/RB/C47/tree)
 prepare: zarr shape (256, 256, 62) holds source layers 1..62 (channel k = layer 1+k)
 fixed: requested layers [1, 63) -> zarr channels [0, 62)
 inference: LayersSource(start_z=0, end_z=62) -> 62 channels (model trained on 62)
 the first channel the model receives is source layer [1] (requested first layer: 1)
+
 == C03 on main  (code: /home/pi/scrollprize_work/repos/villa)
 villa commit: 5a4388f
 input layer:  uint16 (5360, 5998), values in segment 11349..65535
@@ -15,6 +19,7 @@ prepared:     uint8, distinct values in segment: 1, pixels equal to 255: 100.00%
 equals raw >> 8:                 False
 equals cv2.IMREAD_GRAYSCALE read: False
 512 px crop written to /home/pi/scrollprize_work/runs/RELEASE/out/C03/main/work/prepared_crop_5a4388f.png
+
 == C03 on fix  (code: /home/pi/scrollprize_work/runs/RB/C03/tree)
 villa commit: 
 input layer:  uint16 (5360, 5998), values in segment 11349..65535
@@ -22,6 +27,7 @@ prepared:     uint8, distinct values in segment: 197, pixels equal to 255: 0.02%
 equals raw >> 8:                 True
 equals cv2.IMREAD_GRAYSCALE read: True
 512 px crop written to /home/pi/scrollprize_work/runs/RELEASE/out/C03/fix/work/prepared_crop_.png
+
 == C04 on main  (code: /home/pi/scrollprize_work/repos/villa)
 -- one cache directory: read segment A, then segment B, then segment A again
 {"url": "20250919184428-0500P2-wrap01_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 17, "pipeline_shape_HWC": [280, 340, 28], "true_shape_HWC": [280, 340, 28], "pipeline_sha": "66922df18a75", "true_sha": "66922df18a75", "matches_truth": true}
@@ -29,6 +35,7 @@ equals cv2.IMREAD_GRAYSCALE read: True
 {"url": "20250919184428-0500P2-wrap01_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 17, "pipeline_shape_HWC": [280, 340, 28], "true_shape_HWC": [280, 340, 28], "pipeline_sha": "66922df18a75", "true_sha": "66922df18a75", "matches_truth": true}
 -- fresh directory: read segment B
 {"url": "20250920020224-0500P2-wrap13_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 50, "pipeline_shape_HWC": [880, 680, 28], "true_shape_HWC": [880, 680, 28], "pipeline_sha": "6cf491f2e834", "true_sha": "6cf491f2e834", "matches_truth": true}
+
 == C04 on fix  (code: /home/pi/scrollprize_work/runs/RB/C04/tree)
 -- one cache directory: read segment A, then segment B, then segment A again
 {"url": "20250919184428-0500P2-wrap01_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 17, "pipeline_shape_HWC": [280, 340, 28], "true_shape_HWC": [280, 340, 28], "pipeline_sha": "66922df18a75", "true_sha": "66922df18a75", "matches_truth": true}
@@ -36,6 +43,7 @@ equals cv2.IMREAD_GRAYSCALE read: True
 {"url": "20250919184428-0500P2-wrap01_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 67, "pipeline_shape_HWC": [280, 340, 28], "true_shape_HWC": [280, 340, 28], "pipeline_sha": "66922df18a75", "true_sha": "66922df18a75", "matches_truth": true}
 -- fresh directory: read segment B
 {"url": "20250920020224-0500P2-wrap13_0919/surface-volumes/9.362um-1.2m-113keV-volume-20250820143440.zarr", "cwd_cache_entries": 50, "pipeline_shape_HWC": [880, 680, 28], "true_shape_HWC": [880, 680, 28], "pipeline_sha": "6cf491f2e834", "true_sha": "6cf491f2e834", "matches_truth": true}
+
 == C12 on main  (code: /home/pi/scrollprize_work/repos/villa)
 segment w035
 1. published label stores
@@ -45,6 +53,7 @@ segment w035
    Processed 2 image(s): 2 written, 0 skipped, 0 failed.
    label store shape (65, 5820, 5240); training patches found: 1247
    of 312 sampled patches, 0 carry any supervised pixel; supervised pixels 0, ink pixels 0
+
 == C12 on fix  (code: /home/pi/scrollprize_work/runs/RB/C12/tree)
 segment w035
 1. published label stores
@@ -54,26 +63,33 @@ segment w035
    Processed 2 image(s): 2 written, 0 skipped, 0 failed.
    label store shape (65, 5820, 5240); training patches found: 1247
    of 312 sampled patches, 312 carry any supervised pixel; supervised pixels 3454843, ink pixels 1055589
+
 == C64 on main  (code: /home/pi/scrollprize_work/repos/villa)
-patch 128^3: 47 foreground patches kept; labelled voxels outside every patch: 707874 of 2114901 (33.47%)
-patch 192^3: 16 foreground patches kept; labelled voxels outside every patch: 856319 of 2114901 (40.49%)
+patch 128^3: 47 foreground patches kept; labelled voxels outside every patch: 5610914 of 16891192 (33.22%)
+patch 192^3: 16 foreground patches kept; labelled voxels outside every patch: 6805503 of 16891192 (40.29%)
+
 == C64 on fix  (code: /home/pi/scrollprize_work/runs/RB/C64/tree)
-patch 128^3: 70 foreground patches kept; labelled voxels outside every patch: 0 of 2114901 (0.00%)
-patch 192^3: 35 foreground patches kept; labelled voxels outside every patch: 0 of 2114901 (0.00%)
+patch 128^3: 70 foreground patches kept; labelled voxels outside every patch: 0 of 16891192 (0.00%)
+patch 192^3: 35 foreground patches kept; labelled voxels outside every patch: 0 of 16891192 (0.00%)
+
 == C63 on main  (code: /home/pi/scrollprize_work/repos/villa)
 run a (--seed 42): exit 0, surface: 0.9702
 run b (--seed 42): exit 0, surface: 0.7950
 weight tensors that differ between the two runs: 285 of 286
+
 == C63 on fix  (code: /home/pi/scrollprize_work/runs/RB/C63/tree)
-run a (--seed 42): exit 0, surface: 0.9625
-run b (--seed 42): exit 0, surface: 0.9625
+run a (--seed 42): exit 0, surface: 0.8146
+run b (--seed 42): exit 0, surface: 0.8146
 weight tensors that differ between the two runs: 0 of 286
+
 == C38 on main  (code: /home/pi/scrollprize_work/repos/villa)
 [raw255] label values on disk: [0, 255]
 surface: Avg Loss = -9739.5671
+
 == C38 on fix  (code: /home/pi/scrollprize_work/runs/RB/C38/tree)
 [raw255] label values on disk: [0, 255]
 ValueError: Target 'surface' (volume 'vol') is trained with binary losses, so its labels must lie in [0, 1] (or be the ignore value), but the label contains [255.0]. Store the label as 0/1, e.g. convert a 0/255 mask with (label > 0).
+
 == C31 on main  (code: /home/pi/scrollprize_work/repos/villa)
 
 == config A (valid_patch_value 1, like ps128_dicece)
@@ -89,6 +105,7 @@ ValueError: Target 'surface' (volume 'vol') is trained with binary losses, so it
    cache bg_patches     : 0  (annotated background-only patches available: 17)
    trainer dataset      : 90 patches, 90 FG, 0 BG, sampler no-weights
    one training epoch   : 90 FG + 0 BG-only patches (all FG + bg_to_fg_ratio 0.10 of BG, split as train.py does without a validation hold-out)
+
 == C31 on fix  (code: /home/pi/scrollprize_work/runs/RB/C31/tree)
 
 == config A (valid_patch_value 1, like ps128_dicece)
@@ -104,35 +121,42 @@ ValueError: Target 'surface' (volume 'vol') is trained with binary losses, so it
    cache bg_patches     : 17  (annotated background-only patches available: 17)
    trainer dataset      : 36 patches, 19 FG, 17 BG, sampler weights
    one training epoch   : 19 FG + 2 BG-only patches (all FG + bg_to_fg_ratio 0.10 of BG, split as train.py does without a validation hold-out)
+
 == C49 on main  (code: /home/pi/scrollprize_work/repos/villa)
 predict exit 0 parts: ['logits_part_0.zarr']
 stored 'logits': shape (125, 1, 48, 48, 48), non-zero values range 0.0000..0.5166 (probabilities would lie in 0..1)
 blended store: shape (1, 128, 128, 128), non-zero range 0.0008..0.4099, share of voxels < 0: 0.000
-finalize binary --threshold 0.5: exit 0; values min 0 max 255; share == 255: 0.840; share > 127: 0.840
+finalize --mode binary --threshold (cutoff 0.5): exit 0; values min 0 max 255; share == 255: 0.840; share > 127: 0.840
 finalize binary probability map: exit 0; values min 127 max 153; share == 255: 0.000; share > 127: 0.840
+
 == C49 on fix  (code: /home/pi/scrollprize_work/runs/RB/C49/tree)
 predict exit 0 parts: ['logits_part_0.zarr']
 stored 'logits': shape (125, 1, 48, 48, 48), non-zero values range -27.5938..0.0663 (probabilities would lie in 0..1)
 blended store: shape (1, 128, 128, 128), non-zero range -5.6719..-0.0049, share of voxels < 0: 0.840
-finalize binary --threshold 0.5: exit 0; values min 0 max 0; share == 255: 0.000; share > 127: 0.000
+finalize --mode binary --threshold (cutoff 0.5): exit 0; values min 0 max 0; share == 255: 0.000; share > 127: 0.000
 finalize binary probability map: exit 0; values min 0 max 127; share == 255: 0.000; share > 127: 0.000
+
 == C52 on main  (code: /home/pi/scrollprize_work/repos/villa)
 real patch z768 y0 x64 (64^3), label foreground 30.1%; eval() output range 0.000..0.435, train() -12.71..-0.26
 BCEWithLogitsLoss as the validation step computes it (eval outputs): 0.7548
 BCEWithLogitsLoss on the logits (what training computes):            0.6335
 foreground share at threshold 0.5 after a second sigmoid: 1.000; from the probabilities: 0.000; label: 0.301
+
 == C52 on fix  (code: /home/pi/scrollprize_work/runs/RB/C52/tree)
 same real patch; eval() output range -12.71..-0.26
 BCEWithLogitsLoss as validation computes it (eval outputs): 0.6335; on train-mode logits: 0.6335
 foreground share at threshold 0.5 after sigmoid of the eval output: 0.000 (label 0.301)
+
 == C44 on main  (code: /home/pi/scrollprize_work/repos/villa)
 compute_st exit 0
 st: middle eigenvalue / largest (strong-gradient half): median 0.0000, 90th pct 0.0000
 st: confidence values: median 242, share at 255 45.99%, share >= 250 49.50%, distinct 256
 st: first_component neighbour coherence |dot|: z 0.355, y 0.344, x 0.354 (random unit vectors ~0.5)
+
 == C44 on fix  (code: /home/pi/scrollprize_work/runs/RB/C44/tree)
 compute_st exit 0
 st: middle eigenvalue / largest (strong-gradient half): median 0.0924, 90th pct 0.4795
 st: confidence values: median 153, share at 255 1.17%, share >= 250 18.66%, distinct 256
 st: first_component neighbour coherence |dot|: z 0.622, y 0.618, x 0.624 (random unit vectors ~0.5)
+
 ALLDONE

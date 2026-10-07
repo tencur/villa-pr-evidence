@@ -1,0 +1,4 @@
+Run 2026-10-07 on a Raspberry Pi 5 (Python 3.14, torch 2.12 CPU) against the PR branch rebased on upstream main e0bbb8b.
+"Main code" = the same test file run with the PR's source files replaced by upstream main's.
+
+tests/models/run/test_inference_stores_logits.py: 7 passed on the PR; the 2 checkpoint-loader cases fail with main's loaders (the module itself cannot import on main code).

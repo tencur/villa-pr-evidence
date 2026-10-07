@@ -5,7 +5,7 @@ Each folder is named after one PR and holds:
 
 - `screenshot_before.png` and `screenshot_after.png`: terminal output of `run_proof.sh <ID> main` (upstream main `e0bbb8b`) and `run_proof.sh <ID> fix` (the PR branch), on the same data and settings.
 - `scripts/`: the reproduction scripts that `run_proof.sh` calls.
-- `rebased_rerun.txt`: the tests and proof rerun after rebasing onto `e0bbb8b`.
+- `tests.txt`: the current test results for the PR (`rebased_rerun.txt` where the PR has not changed since the rebase).
 
 `FINAL_PROOFS.txt` is the complete output of the final run for every PR, on main and on the fix.
 

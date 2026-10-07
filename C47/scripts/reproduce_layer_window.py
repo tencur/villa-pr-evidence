@@ -27,7 +27,8 @@ z = zarr.open(zpath, mode="r")
 print(f"prepare: zarr shape {z.shape} holds source layers {START}..{END - 1} (channel k = layer {START}+k)")
 # STEP=inference: run_inference(..., start_z=START, end_z=END) -> LayersSource(zarr, start_z, end_z)
 if hasattr(processing, "resolve_zarr_layer_window"):          # fixed code: prepare records the window, inference rebases it
-    processing.record_layer_window(zpath, START, END)
+    window = processing.contiguous_layer_window(kept) if hasattr(processing, "contiguous_layer_window") else (START, END)
+    processing.record_layer_window(zpath, *window)                # as entrypoint.py's prepare step records it
     s0, e0 = processing.resolve_zarr_layer_window(zpath, START, END)
     print(f"fixed: requested layers [{START}, {END}) -> zarr channels [{s0}, {e0})")
 else:

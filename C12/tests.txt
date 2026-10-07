@@ -1,0 +1,5 @@
+Run 2026-10-07 on a Raspberry Pi 5 (Python 3.14, torch 2.12 CPU) against the PR branch rebased on upstream main e0bbb8b.
+"Main code" = the same test file run with the PR's source files replaced by upstream main's.
+
+tests/ink_detection/test_data_foundation.py: 27 passed on the PR; the 4 new cases fail on main code.
+All tests/ink_detection: 303 passed, 2 skipped; 1 failure (test_dependency_wiring) that also fails on main code in this environment.

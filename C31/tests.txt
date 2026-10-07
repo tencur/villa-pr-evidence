@@ -1,0 +1,6 @@
+Run 2026-10-07 on a Raspberry Pi 5 (Python 3.14, torch 2.12 CPU) against the PR branch rebased on upstream main e0bbb8b.
+"Main code" = the same test file run with the PR's source files replaced by upstream main's.
+
+tests/models/datasets/test_bg_sampling_ignore_label.py: 10 passed on the PR; 9 failed on main code.
+tests/models/datasets + tests/models/training: 103 passed, 1 skipped (same pre-existing cross-frame test deselected).
+With the patch-grid, seed and binary-label PRs applied on top: 123 passed.

@@ -1,0 +1,5 @@
+Run 2026-10-07 on a Raspberry Pi 5 (Python 3.14, torch 2.12 CPU) against the PR branch rebased on upstream main e0bbb8b.
+"Main code" = the same test file run with the PR's source files replaced by upstream main's.
+
+tests/models/training/test_train_seed_reproducible.py: 7 passed on the PR; 7 failed on main code.
+tests/models/training + tests/models/datasets: 100 passed, 1 skipped (same pre-existing cross-frame test deselected).

@@ -1,0 +1,6 @@
+Run 2026-10-07 on a Raspberry Pi 5 (Python 3.14, torch 2.12 CPU) against the PR branch rebased on upstream main e0bbb8b.
+"Main code" = the same test file run with the PR's source files replaced by upstream main's.
+
+tests/models/datasets/test_patch_grid_tail.py: 6 passed on the PR; cannot import on main code (no grid_starts).
+The 2 downsampled-tail cases fail on the previous version of this branch (before the full-resolution clamp).
+tests/models/datasets + tests/models/training: 99 passed, 1 skipped (test_cross_frame_realdata::test_foreground_scan_over_small_region deselected: fails identically on main code).

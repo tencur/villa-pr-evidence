@@ -1,0 +1,5 @@
+Run 2026-10-07 on a Raspberry Pi 5 (Python 3.14, torch 2.12 CPU) against the PR branch rebased on upstream main e0bbb8b.
+"Main code" = the same test file run with the PR's source files replaced by upstream main's.
+
+tests/models/training/test_validation_on_logits.py + tests/models/run/test_inference_stores_logits.py: 11 passed on the PR; the full-resume case fails with main's load_checkpoint.
+tests/models/training + run + build + test_load_nnunet_model.py: 219 passed, 1 skipped.

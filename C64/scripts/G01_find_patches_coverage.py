@@ -9,9 +9,9 @@ g = zarr.open(path, mode="r")
 r = find_valid_patches(label_arrays=[g], label_names=["vol"], patch_size=(ps0,) * 3, bbox_threshold=0.0,
                        label_threshold=0.0001, valid_patch_find_resolution=res)
 starts = [tuple(int(v) for v in p["start_pos"]) for p in r["fg_patches"]]
-lab = np.asarray(g["1"][:]) > 0                                   # count on level 1
+lab = np.asarray(g["0"][:]) > 0                                   # count at full resolution
 cov = np.zeros_like(lab)
 for z, y, x in starts:
-    cov[z // 2:(z + ps0) // 2, y // 2:(y + ps0) // 2, x // 2:(x + ps0) // 2] = True
+    cov[z:z + ps0, y:y + ps0, x:x + ps0] = True
 miss = int((lab & ~cov).sum()); tot = int(lab.sum())
 print(f"patch {ps0}^3: {len(starts)} foreground patches kept; labelled voxels outside every patch: {miss} of {tot} ({miss / tot:.2%})")

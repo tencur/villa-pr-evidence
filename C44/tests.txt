@@ -1,0 +1,5 @@
+Run 2026-10-07 on a Raspberry Pi 5 (Python 3.14, torch 2.12 CPU) against the PR branch rebased on upstream main e0bbb8b.
+"Main code" = the same test file run with the PR's source files replaced by upstream main's.
+
+tests/structure_tensor/test_compute_st_integration_default.py: 6 passed on the PR; 5 failed on main code.
+tests/structure_tensor: 37 passed (test_zarr3_compat::test_voxelize_rechunk_keeps_store_v2 deselected: needs trimesh, not installed here).
