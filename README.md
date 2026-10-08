@@ -28,3 +28,7 @@ directory layout is the machine I ran it on (Raspberry Pi 5, CPU only, Python 3.
 | [C49](C49/) | vesuvius.predict: store logits for train.py checkpoints with an output activation |
 | [C52](C52/) | vesuvius.train: validate on logits for targets with an output activation |
 | [C44](C44/) | vesuvius.compute_st: integrate the structure tensor by default |
+
+## C03/gpu (added 2026-10-08)
+
+End-to-end runs of `ink-detection/optimized_inference` on a rented A40 with the public Scroll 5 TimeSformer and real 16-bit layers of two PHerc172 segments: official main versus PR #1998. `p2_driver.py` mirrors the pipeline's prepare, inference and reduce steps per code version; `*-stats.json` hold per-run statistics incl. prediction sha256; `A_main_vs_fix_16bit_pred_small.png` is an 8x box-downsample of the two raw predictions (segment 20241127171800); `segment2/` holds the second segment's statistics.
