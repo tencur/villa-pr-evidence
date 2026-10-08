@@ -1,0 +1,155 @@
+C94 standalone proof -- "compute_st orients eigenvectors per voxel" on upstream main e0bbb8b, CPU only
+host rackpi6 (4 cores, Pi), 2026-10-08 14:35-14:55 UTC
+python /home/pi/scrollprize_work/.venv314/bin/python, OMP_NUM_THREADS=4, CUDA_VISIBLE_DEVICES= (CPU)
+trees: main = /home/pi/scrollprize_work/runs/RB/C94main/main/vesuvius   (exact upstream main e0bbb8b export)
+       fix  = /home/pi/scrollprize_work/runs/RB/C94main/tree/vesuvius   (main + C94; the only src diff is structure_tensor/create_st.py)
+input: real PHerc0500P2 128^3 crop /home/pi/scrollprize_work/runs/C27/crop.zarr
+NO integration smoothing in either tree (C44 not applied; .zattrs smooth_components=false).
+
+Difference from the 2026-10-08 12:16 stacked measurement (runs/RB/C94/): there the eigen stage was replayed on a copy of the
+C44-smoothed tensor (runs/C27/st_smooth.zarr). Here compute_st was run END TO END from crop.zarr with each tree
+(runs/C27/st.zarr does not exist; the unsmoothed tensor is recomputed in ~30 s so no replay was needed).
+Check: st_main.zarr/structure_tensor == st_fix.zarr/structure_tensor (bit-identical), and == runs/C27/st_main.zarr (2026-10-06 main);
+only the eigenvector orientation differs between the two trees.
+
+================ 1. compute_st (sequential; script run_st.sh) ================
+  | #!/usr/bin/env bash
+  | # compute_st end to end from the real PHerc0500P2 crop, upstream main e0bbb8b vs main+C94, no integration smoothing.
+  | cd /home/pi/scrollprize_work/runs/RB/C94main
+  | PY=/home/pi/scrollprize_work/.venv314/bin/python
+  | CROP=/home/pi/scrollprize_work/runs/C27/crop.zarr
+  | for pair in "main:main" "fix:tree"; do
+  |   tag=${pair%%:*}; src=${pair##*:}
+  |   rm -rf st_$tag.zarr
+  |   echo "=== st_$tag  PYTHONPATH=$src/vesuvius/src OMP_NUM_THREADS=4 CUDA_VISIBLE_DEVICES= $PY -m vesuvius.structure_tensor.run_create_st --input_dir $CROP --output_dir st_$tag --patch_size 64,64,64 --keep-eigen"
+  |   t0=$(date +%s)
+  |   PYTHONPATH=$src/vesuvius/src OMP_NUM_THREADS=4 CUDA_VISIBLE_DEVICES= $PY -m vesuvius.structure_tensor.run_create_st --input_dir $CROP --output_dir st_$tag --patch_size 64,64,64 --keep-eigen > st_$tag.log 2>&1
+  |   echo "   exit code $?  wall $(( $(date +%s) - t0 )) s"
+  | done
+  | echo ALLDONE
+--- run_st.out:
+=== st_main  PYTHONPATH=main/vesuvius/src OMP_NUM_THREADS=4 CUDA_VISIBLE_DEVICES= /home/pi/scrollprize_work/.venv314/bin/python -m vesuvius.structure_tensor.run_create_st --input_dir /home/pi/scrollprize_work/runs/C27/crop.zarr --output_dir st_main --patch_size 64,64,64 --keep-eigen
+   exit code 0  wall 38 s
+=== st_fix  PYTHONPATH=tree/vesuvius/src OMP_NUM_THREADS=4 CUDA_VISIBLE_DEVICES= /home/pi/scrollprize_work/.venv314/bin/python -m vesuvius.structure_tensor.run_create_st --input_dir /home/pi/scrollprize_work/runs/C27/crop.zarr --output_dir st_fix --patch_size 64,64,64 --keep-eigen
+   exit code 0  wall 37 s
+ALLDONE
+--- st_main.log (tail):
+--- Structure Tensor Processing Completed Successfully ---
+Output saved to: st_main.zarr
+
+--- Running Eigenanalysis ---
+
+Eigenanalysis completed successfully
+
+--- All computations completed successfully ---
+  - Structure tensor: st_main.zarr/structure_tensor
+  - first_component/, second_component/, normal/, confidence/ (scale '0', ds=1)
+  - Eigenvectors: st_main.zarr/eigenvectors
+  - Eigenvalues:  st_main.zarr/eigenvalues
+--- st_fix.log (tail):
+--- Structure Tensor Processing Completed Successfully ---
+Output saved to: st_fix.zarr
+
+--- Running Eigenanalysis ---
+
+Eigenanalysis completed successfully
+
+--- All computations completed successfully ---
+  - Structure tensor: st_fix.zarr/structure_tensor
+  - first_component/, second_component/, normal/, confidence/ (scale '0', ds=1)
+  - Eigenvectors: st_fix.zarr/eigenvectors
+  - Eigenvalues:  st_fix.zarr/eigenvalues
+
+================ 2. c94_measure.py (antiparallel adjacent-normal fraction per axis, mean dot) ================
+cmd: cd runs/RB/C94main && OMP_NUM_THREADS=1 python ../C94/c94_measure.py st_main.zarr st_fix.zarr
+st_main.zarr [normal/ uint8]: material voxels 1205628 / 2097152
+  z: pairs=1195132  antiparallel=48.88%  mean|dot|=0.9651  mean dot=0.0225
+  y: pairs=1189244  antiparallel=49.37%  mean|dot|=0.9243  mean dot=0.0124
+  x: pairs=1195470  antiparallel=48.81%  mean|dot|=0.9639  mean dot=0.0236
+st_main.zarr [eigenvectors float32, v2]: material voxels 1205628 / 2097152
+  z: pairs=1195132  antiparallel=48.88%  mean|dot|=0.9650  mean dot=0.0225
+  y: pairs=1189244  antiparallel=49.37%  mean|dot|=0.9242  mean dot=0.0124
+  x: pairs=1195470  antiparallel=48.81%  mean|dot|=0.9638  mean dot=0.0236
+  det: min=1.0000 max=1.0000 negatives=0
+  v2_z < 0 count: 586035
+st_fix.zarr [normal/ uint8]: material voxels 1205628 / 2097152
+  z: pairs=1195132  antiparallel=5.75%  mean|dot|=0.9651  mean dot=0.8668
+  y: pairs=1189244  antiparallel=8.89%  mean|dot|=0.9243  mean dot=0.7911
+  x: pairs=1195470  antiparallel=5.67%  mean|dot|=0.9639  mean dot=0.8659
+st_fix.zarr [eigenvectors float32, v2]: material voxels 1205628 / 2097152
+  z: pairs=1195132  antiparallel=5.75%  mean|dot|=0.9650  mean dot=0.8667
+  y: pairs=1189244  antiparallel=8.89%  mean|dot|=0.9242  mean dot=0.7910
+  x: pairs=1195470  antiparallel=5.67%  mean|dot|=0.9638  mean dot=0.8657
+  det: min=1.0000 max=1.0000 negatives=0
+  v2_z < 0 count: 547968
+
+================ 3. compute_vf (both trees in parallel via nohup; script run_vf.sh) ================
+Same arguments as the 12:17 stacked run: xi 2, CPU, 64^3 chunks (8 chunks), --export-field N --write-confidence (no --ome-u8, so only
+float U/V/N are written, as in runs/RB/C94/vf_*.zarr). --input-zarr is the SAME mask file the 12:17 run used,
+runs/RB/C94/c94_mask.zarr (uint8, 1 = material voxel of the smoothed eigen output, 0 elsewhere); compute_vf's load_density_mask
+selects (input == eigen index), so the eigen index must be 1 (verified: mask==1 count 1340400 == material(c94_orig.zarr); an index-0
+run would select only empty voxels). The unsmoothed material set (1205628 voxels) is a strict subset of mask==1, so this mask is
+equivalent to an own-material mask for both standalone runs.
+FAILED/ABORTED first attempt: run_vf.sh was first launched with "--eigen 0:st_*.zarr" (wrong label index -> all-zero field); it was
+killed after ~1 min, its partial vf_*.zarr deleted, and relaunched with "--eigen 1:" (log of the aborted launch: run_vf_WRONGIDX0_aborted.out).
+  | #!/usr/bin/env bash
+  | # compute_vf (xi 2, CPU, 64^3 chunks) on the two standalone eigen outputs, both trees, in parallel.
+  | cd /home/pi/scrollprize_work/runs/RB/C94main
+  | PY=/home/pi/scrollprize_work/.venv314/bin/python
+  | MASK=/home/pi/scrollprize_work/runs/RB/C94/c94_mask.zarr
+  | for pair in "main:main" "fix:tree"; do
+  |   tag=${pair%%:*}; src=${pair##*:}
+  |   rm -rf vf_$tag.zarr
+  |   echo "=== vf_$tag  PYTHONPATH=$src/vesuvius/src OMP_NUM_THREADS=4 CUDA_VISIBLE_DEVICES= $PY -m vesuvius.structure_tensor.compute_vf --input-zarr $MASK --eigen 1:st_$tag.zarr --xi 2 --device cpu --chunk-size 64,64,64 --output-zarr vf_$tag.zarr --export-field N --write-confidence"
+  |   ( t0=$(date +%s); PYTHONPATH=$src/vesuvius/src OMP_NUM_THREADS=4 CUDA_VISIBLE_DEVICES= $PY -m vesuvius.structure_tensor.compute_vf --input-zarr $MASK --eigen 1:st_$tag.zarr --xi 2 --device cpu --chunk-size 64,64,64 --output-zarr vf_$tag.zarr --export-field N --write-confidence > vf_$tag.log 2>&1; echo "vf_$tag exit code $?  wall $(( $(date +%s) - t0 )) s" >> run_vf.out ) &
+  | done
+  | wait
+  | echo ALLDONE >> run_vf.out
+--- run_vf.out:
+=== vf_main  PYTHONPATH=main/vesuvius/src OMP_NUM_THREADS=4 CUDA_VISIBLE_DEVICES= /home/pi/scrollprize_work/.venv314/bin/python -m vesuvius.structure_tensor.compute_vf --input-zarr /home/pi/scrollprize_work/runs/RB/C94/c94_mask.zarr --eigen 1:st_main.zarr --xi 2 --device cpu --chunk-size 64,64,64 --output-zarr vf_main.zarr --export-field N --write-confidence
+=== vf_fix  PYTHONPATH=tree/vesuvius/src OMP_NUM_THREADS=4 CUDA_VISIBLE_DEVICES= /home/pi/scrollprize_work/.venv314/bin/python -m vesuvius.structure_tensor.compute_vf --input-zarr /home/pi/scrollprize_work/runs/RB/C94/c94_mask.zarr --eigen 1:st_fix.zarr --xi 2 --device cpu --chunk-size 64,64,64 --output-zarr vf_fix.zarr --export-field N --write-confidence
+vf_fix exit code 0  wall 220 s
+vf_main exit code 0  wall 225 s
+ALLDONE
+--- vf_main.log (tail):
+Vector‐field chunks: 100%|██████████| 8/8 [03:39<00:00, 26.19s/chunk]
+Vector‐field chunks: 100%|██████████| 8/8 [03:39<00:00, 27.48s/chunk]
+✔ chunked U, V, N written to vf_main.zarr
+--- vf_fix.log (tail):
+Vector‐field chunks: 100%|██████████| 8/8 [03:34<00:00, 26.57s/chunk]
+Vector‐field chunks: 100%|██████████| 8/8 [03:34<00:00, 26.79s/chunk]
+✔ chunked U, V, N written to vf_fix.zarr
+--- mask checks (maskcheck2.py / maskcheck3.py):
+mask==0 count 756752 corr with crop>0: 0 756752
+/home/pi/scrollprize_work/runs/RB/C94main/st_main.zarr material 1205628 mask==0 equals material False mask==0 & material 0
+/home/pi/scrollprize_work/runs/RB/C94main/st_fix.zarr material 1205628 mask==0 equals material False mask==0 & material 0
+structure_tensor main==fix: True  main==C27/st_main(2026-10-06): True  maxabsdiff 0.0
+mask==1 count 1340400 equals material(smoothed c94_orig) True
+vf_orig N nonzero 1462176  nonzero within mask==1 only? 121776 (outside-mask nonzero count; smoothing spreads so >0 expected if mask==1 was used)
+material(unsmoothed st_main) 1205628 subset of mask==1: True outside count 0
+
+================ 4. c94_vf_measure.py (compute_vf confidence = ||smoothed N|| clamped to 1, interior material voxels, rad=6) ================
+cmd: cd runs/RB/C94main && OMP_NUM_THREADS=2 python ../C94/c94_vf_measure.py st_main.zarr vf_main.zarr 2
+                           OMP_NUM_THREADS=2 python ../C94/c94_vf_measure.py st_fix.zarr  vf_fix.zarr  2
+vf_main.zarr: interior material voxels 923608
+  confidence (float N): mean 0.057  median 0.044  frac<0.25 97.5%  frac>0.75 0.0%
+  |cos|(smoothed dir, local eigenvector v2): mean 0.762  median 0.894
+  tree: ['N', 'U', 'V']
+vf_fix.zarr: interior material voxels 923608
+  confidence (float N): mean 0.699  median 0.690  frac<0.25 0.2%  frac>0.75 41.5%
+  |cos|(smoothed dir, local eigenvector v2): mean 0.828  median 0.964
+  tree: ['N', 'U', 'V']
+
+================ 5. Summary ================
+standalone (main e0bbb8b, unsmoothed tensor)           before (main)        after (main+C94)
+  antiparallel pairs z/y/x                             48.88/49.37/48.81%   5.75/8.89/5.67%
+  mean dot z/y/x                                       0.023/0.012/0.024    0.867/0.791/0.866
+  compute_vf confidence mean / median                  0.057 / 0.044        0.699 / 0.690
+  compute_vf confidence share<0.25 / share>0.75        97.5% / 0.0%         0.2% / 41.5%
+  mean |cos|(smoothed dir, local v2)                   0.762                0.828
+stacked on C44 (smoothed tensor, 12:16 run, for reference)
+  antiparallel pairs z/y/x                             17.81/18.01/15.41%   2.43/2.78/2.35%
+  compute_vf confidence mean, share<0.25               0.359, 41.1%         0.841, 0.7%
+Wall times: compute_st 38 s (main) / 37 s (fix), sequential; compute_vf 225 s (main) / 220 s (fix), the two run concurrently.
+Residual 5.7-8.9% antiparallel after the fix on the unsmoothed tensor are genuine neighbour disagreements of a noisy per-voxel
+normal (the largest-|component| rule only switches sign on the |n_i|==|n_j| planes); C44 smoothing removes most of them (-> 2.4-2.8%).
