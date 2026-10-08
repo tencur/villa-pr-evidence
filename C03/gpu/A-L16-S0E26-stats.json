@@ -1,0 +1,39 @@
+{
+ "tag": "A-L16-S0E26",
+ "role": "A",
+ "layerset": "16",
+ "start": 0,
+ "end": 26,
+ "start_z": 0,
+ "end_z": 26,
+ "n_layers": 26,
+ "prepare_s": 3.4,
+ "infer_s": 1087.2,
+ "zarr": {
+  "shape": [
+   5360,
+   5998,
+   26
+  ],
+  "dtype": "uint8",
+  "sample_min": 0,
+  "sample_max": 255,
+  "sample_mean": 181.62874423963135,
+  "frac_255": 0.7122695852534562
+ },
+ "pred_shape": [
+  5360,
+  5998
+ ],
+ "pred_dtype": "uint8",
+ "pred_mean": 29.57319855996775,
+ "pred_std": 18.663837237844643,
+ "pred_frac_gt_128": 0.0,
+ "pred_frac_gt_64": 0.010553766678445054,
+ "pred_sha256": "2a5e12c29f0be9113877e0199e62f7ec933fb913f817d2578a9ce4576383a7ca",
+ "layer_sha256": {
+  "00.tif": "abe32f99ceabb168a56b201489a027be052dcbbe00ee4dd8c996bf335453e5b7",
+  "01.tif": "60039732d022dea08e604c16ae6c12f9b901973136341d30cd8a68061f9e8601"
+ },
+ "gpu_mem_peak_mib": 2560.71923828125
+}
