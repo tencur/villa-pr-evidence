@@ -1,0 +1,11 @@
+# 2026-10-08T12:59Z commit 98bc5c8 (rebased onto e0bbb8b), rackpi6 runs/RB/C02/tree (Python 3.14, .venv314)
+..............                                                           [100%]
+14 passed in 2.07s
+
+# the new test file run against upstream main's package (e0bbb8b export, runs/RB/C02/main)
+FAILED tests/test_reduce_partition_cache.py::ReducePartitionCacheTests::test_larger_second_run_does_not_fail_on_first_run_shape
+FAILED tests/test_reduce_partition_cache.py::ReducePartitionCacheTests::test_partitions_of_one_run_are_blended_together
+FAILED tests/test_reduce_partition_cache.py::ReducePartitionCacheTests::test_rerun_with_fewer_partitions_ignores_earlier_partitions
+FAILED tests/test_reduce_partition_cache.py::ReducePartitionCacheTests::test_second_run_is_not_blended_from_first_run
+FAILED tests/test_reduce_partition_cache.py::ReducePartitionCacheTests::test_smaller_second_run_is_not_a_crop_of_first_run
+5 failed, 1 passed in 1.97s

@@ -159,4 +159,46 @@ st: middle eigenvalue / largest (strong-gradient half): median 0.0924, 90th pct 
 st: confidence values: median 153, share at 255 1.17%, share >= 250 18.66%, distinct 256
 st: first_component neighbour coherence |dot|: z 0.622, y 0.618, x 0.624 (random unit vectors ~0.5)
 
+== C02 on main  (code: /home/pi/scrollprize_work/repos/villa)
+-- run 1 (partitions: /home/pi/scrollprize_work/runs/C03/pred/parts_before), then run 2 (partitions: /home/pi/scrollprize_work/runs/C03/pred/parts_after), nothing cleaned in between
+run1: exit 0, log says 'Reduce completed successfully' 1 time(s)
+run2: exit 0, log says 'Reduce completed successfully' 1 time(s)
+-- run 2 again after removing /tmp/partition_cache by hand (reference)
+run2_reference: exit 0, log says 'Reduce completed successfully' 1 time(s)
+run1            run1.tif             shape=(640, 640) mean= 38.023 nonzero=0.938 sha256=61eb75d5a8f64f24
+run2            run2.tif             shape=(640, 640) mean= 38.023 nonzero=0.938 sha256=61eb75d5a8f64f24
+run2_reference  run2_reference.tif   shape=(640, 640) mean= 54.411 nonzero=0.994 sha256=d73a4802d5b35fee
+run1 vs run2: identical=True differing_pixels=0 (0.00%) max_abs_diff=0
+run1 vs run2_reference: identical=False differing_pixels=402723 (98.32%) max_abs_diff=235
+run2 vs run2_reference: identical=False differing_pixels=402723 (98.32%) max_abs_diff=235
+wrote c02_compare.png
+cache directories left behind by the three reduces: /tmp/partition_cache 
+
+== C02 on fix  (code: /home/pi/scrollprize_work/runs/RB/C02/tree)
+-- run 1 (partitions: /home/pi/scrollprize_work/runs/C03/pred/parts_before), then run 2 (partitions: /home/pi/scrollprize_work/runs/C03/pred/parts_after), nothing cleaned in between
+run1: exit 0, log says 'Reduce completed successfully' 1 time(s)
+run2: exit 0, log says 'Reduce completed successfully' 1 time(s)
+-- run 2 again after removing /tmp/partition_cache by hand (reference)
+run2_reference: exit 0, log says 'Reduce completed successfully' 1 time(s)
+run1            run1.tif             shape=(640, 640) mean= 38.023 nonzero=0.938 sha256=61eb75d5a8f64f24
+run2            run2.tif             shape=(640, 640) mean= 54.411 nonzero=0.994 sha256=d73a4802d5b35fee
+run2_reference  run2_reference.tif   shape=(640, 640) mean= 54.411 nonzero=0.994 sha256=d73a4802d5b35fee
+run1 vs run2: identical=False differing_pixels=402723 (98.32%) max_abs_diff=235
+run1 vs run2_reference: identical=False differing_pixels=402723 (98.32%) max_abs_diff=235
+run2 vs run2_reference: identical=True differing_pixels=0 (0.00%) max_abs_diff=0
+wrote c02_compare.png
+cache directories left behind by the three reduces: none
+
+== C96 on main  (code: /home/pi/scrollprize_work/repos/villa)
+after 'import processing': OPENCV_IO_MAX_IMAGE_PIXELS=0  (OpenCV 5.0.0, Python 3.14.8)
+cv2.imread of a 64x64 PNG: error: /modules/imgcodecs/src/loadsave.cpp:79: error: (-215:Assertion failed) pixels <= CV_IO_MAX_IMAGE_PIXELS in function 'validateInputImageSize'
+layer reader (_read_gray_any) on a real 5998x5360 layer saved as PNG: None (decode failed)
+layer reader (_read_gray_any) on the same layer as 16-bit TIFF (production path, tifffile): read, shape (5360, 5998) dtype uint8
+
+== C96 on fix  (code: /home/pi/scrollprize_work/runs/RB/C96/tree)
+after 'import processing': OPENCV_IO_MAX_IMAGE_PIXELS=1099511627776  (OpenCV 5.0.0, Python 3.14.8)
+cv2.imread of a 64x64 PNG: read, shape (64, 64) dtype uint8
+layer reader (_read_gray_any) on a real 5998x5360 layer saved as PNG: read, shape (5360, 5998) dtype uint8
+layer reader (_read_gray_any) on the same layer as 16-bit TIFF (production path, tifffile): read, shape (5360, 5998) dtype uint8
+
 ALLDONE

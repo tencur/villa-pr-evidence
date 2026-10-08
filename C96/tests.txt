@@ -1,0 +1,9 @@
+# 2026-10-08T12:59Z commit cb380f19 on e0bbb8b, rackpi6 runs/RB/C96/tree (Python 3.14, .venv314, opencv-python-headless 5.0.0.93)
+.........                                                                [100%]
+9 passed in 3.88s
+
+# the new test file run against upstream main's package (e0bbb8b export, runs/RB/C96/main)
+E         cv2.error: OpenCV(5.0.0) /io/opencv/modules/imgcodecs/src/loadsave.cpp:79: error: (-215:Assertion failed) pixels <= CV_IO_MAX_IMAGE_PIXELS in function 'validateInputImageSize'
+FAILED tests/test_opencv_pixel_limit.py::test_cv2_can_decode_after_importing_the_package
+1 failed in 2.34s
+# whole folder on main's package with the new test added: 1 failed, 8 passed in 3.65s

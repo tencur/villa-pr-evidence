@@ -6,6 +6,7 @@ Each folder is named after one PR and holds:
 - `screenshot_before.png` and `screenshot_after.png`: terminal output of `run_proof.sh <ID> main` (upstream main `e0bbb8b`) and `run_proof.sh <ID> fix` (the PR branch), on the same data and settings.
 - `scripts/`: the reproduction scripts that `run_proof.sh` calls.
 - `tests.txt`: the current test results for the PR (`rebased_rerun.txt` where the PR has not changed since the rebase).
+- C02 also holds `c02_compare.png` (the three reduce outputs side by side).
 
 `FINAL_PROOFS.txt` is the complete output of the final run for every PR, on main and on the fix.
 
@@ -28,6 +29,8 @@ directory layout is the machine I ran it on (Raspberry Pi 5, CPU only, Python 3.
 | [C49](C49/) | vesuvius.predict: store logits for train.py checkpoints with an output activation |
 | [C52](C52/) | vesuvius.train: validate on logits for targets with an output activation |
 | [C44](C44/) | vesuvius.compute_st: integrate the structure tensor by default |
+| [C02](C02/) | optimized_inference: reduce blends the partitions of the run it was asked for, not a previous run's |
+| [C96](C96/) | optimized_inference: give OpenCV a real pixel limit instead of "0" |
 
 ## C03/gpu (added 2026-10-08)
 

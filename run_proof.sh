@@ -35,5 +35,7 @@ C38) cd $R/B01 && NO_SCORE=1 PYTHONPATH=$S/vesuvius/src OMP_NUM_THREADS=2 $P3 ru
 C31) PYTHONPATH=$S/vesuvius/src OMP_NUM_THREADS=2 $P3 $R/C31/reproduce_bg_sampling.py $R/C08/ds $OUT/work 2>&1 | grep -v -i "warn\|INFO" | tail -14 ;;
 C44) cd $OUT && PYTHONPATH=$S/vesuvius/src OMP_NUM_THREADS=2 $P3 -m vesuvius.structure_tensor.run_create_st --input_dir $R/C27/crop.zarr --output_dir st --patch_size 64,64,64 > st.log 2>&1; echo "compute_st exit $?"
      $P3 $RB/analyze_st.py st st 2>&1 | head -3 ;;
+C02) bash $R/C02/reproduce_stale_reduce.sh $S/ink-detection/optimized_inference $P2 $R/C03/pred/parts_before $R/C03/pred/parts_after $OUT/work ;;
+C96) $P3 $R/C96/opencv_pixel_limit_probe.py $S/ink-detection/optimized_inference $R/C03/demo/layers/32.tif $OUT/work ;;
 *) echo "unknown ID"; exit 2 ;;
 esac
