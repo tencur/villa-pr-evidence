@@ -1,0 +1,66 @@
+{
+ "tag": "A-L16-S0E26",
+ "role": "A",
+ "layerset": "16",
+ "start": 0,
+ "end": 26,
+ "start_z": 0,
+ "end_z": 26,
+ "n_layers": 26,
+ "prepare_s": 35.2,
+ "infer_s": 1025.8,
+ "zarr": {
+  "shape": [
+   3840,
+   29542,
+   26
+  ],
+  "dtype": "uint8",
+  "sample_min": 0,
+  "sample_max": 255,
+  "sample_mean": 198.27295081967213,
+  "frac_255": 0.7775409836065573
+ },
+ "pred_shape": [
+  3840,
+  29542
+ ],
+ "pred_dtype": "uint8",
+ "pred_mean": 32.05952944113466,
+ "pred_std": 17.25535597473988,
+ "pred_frac_gt_128": 2.0909496084670412e-05,
+ "pred_frac_gt_64": 0.007363889053438043,
+ "pred_sha256": "1d646a018f1801afdbf19447e5d6dadfd3495f4dea66869e41e538c51d3ba75c",
+ "layer_sha256": {
+  "00.tif": "4b4c0fc57a62182f10d02607d0b6615b0324ef0f34917e065f43ee152e578174",
+  "01.tif": "80859cfaac1e4d39151dff195d873f6fa877a6c7a332be6ac8cfebdd6f9b27b0"
+ },
+ "gpu_mem_peak_mib": 2561.12548828125,
+ "probe": {
+  "zero": {
+   "in_mean": 0.0,
+   "out_mean": -1.674255609512329,
+   "out_std": 0.10420264303684235,
+   "out_min": -1.8048851490020752,
+   "out_max": -1.4971444606781006,
+   "n": 16
+  },
+  "noise": {
+   "in_mean": 0.49616023898124695,
+   "out_mean": -1.1657800674438477,
+   "out_std": 0.24526239931583405,
+   "out_min": -1.5855506658554077,
+   "out_max": -0.7256952524185181,
+   "n": 16
+  },
+  "real": {
+   "in_mean": 1.0,
+   "out_mean": -1.6231892108917236,
+   "out_std": 0.0717441514134407,
+   "out_min": -1.7160757780075073,
+   "out_max": -1.4789423942565918,
+   "n": 16
+  },
+  "real_vs_zero_out_mean_diff": 0.05106639862060547
+ }
+}
