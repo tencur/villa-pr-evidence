@@ -1,0 +1,130 @@
+== C428 on main (badee18b, zarr 2.18.7)
+-- 1. trailing slash on the array path (as shell tab-completion writes it)
+  before:  chunk files: 15   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: None
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr/ --task recompress --inplace
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr/: [Errno 2] No such file or directory: 'PHerc0500P2_l4.zarr/_tmp' -> 'PHerc0500P2_l4.zarr/'
+  exit status: 1
+  after:   no array at PHerc0500P2_l4.zarr any more (folder gone; no PHerc0500P2_l4.zarr_tmp either: True)
+-- 2. one truncated chunk (3/1/1 cut to 1 MiB, as an interrupted copy leaves it), no --skip-corrupt
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr --task recompress --inplace
+ValueError: cannot reshape array of size 1048576 into shape (128,128,128)
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr: cannot reshape array of size 1048576 into shape (128,128,128)
+  exit status: 1
+  after:   chunk files:  4   of the 15 chunks stored in the public array,  3 read back with the original data   compressor: None
+  (14 of the 15 chunks are intact before the run; 3/1/1 is the truncated one)
+== C428 on fix (cba59f75, zarr 2.18.7)
+-- 1. trailing slash on the array path (as shell tab-completion writes it)
+  before:  chunk files: 15   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: None
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr/ --task recompress --inplace
+  exit status: 0
+  after:   chunk files: 36   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: zstd
+-- 2. one truncated chunk (3/1/1 cut to 1 MiB, as an interrupted copy leaves it), no --skip-corrupt
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr --task recompress --inplace
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr: cannot reshape array of size 1048576 into shape (128,128,128)
+  Restored 14 copied chunks to PHerc0500P2_l4.zarr
+  exit status: 1
+  after:   chunk files: 15   of the 15 chunks stored in the public array, 14 read back with the original data   compressor: None
+  (14 of the 15 chunks are intact before the run; 3/1/1 is the truncated one)
+
+== RERUNS 2026-10-18 (R2 review): run_rd_c428.sh 3 times per side, rackpi1, zarr 2.18.7, systemd-run --user --scope -p MemoryMax=6G.
+== main = villa b29f31095 (zarr_tasks code identical to badee18b); fix = cba59f75f, same tree as the kit commit 189098de (reworded message only).
+== Run 2 kept on main: 0, 0 and 3 of the 14 intact chunks; on the branch: 14, 14 and 14.
+#### run 1 of 3, side main, 2026-10-18T02:00:32Z
+== C428 on main (b29f31095, zarr 2.18.7)
+-- 1. trailing slash on the array path (as shell tab-completion writes it)
+  before:  chunk files: 15   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: None
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr/ --task recompress --inplace
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr/: [Errno 2] No such file or directory: 'PHerc0500P2_l4.zarr/_tmp' -> 'PHerc0500P2_l4.zarr/'
+  exit status: 1
+  after:   no array at PHerc0500P2_l4.zarr any more (folder gone; no PHerc0500P2_l4.zarr_tmp either: True)
+-- 2. one truncated chunk (3/1/1 cut to 1 MiB, as an interrupted copy leaves it), no --skip-corrupt
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr --task recompress --inplace
+ValueError: cannot reshape array of size 1048576 into shape (128,128,128)
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr: cannot reshape array of size 1048576 into shape (128,128,128)
+  exit status: 1
+  after:   chunk files:  1   of the 15 chunks stored in the public array,  0 read back with the original data   compressor: None
+  (14 of the 15 chunks are intact before the run; 3/1/1 is the truncated one)
+#### run 1 of 3, side fix, 2026-10-18T02:00:41Z
+== C428 on fix (cba59f75f, zarr 2.18.7)
+-- 1. trailing slash on the array path (as shell tab-completion writes it)
+  before:  chunk files: 15   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: None
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr/ --task recompress --inplace
+  exit status: 0
+  after:   chunk files: 36   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: zstd
+-- 2. one truncated chunk (3/1/1 cut to 1 MiB, as an interrupted copy leaves it), no --skip-corrupt
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr --task recompress --inplace
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr: cannot reshape array of size 1048576 into shape (128,128,128)
+  Restored 14 copied chunks to PHerc0500P2_l4.zarr
+  exit status: 1
+  after:   chunk files: 15   of the 15 chunks stored in the public array, 14 read back with the original data   compressor: None
+  (14 of the 15 chunks are intact before the run; 3/1/1 is the truncated one)
+#### run 2 of 3, side main, 2026-10-18T02:00:48Z
+== C428 on main (b29f31095, zarr 2.18.7)
+-- 1. trailing slash on the array path (as shell tab-completion writes it)
+  before:  chunk files: 15   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: None
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr/ --task recompress --inplace
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr/: [Errno 2] No such file or directory: 'PHerc0500P2_l4.zarr/_tmp' -> 'PHerc0500P2_l4.zarr/'
+  exit status: 1
+  after:   no array at PHerc0500P2_l4.zarr any more (folder gone; no PHerc0500P2_l4.zarr_tmp either: True)
+-- 2. one truncated chunk (3/1/1 cut to 1 MiB, as an interrupted copy leaves it), no --skip-corrupt
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr --task recompress --inplace
+ValueError: cannot reshape array of size 1048576 into shape (128,128,128)
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr: cannot reshape array of size 1048576 into shape (128,128,128)
+  exit status: 1
+  after:   chunk files:  1   of the 15 chunks stored in the public array,  0 read back with the original data   compressor: None
+  (14 of the 15 chunks are intact before the run; 3/1/1 is the truncated one)
+#### run 2 of 3, side fix, 2026-10-18T02:00:54Z
+== C428 on fix (cba59f75f, zarr 2.18.7)
+-- 1. trailing slash on the array path (as shell tab-completion writes it)
+  before:  chunk files: 15   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: None
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr/ --task recompress --inplace
+  exit status: 0
+  after:   chunk files: 36   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: zstd
+-- 2. one truncated chunk (3/1/1 cut to 1 MiB, as an interrupted copy leaves it), no --skip-corrupt
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr --task recompress --inplace
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr: cannot reshape array of size 1048576 into shape (128,128,128)
+  Restored 14 copied chunks to PHerc0500P2_l4.zarr
+  exit status: 1
+  after:   chunk files: 15   of the 15 chunks stored in the public array, 14 read back with the original data   compressor: None
+  (14 of the 15 chunks are intact before the run; 3/1/1 is the truncated one)
+#### run 3 of 3, side main, 2026-10-18T02:01:01Z
+== C428 on main (b29f31095, zarr 2.18.7)
+-- 1. trailing slash on the array path (as shell tab-completion writes it)
+  before:  chunk files: 15   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: None
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr/ --task recompress --inplace
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr/: [Errno 2] No such file or directory: 'PHerc0500P2_l4.zarr/_tmp' -> 'PHerc0500P2_l4.zarr/'
+  exit status: 1
+  after:   no array at PHerc0500P2_l4.zarr any more (folder gone; no PHerc0500P2_l4.zarr_tmp either: True)
+-- 2. one truncated chunk (3/1/1 cut to 1 MiB, as an interrupted copy leaves it), no --skip-corrupt
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr --task recompress --inplace
+ValueError: cannot reshape array of size 1048576 into shape (128,128,128)
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr: cannot reshape array of size 1048576 into shape (128,128,128)
+  exit status: 1
+  after:   chunk files:  4   of the 15 chunks stored in the public array,  3 read back with the original data   compressor: None
+  (14 of the 15 chunks are intact before the run; 3/1/1 is the truncated one)
+#### run 3 of 3, side fix, 2026-10-18T02:01:09Z
+== C428 on fix (cba59f75f, zarr 2.18.7)
+-- 1. trailing slash on the array path (as shell tab-completion writes it)
+  before:  chunk files: 15   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: None
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr/ --task recompress --inplace
+  exit status: 0
+  after:   chunk files: 36   of the 15 chunks stored in the public array, 15 read back with the original data   compressor: zstd
+-- 2. one truncated chunk (3/1/1 cut to 1 MiB, as an interrupted copy leaves it), no --skip-corrupt
+$ vesuvius.zarr_tasks PHerc0500P2_l4.zarr --task recompress --inplace
+    raise RuntimeError(f"Recompression failed for {level_path}: {e}") from e
+RuntimeError: Recompression failed for PHerc0500P2_l4.zarr: cannot reshape array of size 1048576 into shape (128,128,128)
+  Restored 14 copied chunks to PHerc0500P2_l4.zarr
+  exit status: 1
+  after:   chunk files: 15   of the 15 chunks stored in the public array, 14 read back with the original data   compressor: None
+  (14 of the 15 chunks are intact before the run; 3/1/1 is the truncated one)
