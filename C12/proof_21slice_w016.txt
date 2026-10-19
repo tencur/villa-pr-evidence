@@ -1,0 +1,29 @@
+21-slice real-data run, 2026-10-18 (R2 review), rackpi1, Python 3.13 / torch 2.14 CPU / zarr 3.2.1, systemd-run MemoryMax=6G.
+Data: scripts/prepare_21slice_w016.sh (README example pherc0139-w016 = public PHerc0139 w029; volume (21, 7020, 7220)).
+Command: python reproduce_label_depth.py <out_dir>/aligned-scrollprizeorg-21slices <work_dir>
+main = villa b29f31095; fix = b29f31095 + this kit's flat-label-depth-window.patch (5e5f8d59).
+
+## main: b29f31095, 2026-10-18T02:05:25Z
+segment pherc0139-w016
+1. published label stores
+   label store shape (21, 7020, 7220); training patches found: 898
+   of 449 sampled patches, 449 carry any supervised pixel; supervised pixels 4774956, ink pixels 1174046
+2. labelling loop: label images saved as TIFF, then create_label_zarrs
+   Processed 2 image(s): 2 written, 0 skipped, 0 failed.
+   label store shape (65, 7020, 7220); training patches found: 898
+   of 449 sampled patches, 141 carry any supervised pixel; supervised pixels 1249779, ink pixels 0
+## fix: b29f31095 + kit patch flat-label-depth-window.patch (5e5f8d59), 2026-10-18T02:07:50Z
+segment pherc0139-w016
+1. published label stores
+   label store shape (21, 7020, 7220); training patches found: 898
+   of 449 sampled patches, 449 carry any supervised pixel; supervised pixels 4774956, ink pixels 1174046
+2. labelling loop: label images saved as TIFF, then create_label_zarrs
+   Processed 2 image(s): 2 written, 0 skipped, 0 failed.
+   label store shape (65, 7020, 7220); training patches found: 898
+   of 449 sampled patches, 449 carry any supervised pixel; supervised pixels 4774956, ink pixels 1174046
+
+## main: count_validation_patches.py work_main/out_converted.json (after create_label_zarrs)
+patches 898 sampled 449 validation among sampled 141
+validation sampled patches with supervision 141
+(so on main all 141 supervised samples are validation patches, whose 21-plane validation mask was not re-converted;
+ their ink labels are read from empty planes of the 65-plane store, and the 308 training patches sampled carry no supervision)
