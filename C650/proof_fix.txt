@@ -1,0 +1,16 @@
+
+=== patch depth 12, model_config.input_pad_depth_to 16 ===
+config: mode=full_3d model_type=vesuvius_unet patch_size=[12, 64, 64] model_config.input_pad_depth_to=16
+input: real CT crop (1, 1, 12, 64, 64) (uint8 mean 27.9)
+training path : network input depth 16
+native infer  : network input depth 16  (TargetModel.input_pad_depth_to=16)
+probabilities vs training path over 49152 voxels: max |diff| 0.0000, mean 0.0000, voxels on the other side of 0.5: 0
+RESULT: OK, inference reproduces the training path (input depth and output resize)
+
+=== patch depth 13, model_config.input_pad_depth_to 16 ===
+config: mode=full_3d model_type=vesuvius_unet patch_size=[13, 64, 64] model_config.input_pad_depth_to=16
+input: real CT crop (1, 1, 13, 64, 64) (uint8 mean 27.9)
+training path : network input depth 16
+native infer  : network input depth 16  (TargetModel.input_pad_depth_to=16)
+probabilities vs training path over 53248 voxels: max |diff| 0.0000, mean 0.0000, voxels on the other side of 0.5: 0
+RESULT: OK, inference reproduces the training path (input depth and output resize)
