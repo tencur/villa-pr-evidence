@@ -1,0 +1,8 @@
+segment w035
+1. published label stores
+   label store shape (28, 5820, 5240); training patches found: 1247
+   of 312 sampled patches, 312 carry any supervised pixel; supervised pixels 3454843, ink pixels 1055589
+2. labelling loop: label images saved as TIFF, then create_label_zarrs
+   Processed 2 image(s): 2 written, 0 skipped, 0 failed.
+   label store shape (65, 5820, 5240); training patches found: 1247
+   of 312 sampled patches, 0 carry any supervised pixel; supervised pixels 0, ink pixels 0

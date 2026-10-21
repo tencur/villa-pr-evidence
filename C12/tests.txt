@@ -1,3 +1,21 @@
+# 2026-10-20 P1 merge-ready pass: fix/flat-label-depth-window b043f0f68 (test-only change: the tautological
+# v7 cache-token test dropped, the two patch_finding_subtiling imports merged). Run on rackpi1, Python 3.13.5,
+# torch 2.14.1+cpu (fixwork/venv), the kit patch applied to upstream main 344ada66b (worktree /home/pi/fixwork/p1/c12p).
+# command: cd vesuvius && PYTHONPATH=$PWD/src python -m pytest -q -p no:cacheprovider <files>
+## branch: tests/ink_detection/test_data_foundation.py
+26 passed
+## main 344ada66b + this branch's test file
+3 failed, 23 passed (test_flat_sample_reads_converted_labels_at_their_own_mid_plane,
+test_patch_discovery_reads_each_label_store_at_its_own_mid_plane, test_subtiling_patches_take_their_depth_window_from_the_image)
+## branch: tests/ink_detection (whole directory)
+301 passed, 10 skipped (main 344ada66b: 298 passed, 10 skipped)
+# (earlier runs below)
+
+# 2026-10-09 rebase onto origin/main a329895e (F2 lane O): fix/flat-label-depth-window 5e5f8d59 on a329895e, rackpi6 runs/RB/C12/fix_a329 (git export of a329895e + this kit's .patch; Python 3.14.8 .venv314)
+# none of this branch's files changed upstream; the kit's own test files rerun: vesuvius/tests/ink_detection/test_data_foundation.py 
+27 passed in 10.32s
+# (earlier runs below)
+
 Run 2026-10-07 on a Raspberry Pi 5 (Python 3.14, torch 2.12 CPU) against the PR branch rebased on upstream main e0bbb8b.
 "Main code" = the same test file run with the PR's source files replaced by upstream main's.
 
