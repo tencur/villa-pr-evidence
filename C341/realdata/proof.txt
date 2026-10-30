@@ -1,0 +1,10 @@
+== C341 on main (villa main 4eecd08f)
+input: published PHerc0500P2 surface prediction (128, 256, 256), 636549 surface voxels; shipped settings
+dust threshold given to the skeletonizer: 400 (prepare_cc_labels cutoff: 6 downsampled voxels)
+slabs: 15, slabs without any track: 15
+tracks written: 0, track points: 0
+== C341 on fix (fix/surface-tracks-dust-threshold-downsampled)
+input: published PHerc0500P2 surface prediction (128, 256, 256), 636549 surface voxels; shipped settings
+dust threshold given to the skeletonizer: 6 (prepare_cc_labels cutoff: 6 downsampled voxels)
+slabs: 15, slabs without any track: 3
+tracks written: 46, track points: 1306
