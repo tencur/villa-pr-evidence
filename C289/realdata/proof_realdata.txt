@@ -1,0 +1,8 @@
+== C289 on main  (2026-10-13T03:48:52Z)
+input: public PHerc0139 lasagna prediction (cos/grad_mag/nx/ny, level 4, z 2400-2463, y/x 800-863), packed as preprocessed zarrs
+RESULT crop x,y,z,w,h,d=[10, 0, 0, 40, 64, 64]: exit 0; voxels in the crop that differ from their source: 357,149 of 655,360 (54.5 %)
+RESULT crop x,y,z,w,h,d=[5, 7, 3, 50, 40, 45]: exit 0; voxels in the crop that differ from their source: 331,586 of 360,000 (92.1 %)
+== C289 on fix  (2026-10-13T03:48:56Z)
+input: public PHerc0139 lasagna prediction (cos/grad_mag/nx/ny, level 4, z 2400-2463, y/x 800-863), packed as preprocessed zarrs
+RESULT crop x,y,z,w,h,d=[10, 0, 0, 40, 64, 64]: exit 0; voxels in the crop that differ from their source: 0 of 655,360 (0.0 %)
+RESULT crop x,y,z,w,h,d=[5, 7, 3, 50, 40, 45]: exit 0; voxels in the crop that differ from their source: 0 of 360,000 (0.0 %)

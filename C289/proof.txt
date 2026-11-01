@@ -1,0 +1,6 @@
+=== main (4eecd08f)
+RESULT crop x,y,z,w,h,d=[10, 0, 0, 40, 64, 64]: exit 0; voxels in the crop that differ from their source: 359,649 of 655,360 (54.9 %)
+RESULT crop x,y,z,w,h,d=[5, 7, 3, 50, 40, 45]: exit 0; voxels in the crop that differ from their source: 337,042 of 360,000 (93.6 %)
+=== fix
+RESULT crop x,y,z,w,h,d=[10, 0, 0, 40, 64, 64]: exit 0; voxels in the crop that differ from their source: 0 of 655,360 (0.0 %)
+RESULT crop x,y,z,w,h,d=[5, 7, 3, 50, 40, 45]: exit 0; voxels in the crop that differ from their source: 0 of 360,000 (0.0 %)
