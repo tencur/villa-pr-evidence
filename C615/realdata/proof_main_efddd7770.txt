@@ -1,0 +1,6 @@
+-- upstream main efddd7770
+PHerc0332 surface prediction crop z/y/x 3840/1728/1728 + 500^3: values [0, 255], 18,498,790 nonzero voxels
+grids_to_zarr.py ships map = True with value_map {0: 0, 1: 255}
+apply_thresholds output values [0, 255]; foreground in the trimmed block: 18,498,790
+grids_to_zarr says: All files processed successfully!
+combined zarr: 0 nonzero voxels; equal to the thresholded block: False
