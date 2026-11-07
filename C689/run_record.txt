@@ -1,0 +1,14 @@
+# rackpi1, sparse worktree /home/pi/fixwork/h11Z3/wt, each fix one commit on upstream main 7e6b82164; vc_reader cp313 module built from main
+## C689 main 7e6b82164 (extract_surface_tracks.py from main, test from the branch)
+1 failed, 28 deselected in 6.70s
+E       ModuleNotFoundError: No module named 'vesuvius.data.utils'
+FAILED tests/test_extract_surface_tracks.py::test_cpu_backend_opens_a_real_zarr
+## C689 branch 09ee23ca0
+1 passed, 28 deselected in 6.10s
+
+# 2026-11-07 ~05:25Z re-proof of the PR head cda35ee6f on upstream main 7e6b82164 (rackpi1, Python 3.13.5, vc_reader built from 7e6b82164)
+# tests: branch new test 1 passed, whole tests/test_extract_surface_tracks.py 28 passed 1 skipped;
+#        main extract_surface_tracks.py + branch tests: test_cpu_backend_opens_a_real_zarr FAILED, ModuleNotFoundError: No module named 'vesuvius.data.utils'
+# CLI:   python make_preds.py preds.zarr
+#        python extract_surface_tracks.py --backend cpu --predictions preds.zarr --z-min 0 --z-max 96 --no-packed-store --out X.dbm [--slab-workers 3 --kimimaro-parallel 1]
+#        main: exit 1 (ModuleNotFoundError: No module named 'vesuvius.data.utils'); branch: exit 0, 28 keys, 89 tracks; 3 workers: same tracks under every key
