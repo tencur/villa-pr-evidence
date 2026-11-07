@@ -1,0 +1,35 @@
+--- test_orig.inc.bak-p3	2026-11-07 03:45:26.000000000 +0000
++++ test_orig.inc	2026-11-07 03:45:26.000000000 +0000
+@@ -62,10 +62,12 @@
+         const auto uuid = util::newUuid();
+         {
+             QuadSurface grid(original.clone(), {1.f, 1.f});
+-            state.objectStoreSession()->act(attachment, {{uuid, std::nullopt}}, [&](auto& db, auto& txn) {
+-                create_quad_in_store(db, txn, uuid, grid, "segment", {}, volumeCoordinates(volume->id(), 1),
+-                                     {"surface-rotation-test"});
+-            });
++            // 7e6b82164 (#2462): a checked request, as SurfacePanelStoreTest.inc creates its surfaces.
++            auto request = state.objectStoreSession()->newRequest(attachment);
++            request.expectedObjects = {{uuid, std::nullopt}};
++            request.operations = createSurfaceOperations(uuid, "segment", {}, volumeCoordinates(volume->id(), 1),
++                                                         {"surface-rotation-test"}, grid.meta, quad_surface_geometry(grid));
++            state.objectStoreSession()->submit(attachment, request);
+         }
+ 
+         SurfaceCatalog catalog(state.objectStoreSession());
+@@ -98,11 +100,10 @@
+             if (!row || std::find(uuids.begin(), uuids.end(), active->id) == uuids.end()) return;
+             auto known = module.storePin(active.get());
+             if (!known && panel.opened()) known = panel.opened()->pin;
+-            std::optional<std::string> head;
+-            catalog.session()->read(row->source, [&](const auto& db, const auto& txn, const auto&) {
+-                if (const auto revision = db.currentObjectRevision(txn, active->id)) head = revision->uuid;
+-            });
+-            if (!head || (known && known->objectRevision == *head)) return;
++            // 7e6b82164 (#2462): as CWindow now reads the head and compares the pin.
++            const auto head = catalog.session()->currentObject(row->source, active->id);
++            if (!head || (known && known->version == head->version && known->generation == head->generation)) return;
++            if (module.editingEnabled()) return;
+             panel.activateSurfaceById(active->id);
+         });
+ 

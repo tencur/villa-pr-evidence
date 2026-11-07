@@ -1,0 +1,9 @@
+start 2026-10-29T23:00:21Z
+fix ninja exit 0 2026-10-29T23:00:45Z
+fix ctest exit 0 100% tests passed, 0 tests failed out of 1
+100% tests passed, 0 tests failed out of 1
+pre ninja exit 0 2026-10-29T23:01:01Z
+pre ctest exit 8 0% tests passed, 1 tests failed out of 1
+surface rotation apply test: a second flip starts from the saved geometry: two flips give the original back
+0% tests passed, 1 tests failed out of 1
+done 2026-10-29T23:01:02Z

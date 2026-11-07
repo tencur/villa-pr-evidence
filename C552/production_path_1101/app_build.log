@@ -1,0 +1,8 @@
+main ninja exit 0 22:16:01
+r32 ninja exit 0 22:16:05
+h5e ninja exit 0 22:16:11
+os ninja exit 0 22:21:05
+4077b587ffd58992e02fa37c512a1542dce54c0ac128038be895831d71da5869  /home/pi/scrollprize_work/vcbuild/h5E/app/bin/VC3D.h5e
+7f80722cb1b67a02070a5e6e4a9905810365be2f66d62b319bcb6857748843a2  /home/pi/scrollprize_work/vcbuild/h5E/app/bin/VC3D.main
+a42ad87f780189ec10b3426eb03dbc9a4bafb7c9351ad042605c20f3c9732fab  /home/pi/scrollprize_work/vcbuild/h5E/app/bin/VC3D.r32
+done

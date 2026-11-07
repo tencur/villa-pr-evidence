@@ -1,0 +1,25 @@
+# C552 app runs, 2026-10-30, rackpi6 (arm64 Debian trixie, gcc 14, Qt 6.8), VC3D under Xvfb :99 (Qt xcb), real XTEST mouse clicks.
+# Source: upstream main 558a0156a (git archive incl. vc_object_store, vc_reader); build: QuickBuild -O2, VC_BUILD_APPS=ON.
+# main = VC3D from 558a0156a; fix = the same tree + this PR's patch (7398ab0e9), rebuilt incrementally (one file).
+# Project: new .vcobj with the public PHerc0800 segment 20251028220955 imported by vc_object_ingest (its published
+# meta.json uuid "output_tifxyz" replaced by a fresh UUID; volume_uuid set to VC3D's id for the open volume, scale 1),
+# + the public PHerc0800 volume 20250521135224-8.640um-1.2m-116keV-masked.zarr streamed from the open-data bucket.
+# Harness: c552_gui_1030.py <tag> run; clicks.json (menu/tool positions read off screenshots). The agent bridge only
+# selects the segment once (segments.activate) and reads state; every Rotate/Flip/Apply is a mouse click.
+# Stored geometry after each Apply: vc_object_export of the surface's current revision, compared with the original x/y/z.tif.
+
+=== main, run 1 (runlog_main.txt, screens/main_*)
+  after Apply 1: FLIPPED; max vertex move vs original 1430.6 vx
+  (segment NOT selected again) Actions > Transforms > Rotate: no Rotate/Flip tool appears; status bar "Surface rotation active"
+  (screens/main_apply2_tool.png); the Flip and Apply clicks land on the viewer.
+  after the second Flip + Apply clicks: FLIPPED (same as after Apply 1)
+  state.get after Apply 1 (debug run): activeSurface null
+=== main, runs 2 and 3: same as run 1 (no tool on the second Rotate; stored FLIPPED, same as after Apply 1);
+  screens/main_repeats_apply2_tool.png
+=== fix, run 1 (runlog_fix.txt, screens/fix_*)
+  after Apply 1: FLIPPED; max vertex move vs original 1430.6 vx
+  (segment NOT selected again) Actions > Transforms > Rotate: the tool opens (screens/fix_apply2_tool.png), Flip ticked, Apply
+  after Apply 2 (two flips): ORIGINAL; max vertex move vs original 0.0 vx
+=== fix, run 2: same as run 1 (ORIGINAL after two flips)
+# Note: state.get reports activeSurface null after Apply 1 with both builds (CState's active surface id is empty after the
+# Apply); with the fix the active surface pointer is the saved surface, so beginRotate finds it.

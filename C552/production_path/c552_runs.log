@@ -1,0 +1,22 @@
+=== VC3D build main
+segment 20251028220955: grid 105x105, 5374 valid vertices
+select segment: True
+  before: on disk (x/y/z.tif) ORIGINAL; max vertex move vs original 0.0 vx; mtime 17:30:32
+Apply 1: Actions > Transforms > Rotate, tick 'Flip horizontally', Apply
+  after Apply 1: on disk (x/y/z.tif) FLIPPED; max vertex move vs original 1430.6 vx; mtime 02:05:55
+  active surface after Apply 1: None
+select the segment again in the segment panel (segments.activate): {'activated': True, 'alreadyActive': False}
+Apply 2: Actions > Transforms > Rotate, tick 'Flip horizontally', Apply
+  after Apply 2 (two flips = original): on disk (x/y/z.tif) FLIPPED (same as after Apply 1); max vertex move vs original 1430.6 vx; mtime 02:06:22
+VC3D running: True
+=== VC3D build C552
+segment 20251028220955: grid 105x105, 5374 valid vertices
+select segment: True
+  before: on disk (x/y/z.tif) ORIGINAL; max vertex move vs original 0.0 vx; mtime 17:30:32
+Apply 1: Actions > Transforms > Rotate, tick 'Flip horizontally', Apply
+  after Apply 1: on disk (x/y/z.tif) FLIPPED; max vertex move vs original 1430.6 vx; mtime 02:06:59
+  active surface after Apply 1: None
+select the segment again in the segment panel (segments.activate): {'activated': True, 'alreadyActive': False}
+Apply 2: Actions > Transforms > Rotate, tick 'Flip horizontally', Apply
+  after Apply 2 (two flips = original): on disk (x/y/z.tif) ORIGINAL; max vertex move vs original 0.0 vx; mtime 02:07:25
+VC3D running: True

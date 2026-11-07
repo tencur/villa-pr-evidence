@@ -1,0 +1,19 @@
+vc_object_ingest: 0 1 ingested, 0 problems 
+segment 20251028220955: grid 105x105, 5374 valid vertices
+open volume (state.get): {"id": "20250521135224-8.640um-1.2m-116keV-masked.zarr-59098600b52265ae", "path": "", "volumeIds": ["20250521135224-8.640um-1.2m-116keV-masked.zarr-59098600b52265ae"], "voxelSize": 8.64}
+segments.list: [{'id': 'c3f53f94-53ac-4c04-a04e-10f04e647aff', 'name': '20251028220955', 'active': False}]
+select segment (segments.activate): True
+  before: stored geometry (vc_object_export of the current revision) ORIGINAL; max vertex move vs original 0.0 vx
+Apply 1: Actions > Transforms > Rotate, tick 'Flip horizontally', Apply
+  after Apply 1: stored geometry (vc_object_export of the current revision) FLIPPED; max vertex move vs original 1430.6 vx
+  after Apply 1: state.get activeSurface = {"id": "c3f53f94-53ac-4c04-a04e-10f04e647aff"} (selected segment c3f53f94-53ac-4c04-a04e-10f04e647aff)
+  (the segment is NOT selected again)
+Apply 2: Actions > Transforms > Rotate, tick 'Flip horizontally', Apply
+  after Apply 2 (two flips = original): stored geometry (vc_object_export of the current revision) ORIGINAL; max vertex move vs original 0.0 vx
+  after Apply 2: state.get activeSurface = {"id": "c3f53f94-53ac-4c04-a04e-10f04e647aff"} (selected segment c3f53f94-53ac-4c04-a04e-10f04e647aff)
+Apply 3: Rotate, tick and untick Flip horizontally, Apply (no change)
+  after Apply 3 (no change = original): stored geometry (vc_object_export of the current revision) ORIGINAL; max vertex move vs original 0.0 vx
+  after Apply 3: state.get activeSurface = {"id": "c3f53f94-53ac-4c04-a04e-10f04e647aff"} (selected segment c3f53f94-53ac-4c04-a04e-10f04e647aff)
+  Rotate again after Apply 3: see apply4_tool.png
+VC3D running: True
+exit 0

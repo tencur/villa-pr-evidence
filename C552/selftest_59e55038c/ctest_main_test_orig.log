@@ -1,0 +1,18 @@
+Test project /home/pi/scrollprize_work/vcbuild/h5E/build
+    Start 200: surface_rotation_apply
+1/1 Test #200: surface_rotation_apply ...........***Failed    0.33 sec
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+surface rotation apply test: a second flip starts from the saved geometry: two flips give the original back
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+vc-core    =   0.33 sec*proc (1 test)
+
+Total Test time (real) =   0.34 sec
+
+The following tests FAILED:
+	200 - surface_rotation_apply (Failed)                   vc-core
+Errors while running CTest

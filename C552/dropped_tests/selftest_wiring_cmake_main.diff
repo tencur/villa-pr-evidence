@@ -1,0 +1,45 @@
+diff --git a/volume-cartographer/apps/VC3D/CMakeLists.txt b/volume-cartographer/apps/VC3D/CMakeLists.txt
+index d2403e056..98b1f24ae 100644
+--- a/volume-cartographer/apps/VC3D/CMakeLists.txt
++++ b/volume-cartographer/apps/VC3D/CMakeLists.txt
+@@ -457,7 +457,7 @@ if(EXISTS "${_vc3d_fiber_format_src}/__init__.py")
+ endif()
+ 
+ if(VC_TESTING)
+-    set_source_files_properties(LineAnnotationController.cpp SurfacePanelController.cpp VCAppMain.cpp PROPERTIES COMPILE_DEFINITIONS VC_TESTING)
++    set_source_files_properties(LineAnnotationController.cpp SurfacePanelController.cpp VCAppMain.cpp overlays/SurfaceRotationOverlayController.cpp PROPERTIES COMPILE_DEFINITIONS VC_TESTING)
+     # The in-binary store tests build their fixture volumes with core/test/support.
+     target_include_directories(VC3D PRIVATE ${PROJECT_SOURCE_DIR}/core/test)
+ endif()
+diff --git a/volume-cartographer/apps/VC3D/VCAppMain.cpp b/volume-cartographer/apps/VC3D/VCAppMain.cpp
+index 45de99572..4001a99ad 100644
+--- a/volume-cartographer/apps/VC3D/VCAppMain.cpp
++++ b/volume-cartographer/apps/VC3D/VCAppMain.cpp
+@@ -320,6 +320,12 @@ auto main(int argc, char* argv[]) -> int
+         std::cout.flush(); std::cerr.flush();
+         std::_Exit(result);
+     }
++    if (hasCliFlag(argc, argv, "--test-surface-rotation")) {
++        extern int runSurfaceRotationApplyTests();
++        const int result = runSurfaceRotationApplyTests();
++        std::cout.flush(); std::cerr.flush();
++        std::_Exit(result);
++    }
+ #endif
+     // Wide surface-aligned Spiral overlays can legitimately exceed Qt's
+     // 128-MiB default image-I/O allocation limit. Set the Qt runtime value
+diff --git a/volume-cartographer/apps/VC3D/test/CMakeLists.txt b/volume-cartographer/apps/VC3D/test/CMakeLists.txt
+index 17b4918a1..ba6d44a25 100644
+--- a/volume-cartographer/apps/VC3D/test/CMakeLists.txt
++++ b/volume-cartographer/apps/VC3D/test/CMakeLists.txt
+@@ -644,6 +644,10 @@ if(TARGET VC3D)
+     set_tests_properties(surface_panel_store PROPERTIES
+         ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 90)
+     vc_register_ctest(surface_panel_store VC3D)
++    add_test(NAME surface_rotation_apply COMMAND VC3D --test-surface-rotation)
++    set_tests_properties(surface_rotation_apply PROPERTIES
++        ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 120)
++    vc_register_ctest(surface_rotation_apply VC3D)
+ endif()
+ 
+ add_executable(test_surface_catalog test_surface_catalog.cpp ../SurfaceCatalog.cpp ../SurfaceCatalog.hpp

@@ -1,0 +1,10 @@
+# build main
+9e912b7f199e016d6e92b5ada2bb69096e456e31b123db0e87fa40691296c28f  bin/VC3D
+8b208800c75d82f4c1a3992d920b19691751118adfa6899bf6d51a69f42dce7b  core/libvc_core.so
+# build C552
+38a290a01f31501f74303efdcbd381e5da31bc4333a1a2cf48dd149206d5769d  bin/VC3D
+d66b2be238e6ad58a0a7fff61ea1f9653da4a13a20606646bf35181cdc8d0204  core/libvc_core.so
+../build_main.log:src 5432721dc changes: 
+../build_main.log:ninja exit 0 2026-10-15T01:07:56Z
+../build_C552.log:src 843fde049 changes: 
+../build_C552.log:ninja exit 0 2026-10-15T01:44:08Z

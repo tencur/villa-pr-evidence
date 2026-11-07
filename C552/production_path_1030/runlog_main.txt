@@ -1,0 +1,11 @@
+vc_object_ingest: 0 1 ingested, 0 problems 
+segment 20251028220955: grid 105x105, 5374 valid vertices
+segments.list: [{'id': 'd48afdf2-a1a3-4d53-8a17-bb32fd3d2acd', 'name': '20251028220955', 'active': False}]
+select segment (segments.activate): True
+  before: stored geometry (vc_object_export of the current revision) ORIGINAL; max vertex move vs original 0.0 vx
+Apply 1: Actions > Transforms > Rotate, tick 'Flip horizontally', Apply
+  after Apply 1: stored geometry (vc_object_export of the current revision) FLIPPED; max vertex move vs original 1430.6 vx
+  (the segment is NOT selected again)
+Apply 2: Actions > Transforms > Rotate, tick 'Flip horizontally', Apply
+  after Apply 2 (two flips = original): stored geometry (vc_object_export of the current revision) FLIPPED (same as after Apply 1); max vertex move vs original 1430.6 vx
+VC3D running: True

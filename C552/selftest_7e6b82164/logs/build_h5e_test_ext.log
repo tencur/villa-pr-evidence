@@ -1,0 +1,27 @@
+ninja: Entering directory `/home/pi/scrollprize_work/vcbuild/c552n/build'
+[0/2] Re-checking globbed directories...
+[1/26] Automatic MOC and UIC for target vc3d_app
+[2/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/CWindowContextMenu.cpp.o
+[3/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/vc3d_app_autogen/mocs_compilation.cpp.o
+[4/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/CWindow.cpp.o
+[5/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/StoreImportController.cpp.o
+[6/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/MenuActionController.cpp.o
+[7/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/VolumeAttachmentController.cpp.o
+[8/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeServer.cpp.o
+[9/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeJobs.cpp.o
+[10/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_catalog.cpp.o
+[11/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_session.cpp.o
+[12/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_stores.cpp.o
+[13/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_editing.cpp.o
+[14/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_wrap.cpp.o
+[15/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_fiber.cpp.o
+[16/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_seeding.cpp.o
+[17/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_lasagna.cpp.o
+[18/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_flatten.cpp.o
+[19/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_points.cpp.o
+[20/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_review.cpp.o
+[21/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_viewer.cpp.o
+[22/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_surfaceops.cpp.o
+[23/26] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/overlays/SurfaceRotationOverlayController.cpp.o
+[24/26] Building CXX object apps/VC3D/CMakeFiles/VC3D.dir/VCAppMain.cpp.o
+[25/26] Linking CXX executable bin/VC3D

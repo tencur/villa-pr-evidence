@@ -1,0 +1,10 @@
+Test project /home/pi/scrollprize_work/vcbuild/h5E/build
+    Start 200: surface_rotation_apply
+1/1 Test #200: surface_rotation_apply ...........   Passed    0.33 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+vc-core    =   0.33 sec*proc (1 test)
+
+Total Test time (real) =   0.34 sec

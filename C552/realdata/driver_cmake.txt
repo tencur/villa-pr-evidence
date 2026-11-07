@@ -1,0 +1,13 @@
+# C552 real-data driver (kit only, not part of the PR): links VC3D's objects like the panel tests.
+if(TARGET VC3D)
+    add_executable(c552_realdata_driver
+        ${CMAKE_CURRENT_SOURCE_DIR}/test/c552_realdata_driver.cpp
+        $<FILTER:$<TARGET_OBJECTS:VC3D>,EXCLUDE,VCAppMain>)
+    set_target_properties(c552_realdata_driver PROPERTIES
+        AUTOMOC ON AUTOUIC OFF AUTORCC OFF)
+    target_include_directories(c552_realdata_driver PRIVATE
+        ${PROJECT_SOURCE_DIR}/apps/VC3D
+        ${PROJECT_SOURCE_DIR}/core/src)
+    target_link_libraries(c552_realdata_driver PRIVATE
+        $<TARGET_GENEX_EVAL:VC3D,$<TARGET_PROPERTY:VC3D,LINK_LIBRARIES>>)
+endif()

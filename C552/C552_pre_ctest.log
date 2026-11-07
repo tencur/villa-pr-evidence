@@ -1,0 +1,25 @@
+Test project /home/pi/scrollprize_work/vcbuild/fsw4/build_allv2
+    Start 169: surface_rotation_apply
+1/1 Test #169: surface_rotation_apply ...........***Failed    0.28 sec
+********* Start testing of SurfaceRotationApplyTest *********
+Config: Using QtTest library 6.8.2, Qt 6.8.2 (arm64-little_endian-lp64 shared (dynamic) release build; by GCC 14.2.0), debian 13
+PASS   : SurfaceRotationApplyTest::initTestCase()
+QWARN  : SurfaceRotationApplyTest::applyUpdatesEveryHolderAndComposes() This plugin does not support propagateSizeHints()
+[2026-10-14 14:09:21.268] [INFO ] autosaved seg_a/0 -> /home/pi/scrollprize_work/vcbuild/fsw4/tmp/test_surface_rotation_apply-aOPKss/paths/backups/seg_a/0
+FAIL!  : SurfaceRotationApplyTest::applyUpdatesEveryHolderAndComposes() 'samePoints(pointsOf(pkg->getSurface(kSegmentId)), flipped)' returned FALSE. ()
+   Loc: [../src_allv2/volume-cartographer/apps/VC3D/test/test_surface_rotation_apply.cpp(172)]
+PASS   : SurfaceRotationApplyTest::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 21ms
+********* Finished testing of SurfaceRotationApplyTest *********
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+vc-core    =   0.28 sec*proc (1 test)
+
+Total Test time (real) =   0.28 sec
+
+The following tests FAILED:
+	169 - surface_rotation_apply (Failed)                   vc-core
+Errors while running CTest

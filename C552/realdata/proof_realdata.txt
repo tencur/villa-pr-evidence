@@ -1,0 +1,70 @@
+== C552 on main
+  segment 20251028220955: grid 105x105, 5374 valid vertices; flipped differs from original by up to 12903.7 vx
+  before:
+    on disk (x/y/z.tif)              ORIGINAL
+    viewer slot "segmentation"       ORIGINAL
+    active surface                   ORIGINAL
+    VolumePkg::getSurface(id)        ORIGINAL
+    CState entry for the id          ORIGINAL
+    segment listed (VolumePkg/tree)  yes/1
+[2026-10-14 14:11:48.845] [INFO ] Processing addition of backups to paths
+[2026-10-14 14:11:48.845] [INFO ] Processing addition of 20251028220955 to paths
+  round 1: Apply finished (save in flight: no)
+  after Apply (flip 1):
+    on disk (x/y/z.tif)              FLIPPED
+    viewer slot "segmentation"       FLIPPED
+    active surface                   ORIGINAL
+    VolumePkg::getSurface(id)        ORIGINAL
+    CState entry for the id          ORIGINAL
+    segment listed (VolumePkg/tree)  yes/1
+  after selecting the segment again in the panel:
+    on disk (x/y/z.tif)              FLIPPED
+    viewer slot "segmentation"       ORIGINAL
+    active surface                   ORIGINAL
+    VolumePkg::getSurface(id)        ORIGINAL
+    CState entry for the id          ORIGINAL
+    segment listed (VolumePkg/tree)  yes/1
+[2026-10-14 14:11:56.847] [INFO ] Processing update of 20251028220955 in paths
+  round 2: Apply finished (save in flight: no)
+  after a second Apply (flip 2; two flips = original):
+    on disk (x/y/z.tif)              FLIPPED
+    viewer slot "segmentation"       FLIPPED
+    active surface                   (none)
+    VolumePkg::getSurface(id)        FLIPPED
+    CState entry for the id          FLIPPED
+    segment listed (VolumePkg/tree)  yes/1
+== C552 on fix
+  segment 20251028220955: grid 105x105, 5374 valid vertices; flipped differs from original by up to 12903.7 vx
+  before:
+    on disk (x/y/z.tif)              ORIGINAL
+    viewer slot "segmentation"       ORIGINAL
+    active surface                   ORIGINAL
+    VolumePkg::getSurface(id)        ORIGINAL
+    CState entry for the id          ORIGINAL
+    segment listed (VolumePkg/tree)  yes/1
+[2026-10-14 14:12:05.163] [INFO ] Processing addition of backups to paths
+[2026-10-14 14:12:05.163] [INFO ] Processing addition of 20251028220955 to paths
+  round 1: Apply finished (save in flight: no)
+  after Apply (flip 1):
+    on disk (x/y/z.tif)              FLIPPED
+    viewer slot "segmentation"       FLIPPED
+    active surface                   FLIPPED
+    VolumePkg::getSurface(id)        FLIPPED
+    CState entry for the id          FLIPPED
+    segment listed (VolumePkg/tree)  yes/1
+  after selecting the segment again in the panel:
+    on disk (x/y/z.tif)              FLIPPED
+    viewer slot "segmentation"       FLIPPED
+    active surface                   FLIPPED
+    VolumePkg::getSurface(id)        FLIPPED
+    CState entry for the id          FLIPPED
+    segment listed (VolumePkg/tree)  yes/1
+[2026-10-14 14:12:13.166] [INFO ] Processing update of 20251028220955 in paths
+  round 2: Apply finished (save in flight: no)
+  after a second Apply (flip 2; two flips = original):
+    on disk (x/y/z.tif)              ORIGINAL
+    viewer slot "segmentation"       ORIGINAL
+    active surface                   (none)
+    VolumePkg::getSurface(id)        ORIGINAL
+    CState entry for the id          ORIGINAL
+    segment listed (VolumePkg/tree)  yes/1

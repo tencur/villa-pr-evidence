@@ -1,0 +1,48 @@
+diff --git a/volume-cartographer/apps/VC3D/CMakeLists.txt b/volume-cartographer/apps/VC3D/CMakeLists.txt
+index 94b4f2dbc..0ff127c84 100644
+--- a/volume-cartographer/apps/VC3D/CMakeLists.txt
++++ b/volume-cartographer/apps/VC3D/CMakeLists.txt
+@@ -367,7 +367,8 @@ target_include_directories(VC3D
+ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+     find_package(PkgConfig QUIET)
+     if(PkgConfig_FOUND)
+-        pkg_check_modules(AVAHI IMPORTED_TARGET avahi-client)
++        # GLOBAL: tests that link VC3D's objects (apps/VC3D/test) use its link libraries.
++        pkg_check_modules(AVAHI IMPORTED_TARGET GLOBAL avahi-client)
+     endif()
+ endif()
+ 
+diff --git a/volume-cartographer/apps/VC3D/test/CMakeLists.txt b/volume-cartographer/apps/VC3D/test/CMakeLists.txt
+index 6d38bfa47..efb0f4124 100644
+--- a/volume-cartographer/apps/VC3D/test/CMakeLists.txt
++++ b/volume-cartographer/apps/VC3D/test/CMakeLists.txt
+@@ -93,6 +93,29 @@ add_test(NAME surface_rotation_transform COMMAND test_surface_rotation_transform
+ vc_register_test_target(test_surface_rotation_transform)
+ vc_register_ctest(surface_rotation_transform test_surface_rotation_transform)
+ 
++# Links VC3D's objects: drives SurfaceRotationOverlayController through the
++# overlay widget of a real viewer.
++add_executable(test_surface_rotation_apply
++    test_surface_rotation_apply.cpp
++    $<FILTER:$<TARGET_OBJECTS:VC3D>,EXCLUDE,VCAppMain>)
++
++set_target_properties(test_surface_rotation_apply PROPERTIES
++    AUTOMOC ON AUTOUIC OFF AUTORCC OFF)
++
++target_include_directories(test_surface_rotation_apply PRIVATE
++    ${PROJECT_SOURCE_DIR}/apps/VC3D
++    ${PROJECT_SOURCE_DIR}/core/src)
++
++target_link_libraries(test_surface_rotation_apply PRIVATE
++    $<TARGET_GENEX_EVAL:VC3D,$<TARGET_PROPERTY:VC3D,LINK_LIBRARIES>>
++    Qt6::Test)
++
++add_test(NAME surface_rotation_apply COMMAND test_surface_rotation_apply)
++set_tests_properties(surface_rotation_apply PROPERTIES
++    ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
++vc_register_test_target(test_surface_rotation_apply)
++vc_register_ctest(surface_rotation_apply test_surface_rotation_apply)
++
+ add_executable(test_vc_settings
+     test_vc_settings.cpp)
+ 

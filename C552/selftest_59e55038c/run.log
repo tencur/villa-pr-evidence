@@ -1,0 +1,15 @@
+start 2026-11-01T21:45:55Z
+h5e:test_ext ninja exit 0 2026-11-01T22:13:02Z
+h5e:test_ext ctest exit 0 100% tests passed, 0 tests failed out of 1
+r32:test_ext ninja exit 0 2026-11-01T22:14:54Z
+r32:test_ext ctest exit 8 0% tests passed, 1 tests failed out of 1
+surface rotation apply test: after Apply the segment is still the selected one (active surface and id)
+main:test_ext ninja exit 0 2026-11-01T22:15:09Z
+main:test_ext ctest exit 8 0% tests passed, 1 tests failed out of 1
+surface rotation apply test: Actions > Transforms > Rotate opens the tool (Flip and Apply shown)
+r32:test_orig ninja exit 0 2026-11-01T22:15:24Z
+r32:test_orig ctest exit 0 100% tests passed, 0 tests failed out of 1
+main:test_orig ninja exit 0 2026-11-01T22:15:39Z
+main:test_orig ctest exit 8 0% tests passed, 1 tests failed out of 1
+surface rotation apply test: a second flip starts from the saved geometry: two flips give the original back
+done 2026-11-01T22:15:39Z
