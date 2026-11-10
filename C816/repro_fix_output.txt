@@ -1,0 +1,4 @@
+voxels compared: 25407
+no TTA           seg max|diff vs no-TTA| 0.0000 | normals mean |n| 1.0000, median angle to truth   0.00 deg, >10 deg   0.0% | tensor mean |off-diag| 0.0957 (truth 0.0957), mean |diag err| 0.0000
+TTA mirroring    seg max|diff vs no-TTA| 0.0000 | normals mean |n| 1.0000, median angle to truth   0.00 deg, >10 deg   0.0% | tensor mean |off-diag| 0.0957 (truth 0.0957), mean |diag err| 0.0000
+TTA rotation     seg max|diff vs no-TTA| 0.0000 | normals mean |n| 1.0000, median angle to truth   0.00 deg, >10 deg   0.0% | tensor mean |off-diag| 0.0957 (truth 0.0957), mean |diag err| 0.0000

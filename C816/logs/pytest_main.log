@@ -1,0 +1,158 @@
+FFFFFFF.................................                                 [100%]
+=================================== FAILURES ===================================
+_____________ test_tta_keeps_vector_and_tensor_heads[3-mirroring] ______________
+
+nd = 3, tta_type = 'mirroring'
+
+    @pytest.mark.parametrize("tta_type", ["mirroring", "rotation"])
+    @pytest.mark.parametrize("nd", [3, 2])
+    def test_tta_keeps_vector_and_tensor_heads(nd, tta_type):
+        targets = TARGETS if nd == 3 else TARGETS_2D
+        x = _volume((20, 20, 20) if nd == 3 else (24, 24))[None, None]
+        model, concat = Oracle(), _concat(targets)
+        reference = concat(model(x))
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), nd)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:90: AttributeError
+______________ test_tta_keeps_vector_and_tensor_heads[3-rotation] ______________
+
+nd = 3, tta_type = 'rotation'
+
+    @pytest.mark.parametrize("tta_type", ["mirroring", "rotation"])
+    @pytest.mark.parametrize("nd", [3, 2])
+    def test_tta_keeps_vector_and_tensor_heads(nd, tta_type):
+        targets = TARGETS if nd == 3 else TARGETS_2D
+        x = _volume((20, 20, 20) if nd == 3 else (24, 24))[None, None]
+        model, concat = Oracle(), _concat(targets)
+        reference = concat(model(x))
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), nd)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:90: AttributeError
+_____________ test_tta_keeps_vector_and_tensor_heads[2-mirroring] ______________
+
+nd = 2, tta_type = 'mirroring'
+
+    @pytest.mark.parametrize("tta_type", ["mirroring", "rotation"])
+    @pytest.mark.parametrize("nd", [3, 2])
+    def test_tta_keeps_vector_and_tensor_heads(nd, tta_type):
+        targets = TARGETS if nd == 3 else TARGETS_2D
+        x = _volume((20, 20, 20) if nd == 3 else (24, 24))[None, None]
+        model, concat = Oracle(), _concat(targets)
+        reference = concat(model(x))
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), nd)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:90: AttributeError
+______________ test_tta_keeps_vector_and_tensor_heads[2-rotation] ______________
+
+nd = 2, tta_type = 'rotation'
+
+    @pytest.mark.parametrize("tta_type", ["mirroring", "rotation"])
+    @pytest.mark.parametrize("nd", [3, 2])
+    def test_tta_keeps_vector_and_tensor_heads(nd, tta_type):
+        targets = TARGETS if nd == 3 else TARGETS_2D
+        x = _volume((20, 20, 20) if nd == 3 else (24, 24))[None, None]
+        model, concat = Oracle(), _concat(targets)
+        reference = concat(model(x))
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), nd)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:90: AttributeError
+__________________ test_batched_mirroring_matches_sequential ___________________
+
+    def test_batched_mirroring_matches_sequential():
+        x = _volume((16, 16, 16))[None, None]
+        model, concat = Oracle(), _concat(TARGETS)
+>       groups = tta.tta_channel_groups(TARGETS, _target_info(TARGETS), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:105: AttributeError
+_______________ test_segmentation_only_models_average_as_before ________________
+
+    def test_segmentation_only_models_average_as_before():
+        x = torch.rand(1, 1, 8, 8, 8)
+        model = torch.nn.Conv3d(1, 2, 3, padding=1)
+        flips = [[], [-1], [-2], [-3], [-1, -2], [-1, -3], [-2, -3], [-1, -2, -3]]
+        with torch.no_grad():
+            expected = torch.stack([torch.flip(model(torch.flip(x, f)), f) if f else model(x) for f in flips]).mean(0)
+            assert torch.equal(tta.infer_with_tta(model, x, "mirroring"), expected)
+>       assert tta.tta_channel_groups({"surface": {"out_channels": 2}}, _target_info({"surface": {"out_channels": 2}}), 3) == []
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:121: AttributeError
+_________________ test_predict_keeps_normals_with_default_tta __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffef6ef23f0>
+
+    def test_predict_keeps_normals_with_default_tta(tmp_path, monkeypatch):
+        """vesuvius.predict on a multi-task checkpoint (default mirroring TTA) writes the normals it predicts."""
+        shape, patch = (32, 32, 32), (16, 16, 16)
+        volume = _volume(shape).numpy()
+        writer = ZarrWriter.create(str(tmp_path / "volume.zarr"), shape=shape, chunks=patch, dtype=np.float32)
+        writer[:] = volume
+        (tmp_path / "model.pth").write_bytes(b"")
+        targets = {name: TARGETS[name] for name in ("surface", "normals")}
+    
+        def fake_load(self, checkpoint_path):
+            return {"network": Oracle(), "patch_size": patch, "num_input_channels": 1, "num_seg_heads": 5,
+                    "targets": targets, "normalization_scheme": "none"}
+    
+        monkeypatch.setattr(inference.Inferer, "_load_train_py_model", fake_load)
+    
+        def predict(name, **kwargs):
+            out = tmp_path / name
+            Inferer(model_path=str(tmp_path / "model.pth"), input_dir=str(tmp_path / "volume.zarr"),
+                    output_dir=str(tmp_path / "parts"), model_type="train_py", device="cpu",
+                    num_dataloader_workers=0, in_memory_blend={"output_path": str(out)}, **kwargs).infer()
+            return np.asarray(open_zarr(str(out))[:], dtype=np.float32)
+    
+        with_tta = predict("tta.zarr")
+        without = predict("no_tta.zarr", do_tta=False)
+        mask = _defined(torch.from_numpy(volume)[None, None]).numpy()
+        mask[[0, -1]] = mask[:, [0, -1]] = mask[:, :, [0, -1]] = False
+        length = np.sqrt((with_tta[2:5] ** 2).sum(0))[mask]
+>       assert length.mean() > 0.99, f"TTA normals have mean length {length.mean():.3f}"
+E       AssertionError: TTA normals have mean length 0.000
+E       assert np.float32(0.0) > 0.99
+E        +  where np.float32(0.0) = <built-in method mean of numpy.ndarray object at 0x7ffef6fa5470>()
+E        +    where <built-in method mean of numpy.ndarray object at 0x7ffef6fa5470> = array([0., 0., 0., ..., 0., 0., 0.], shape=(27000,), dtype=float32).mean
+
+tests/models/run/test_tta_vector_heads.py:151: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0/parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0/volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0/volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0/volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0/tta.zarr
+  Shape: (5, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0/parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache HIT (sidecar:/tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0/volume.zarr/.chunk_occupancy.npz): 8/8 (100.0%) chunks occupied for /tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0/volume.zarr
+In-memory blending: the blend sums need 0.0 GiB (12.3 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-1697/test_predict_keeps_normals_wit0/no_tta.zarr
+  Shape: (5, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  22%|██▏       | 6/27 [00:00<00:00, 57.84it/s]Inferring Part 0:  48%|████▊     | 13/27 [00:00<00:00, 62.21it/s]Inferring Part 0:  74%|███████▍  | 20/27 [00:00<00:00, 60.66it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 60.70it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 60.62it/s]
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  93%|█████████▎| 25/27 [00:00<00:00, 239.13it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 236.73it/s]
+=========================== short test summary info ============================
+FAILED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[3-mirroring]
+FAILED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[3-rotation]
+FAILED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[2-mirroring]
+FAILED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[2-rotation]
+FAILED tests/models/run/test_tta_vector_heads.py::test_batched_mirroring_matches_sequential
+FAILED tests/models/run/test_tta_vector_heads.py::test_segmentation_only_models_average_as_before
+FAILED tests/models/run/test_tta_vector_heads.py::test_predict_keeps_normals_with_default_tta
+7 failed, 33 passed in 34.91s
