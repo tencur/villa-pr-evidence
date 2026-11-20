@@ -1,0 +1,40 @@
+UpdateCTestConfiguration  from :<work>/build/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<work>/build/DartConfiguration.tcl
+Test project <work>/build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 208
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: This plugin does not support propagateSizeHints()
+208: surface rotation apply test: Actions > Transforms > Rotate opens the tool (Flip and Apply shown)
+1/1 Test #208: surface_rotation_apply ...........***Failed    0.43 sec
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+vc-core    =   0.43 sec*proc (1 test)
+
+Total Test time (real) =   0.44 sec
+
+The following tests FAILED:
+	208 - surface_rotation_apply (Failed)                   vc-core
+Errors while running CTest
+Output from these tests are in: <work>/build/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

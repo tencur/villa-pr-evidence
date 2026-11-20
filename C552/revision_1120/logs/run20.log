@@ -1,0 +1,63 @@
+start 2026-11-20T22:36:39Z runs: r20:test_ext20
+src synced to c8f3ba453+wiring 2026-11-20T22:36:39Z
+configured 2026-11-20T22:36:42Z
+r20:test_ext20 ninja exit 0 2026-11-20T22:45:51Z
+r20:test_ext20 ctest exit 0 208: surface rotation apply tests passed
+The following tests passed:
+100% tests passed, 0 tests failed out of 1
+case passed: 1 Rotate on A, select B, Apply
+case passed: 2 Apply, Rotate again, clear the selection, Apply
+case passed: 4a Apply pending, A selected again and flipped from the surface panel
+case passed: 4b Apply pending, the surface panel's Flip where available
+case passed: 5a another client saves during the preview, then Apply
+case passed: 5b the save fails (another client saved first)
+case passed: 3 Rotate on A, A deleted, Apply with no change
+surface rotation apply cases: 7 passed, 0 failed
+done 2026-11-20T22:45:53Z
+start 2026-11-20T22:46:04Z runs: r20:test_ext18 r20:test_orig18 af:test_ext20 main:test_ext20 main:test_orig18
+src synced to c8f3ba453+wiring 2026-11-20T22:46:05Z
+configured 2026-11-20T22:46:09Z
+r20:test_ext18 ninja exit 0 2026-11-20T22:46:26Z
+r20:test_ext18 ctest exit 0 208: surface rotation apply tests passed
+The following tests passed:
+100% tests passed, 0 tests failed out of 1
+r20:test_orig18 ninja exit 0 2026-11-20T22:46:44Z
+r20:test_orig18 ctest exit 0 208: surface rotation apply tests passed
+The following tests passed:
+100% tests passed, 0 tests failed out of 1
+af:test_ext20 ninja exit 0 2026-11-20T22:50:07Z
+af:test_ext20 ctest exit 8 0% tests passed, 1 tests failed out of 1
+case FAILED: 1 Rotate on A, select B, Apply: after Apply, B is still the selected and shown surface
+case FAILED: 2 Apply, Rotate again, clear the selection, Apply: after Apply no surface is selected
+case FAILED: 4a Apply pending, A selected again and flipped from the surface panel: the pending Apply does not overwrite the surface panel's newer save
+case passed: 4b Apply pending, the surface panel's Flip where available
+case FAILED: 5a another client saves during the preview, then Apply: after Apply the segment is not selected at an old revision (the agent bridge can reopen it)
+case FAILED: 5b the save fails (another client saved first): after the failed save the segment is not selected at an old revision (the agent bridge can reopen it)
+case FAILED: 3 Rotate on A, A deleted, Apply with no change: after Apply with no change the deleted segment is not the active one (the agent bridge reads its row)
+surface rotation apply cases: 1 passed, 6 failed
+The following tests FAILED:
+main:test_ext20 ninja exit 0 2026-11-20T22:53:44Z
+main:test_ext20 ctest exit 8 0% tests passed, 1 tests failed out of 1
+surface rotation apply test: Actions > Transforms > Rotate opens the tool (Flip and Apply shown)
+The following tests FAILED:
+main:test_orig18 ninja exit 0 2026-11-20T22:53:49Z
+main:test_orig18 ctest exit 8 0% tests passed, 1 tests failed out of 1
+surface rotation apply test: a second flip starts from the saved geometry: two flips give the original back
+The following tests FAILED:
+done 2026-11-20T22:53:50Z
+start 2026-11-20T22:54:20Z runs: r20:test_ext20
+src synced to c8f3ba453+wiring 2026-11-20T22:54:20Z
+configured 2026-11-20T22:54:23Z
+r20:test_ext20 ninja exit 0 2026-11-20T22:54:30Z
+r20:test_ext20 ctest exit 0 208: surface rotation apply tests passed
+The following tests passed:
+100% tests passed, 0 tests failed out of 1
+case passed: 1 Rotate on A, select B, Apply
+case passed: 2 Apply, Rotate again, clear the selection, Apply
+case passed: 4a Apply pending, A selected again and flipped from the surface panel
+case passed: 4b Apply pending, the surface panel's Flip where available
+case passed: 5a another client saves during the preview, then Apply
+case passed: 5b the save fails (another client saved first)
+case passed: 3 Rotate on A, A deleted, Apply with no change
+surface rotation apply cases: 7 passed, 0 failed
+done 2026-11-20T22:54:32Z

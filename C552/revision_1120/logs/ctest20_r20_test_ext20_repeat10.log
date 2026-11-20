@@ -1,0 +1,29 @@
+# cd <work>/build && ctest -R "^surface_rotation_apply$" --repeat until-fail:10 --timeout 300   (variant r20, test_ext20; 10 runs)
+Test project <work>/build
+    Start 208: surface_rotation_apply
+    Test #208: surface_rotation_apply ...........   Passed    1.78 sec
+    Start 208: surface_rotation_apply
+    Test #208: surface_rotation_apply ...........   Passed    1.67 sec
+    Start 208: surface_rotation_apply
+    Test #208: surface_rotation_apply ...........   Passed    1.80 sec
+    Start 208: surface_rotation_apply
+    Test #208: surface_rotation_apply ...........   Passed    1.78 sec
+    Start 208: surface_rotation_apply
+    Test #208: surface_rotation_apply ...........   Passed    1.68 sec
+    Start 208: surface_rotation_apply
+    Test #208: surface_rotation_apply ...........   Passed    1.79 sec
+    Start 208: surface_rotation_apply
+    Test #208: surface_rotation_apply ...........   Passed    1.69 sec
+    Start 208: surface_rotation_apply
+    Test #208: surface_rotation_apply ...........   Passed    1.81 sec
+    Start 208: surface_rotation_apply
+    Test #208: surface_rotation_apply ...........   Passed    1.80 sec
+    Start 208: surface_rotation_apply
+1/1 Test #208: surface_rotation_apply ...........   Passed    1.67 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+vc-core    =   1.67 sec*proc (1 test)
+
+Total Test time (real) =  17.48 sec

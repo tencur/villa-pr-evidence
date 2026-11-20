@@ -1,0 +1,20 @@
+Build tree: upstream main c8f3ba453 (c8f3ba45304f0a317a49a155929e30d294f201eb) + self-test wiring; per run the overlay
+files and CWindow.cpp below are swapped in (run20.sh). git blob ids (git hash-object of the variant file = blob in the commit):
+
+variant r20  = new head b860d5aa0 (branch fix/vc3d-rotate-apply-r20, one commit on PR head 3b3134af8)
+  SurfaceRotationOverlayController.cpp  e3f62b8ea108d3a1ea57f9f467a9ab7f1e731ab4  = b860d5aa0
+  SurfaceRotationOverlayController.hpp  3b2e3f48ebb1ee39d8f16365a5e75cea36468562  = b860d5aa0
+  CWindow.cpp                           d7c011939f4a766f0e79ad58dea89366247f1f5c  = b860d5aa0
+variant af   = PR head 3b3134af8
+  SurfaceRotationOverlayController.cpp  a775d3f9d2d8dfba40833bdc42e12fc46a8b4de5  = 3b3134af8
+  SurfaceRotationOverlayController.hpp  6b5a8456e7d16dff84a034412c6bc50ea43f2e60  = 3b3134af8
+  CWindow.cpp                           0b51a7509f412603f0563ac73f83a164dc024f3c  = 3b3134af8 = c8f3ba453
+variant main = main c8f3ba453
+  SurfaceRotationOverlayController.cpp  a9cc7558c8a37b279790c52ebdb275b30c856036  = c8f3ba453
+  SurfaceRotationOverlayController.hpp  3ffa32e3f11f38c77fd571f16f75e72d225ed099  = c8f3ba453
+  CWindow.cpp                           0b51a7509f412603f0563ac73f83a164dc024f3c  = c8f3ba453
+
+Tests: test_ext20 = ../test/SurfaceRotationApplyTest_ext_c8f3ba453.inc (new: base flow + 7 review cases);
+test_ext18 / test_orig18 = ../../scripts/dropped_tests/SurfaceRotationApplyTest_ext_1386f072e.inc / SurfaceRotationApplyTest_1386f072e.inc
+(the extended and original self-tests from the 18 Nov refresh, unchanged).
+ctest20_r20_test_ext20.first.log = first run of r20:test_ext20; ctest20_r20_test_ext20.log = rebuild + rerun before the repeat.
