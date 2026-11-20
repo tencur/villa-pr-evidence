@@ -1,0 +1,24 @@
+## head-91ddb04f1: repro_tta_vector_heads.py (48^3, real Inferer + in-memory blend)
+voxels compared: 25407
+no TTA           seg max|diff vs no-TTA| 0.0000 | normals mean |n| 1.0000, median angle to truth   0.00 deg, >10 deg   0.0% | tensor mean |off-diag| 0.0957 (truth 0.0957), mean |diag err| 0.0000
+TTA mirroring    seg max|diff vs no-TTA| 0.0000 | normals mean |n| 1.0000, median angle to truth   0.00 deg, >10 deg   0.0% | tensor mean |off-diag| 0.0957 (truth 0.0957), mean |diag err| 0.0000
+TTA rotation     seg max|diff vs no-TTA| 0.0000 | normals mean |n| 1.0000, median angle to truth   0.00 deg, >10 deg   0.0% | tensor mean |off-diag| 0.0957 (truth 0.0957), mean |diag err| 0.0000
+## head-91ddb04f1: review_seam_fixture.py
+Gaussian weight at voxel (8, 8, 12): patch x=0 (index 12) 0.135335, patch x=8 (index 4) 0.135335
+mirroring TTA (default)  blended direction at the seam voxel (8, 8, 12): x 1.0000, y 0.0000, z 0.0000 | interior min |x| 1.0000
+no TTA                   blended direction at the seam voxel (8, 8, 12): x 0.0000, y 0.0000, z 0.0000 | interior min |x| 0.0000
+## head-91ddb04f1: review_multiclass_cli.py
+case A: 2 surface scores + normals, default TTA: exit 0, output shape (3, 32, 32, 32), class at (16, 16, 16) = 1 (expected 1); interior: class 1: 21952
+case B: 3 surface scores + normals, --disable_tta: exit 0, output shape (4, 32, 32, 32), class at (16, 16, 16) = 1 (expected 1); interior: class 1: 21952
+## head-91ddb04f1: review_fp16_small_direction.py
+product in float16: -0.0
+batched    output dtype torch.float16, mean direction x 0.000100 y 0.000000 z 0.000000
+sequential output dtype torch.float16, mean direction x 0.000100 y 0.000000 z 0.000000
+## head-91ddb04f1: review_peak_memory.py
+one float16 output variant (5 x 128^3): 20.0 MiB
+batched    plain              peak over baseline 612.6 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+batched    surface_normals    peak over baseline 612.5 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+batched    inplane_direction  peak over baseline 625.0 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+sequential plain              peak over baseline 860.0 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+sequential surface_normals    peak over baseline 860.0 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+sequential inplane_direction  peak over baseline 878.5 MiB  (output (1, 5, 128, 128, 128) torch.float16)
