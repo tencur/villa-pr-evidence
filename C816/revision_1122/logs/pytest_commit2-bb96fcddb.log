@@ -1,0 +1,2134 @@
+## commit bb96fcddb (blocker 2) with its own tests, tests/models/run
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-9.1.1, pluggy-1.6.0
+rootdir: <work>/k2/vesuvius
+configfile: pytest.ini
+plugins: anyio-4.15.1, platformdirs-4.13.0
+collected 137 items
+
+tests/models/run/test_blend_finalize_pipeline.py .                       [  0%]
+tests/models/run/test_finalize_multiclass_scale.py ........              [  6%]
+tests/models/run/test_finalize_uncovered_voxels.py ....                  [  9%]
+tests/models/run/test_in_memory_blend.py ............................... [ 32%]
+                                                                         [ 32%]
+tests/models/run/test_inference_chunk_cache.py ......                    [ 36%]
+tests/models/run/test_inference_legacy_checkpoint.py ............        [ 45%]
+tests/models/run/test_inference_nnunet_normalization.py .........        [ 51%]
+tests/models/run/test_inference_non_cuda_devices.py ..                   [ 53%]
+tests/models/run/test_inference_run_config_attrs.py .....                [ 56%]
+tests/models/run/test_lock_file_exclusive.py .....                       [ 60%]
+tests/models/run/test_pipeline_cli.py ..............                     [ 70%]
+tests/models/run/test_tta_vector_heads.py .............................. [ 92%]
+..........                                                               [100%]
+
+==================================== PASSES ====================================
+___________________________ test_blend_then_finalize ___________________________
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blend_then_finalize0
+Found 3 parts (IDs 0..2)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 4, 4, 4)
+  Patch Size: (4, 4, 4)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (4, 4, 8)
+Creating final output store: <tmp>/test_blend_then_finalize0/blended.zarr
+  Shape: (2, 4, 4, 8), Chunks: (1, 4, 4, 4)
+Generated Gaussian map with shape (1, 4, 4, 4), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 3 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 3 to 2 relevant parts
+  Loading coordinates and non-empty masks for 2 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 2
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 2
+  Avg chunk size (uncompressed): 0.5 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blend_then_finalize0/blended.zarr
+Using 1 worker processes
+Opening input logits: <tmp>/test_blend_then_finalize0/blended.zarr
+Mode: binary, Threshold: off
+Input shape: (2, 4, 4, 8), Num classes: 2
+Output will have 1 channel: [softmax_fg]
+Creating output store: <tmp>/test_blend_then_finalize0/final.zarr
+  Shape: (1, 4, 4, 8), Chunks: (1, 4, 4, 4)
+Processing data in 2 chunks using 1 worker processes...
+
+Output processing complete. Processed 2 chunks, skipped 0 empty chunks (0.00%).
+Deleting intermediate logits: <tmp>/test_blend_then_finalize0/blended.zarr
+Successfully deleted intermediate logits (local path)
+Final output saved to: <tmp>/test_blend_then_finalize0/final.zarr
+__ test_in_memory_blend_matches_blend_and_finalize[2-finalize_config0-False] ___
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_in_memory_blend_matches_b0/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Fused blend+finalize mode: binary, threshold=None
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_matches_b0/staged.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.5 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_in_memory_blend_matches_b0/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_matches_b0/in_memory.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+__ test_in_memory_blend_matches_blend_and_finalize[2-finalize_config1-False] ___
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_in_memory_blend_matches_b1/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Fused blend+finalize mode: binary, threshold=0.3
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_matches_b1/staged.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.5 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_in_memory_blend_matches_b1/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_matches_b1/in_memory.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+__ test_in_memory_blend_matches_blend_and_finalize[3-finalize_config2-False] ___
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_in_memory_blend_matches_b2/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 3, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 3
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Fused blend+finalize mode: multiclass, threshold=None
+  Finalized output shape: (4, 40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_matches_b2/staged.zarr
+  Shape: (4, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.4s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.1 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 48.0 KB
+  Total data (uncompressed): 0.02 GB
+  Wall throughput: 0.01 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_in_memory_blend_matches_b2/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (4, 40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_matches_b2/in_memory.zarr
+  Shape: (4, 40, 36, 44), Chunks: (1, 12, 12, 12)
+________ test_in_memory_blend_matches_blend_and_finalize[2-None-False] _________
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_in_memory_blend_matches_b3/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_matches_b3/staged.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.5 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_in_memory_blend_matches_b3/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_in_memory_blend_matches_b3/in_memory.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+___ test_in_memory_blend_matches_blend_and_finalize[2-finalize_config4-True] ___
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_in_memory_blend_matches_b4/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Fused blend+finalize mode: binary, threshold=None
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_matches_b4/staged.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.4s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.2 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_in_memory_blend_matches_b4/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+[writer stall] waited 0.00s this patch, 0.0s total (46.7% of wall clock)
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_matches_b4/in_memory.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+______________ test_in_memory_blend_covers_only_the_patch_extent _______________
+----------------------------- Captured stdout call -----------------------------
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_in_memory_blend_covers_on0/out.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 16, 16, 16)
+__________________ test_main_passes_in_memory_blend_settings ___________________
+----------------------------- Captured stdout call -----------------------------
+
+--- Initializing Inferer ---
+
+--- Starting Inference ---
+
+--- Inference Finished ---
+Blended output written to: <tmp>/test_main_passes_in_memory_ble0/blended.zarr
+_________________ test_main_passes_parts_with_blend_in_memory __________________
+----------------------------- Captured stdout call -----------------------------
+
+--- Initializing Inferer ---
+
+--- Starting Inference ---
+
+--- Inference Finished ---
+Blended output written to: <tmp>/test_main_passes_parts_with_bl0/blended.zarr
+__ test_split_in_memory_blend_matches_blend_and_finalize[finalize_config0-2] ___
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_split_in_memory_blend_mat0/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Fused blend+finalize mode: binary, threshold=None
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_split_in_memory_blend_mat0/staged.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.4s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.4 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_split_in_memory_blend_mat0/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_split_in_memory_blend_mat0/split.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+__ test_split_in_memory_blend_matches_blend_and_finalize[finalize_config0-3] ___
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_split_in_memory_blend_mat1/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Fused blend+finalize mode: binary, threshold=None
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_split_in_memory_blend_mat1/staged.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.4s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.1 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_split_in_memory_blend_mat1/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_split_in_memory_blend_mat1/split.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+__ test_split_in_memory_blend_matches_blend_and_finalize[finalize_config0-4] ___
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_split_in_memory_blend_mat2/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Fused blend+finalize mode: binary, threshold=None
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_split_in_memory_blend_mat2/staged.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.8 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_split_in_memory_blend_mat2/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (1, 40, 36, 44)
+Creating final output store: <tmp>/test_split_in_memory_blend_mat2/split.zarr
+  Shape: (1, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+________ test_split_in_memory_blend_matches_blend_and_finalize[None-2] _________
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_split_in_memory_blend_mat3/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Creating final output store: <tmp>/test_split_in_memory_blend_mat3/staged.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 21.0 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.01 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_split_in_memory_blend_mat3/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_split_in_memory_blend_mat3/split.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+________ test_split_in_memory_blend_matches_blend_and_finalize[None-3] _________
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_split_in_memory_blend_mat4/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Creating final output store: <tmp>/test_split_in_memory_blend_mat4/staged.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.7 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_split_in_memory_blend_mat4/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_split_in_memory_blend_mat4/split.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+________ test_split_in_memory_blend_matches_blend_and_finalize[None-4] _________
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_split_in_memory_blend_mat5/parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 2, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 2
+  Original Volume Shape (Z,Y,X): (40, 36, 44)
+Creating final output store: <tmp>/test_split_in_memory_blend_mat5/staged.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 48 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 48 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 48
+  Skipped (no patches): 0
+  To process: 48
+  Total patch assignments: 376
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 48
+  Chunks skipped (empty): 0
+  Patches processed: 376
+  Workers: 1
+  Avg rate: 20.5 chunks/s
+  Zarr chunk reads: 376
+  Avg chunk size (uncompressed): 32.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_split_in_memory_blend_mat5/staged.zarr
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_split_in_memory_blend_mat5/split.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+_________________ test_write_rejects_a_slab_that_cuts_a_chunk __________________
+----------------------------- Captured stdout call -----------------------------
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+_________ test_inferer_prepares_blend_output_before_processing[False] __________
+----------------------------- Captured stdout call -----------------------------
+In-memory blending: the blend sums need 0.0 GiB (11.4 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_inferer_prepares_blend_ou0/out.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 16, 16, 16)
+__________ test_inferer_prepares_blend_output_before_processing[True] __________
+----------------------------- Captured stdout call -----------------------------
+In-memory blending: the blend sums need 0.0 GiB (11.4 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_inferer_prepares_blend_ou1/out.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 16, 16, 16)
+Part 0 has no patches; wrote empty output stores and skipped inference.
+___________ test_blend_part_waits_for_this_runs_initialization[None] ___________
+----------------------------- Captured stdout call -----------------------------
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blend_part_waits_for_this0/out.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+_________ test_blend_part_waits_for_this_runs_initialization[old-run] __________
+----------------------------- Captured stdout call -----------------------------
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blend_part_waits_for_this1/out.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+Creating final output store: <tmp>/test_blend_part_waits_for_this1/out.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 12, 12, 12)
+_____________ test_blend_ready_marker_is_published_after_creation ______________
+----------------------------- Captured stdout call -----------------------------
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blend_ready_marker_is_pub0/out.zarr
+  Shape: (2, 40, 36, 44), Chunks: (1, 16, 16, 16)
+______________ test_failed_blend_creation_does_not_publish_ready _______________
+----------------------------- Captured stdout call -----------------------------
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+___________________ test_split_inferer_requires_run_id[None] ___________________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_split_inferer_requires_ru0/out'
+_____________________ test_split_inferer_requires_run_id[] _____________________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_split_inferer_requires_ru1/out'
+____________________ test_split_inferer_requires_run_id[ ] _____________________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_split_inferer_requires_ru2/out'
+_________ test_main_rejects_invalid_blend_initialization[extra_args0] __________
+----------------------------- Captured stderr call -----------------------------
+usage: vesuvius.predict [-h] --model_path MODEL_PATH --input_dir INPUT_DIR
+                        [--input_anon] --output_dir OUTPUT_DIR
+                        [--tta_type {mirroring,rotation}] [--disable_tta]
+                        [--num_parts NUM_PARTS] [--part_id PART_ID]
+                        [--overlap OVERLAP] [--batch_size BATCH_SIZE]
+                        [--patch_size PATCH_SIZE] [--save_softmax]
+                        [--normalization NORMALIZATION] [--device DEVICE]
+                        [--num_workers NUM_WORKERS]
+                        [--writer_workers WRITER_WORKERS] [--verbose]
+                        [--skip_empty_patches] [--no_skip_empty_patches]
+                        [--zarr_compressor {zstd,lz4,zlib,none}]
+                        [--zarr_compression_level ZARR_COMPRESSION_LEVEL]
+                        [--hf_token HF_TOKEN]
+                        [--model_type {auto,nnunet,train_py,resnet}]
+                        [--model_cache_dir MODEL_CACHE_DIR]
+                        [--chunk_cache_mb CHUNK_CACHE_MB]
+                        [--max_patches MAX_PATCHES] [--bbox BBOX]
+                        [--blend_in_memory OUTPUT_PATH]
+                        [--blend_run_id BLEND_RUN_ID]
+                        [--blend_wait_timeout SECONDS]
+                        [--mode {binary,multiclass}] [--threshold]
+                        [--threshold_value THRESHOLD_VALUE]
+                        [--blend_sigma_scale BLEND_SIGMA_SCALE]
+                        [--blend_chunk_size BLEND_CHUNK_SIZE]
+                        [--blend_compression_level {0,1,2,3,4,5,6,7,8,9}]
+vesuvius.predict: error: --blend_run_id is required with split --blend_in_memory; share one fresh ID across all parts of each run.
+_________ test_main_rejects_invalid_blend_initialization[extra_args1] __________
+----------------------------- Captured stderr call -----------------------------
+usage: vesuvius.predict [-h] --model_path MODEL_PATH --input_dir INPUT_DIR
+                        [--input_anon] --output_dir OUTPUT_DIR
+                        [--tta_type {mirroring,rotation}] [--disable_tta]
+                        [--num_parts NUM_PARTS] [--part_id PART_ID]
+                        [--overlap OVERLAP] [--batch_size BATCH_SIZE]
+                        [--patch_size PATCH_SIZE] [--save_softmax]
+                        [--normalization NORMALIZATION] [--device DEVICE]
+                        [--num_workers NUM_WORKERS]
+                        [--writer_workers WRITER_WORKERS] [--verbose]
+                        [--skip_empty_patches] [--no_skip_empty_patches]
+                        [--zarr_compressor {zstd,lz4,zlib,none}]
+                        [--zarr_compression_level ZARR_COMPRESSION_LEVEL]
+                        [--hf_token HF_TOKEN]
+                        [--model_type {auto,nnunet,train_py,resnet}]
+                        [--model_cache_dir MODEL_CACHE_DIR]
+                        [--chunk_cache_mb CHUNK_CACHE_MB]
+                        [--max_patches MAX_PATCHES] [--bbox BBOX]
+                        [--blend_in_memory OUTPUT_PATH]
+                        [--blend_run_id BLEND_RUN_ID]
+                        [--blend_wait_timeout SECONDS]
+                        [--mode {binary,multiclass}] [--threshold]
+                        [--threshold_value THRESHOLD_VALUE]
+                        [--blend_sigma_scale BLEND_SIGMA_SCALE]
+                        [--blend_chunk_size BLEND_CHUNK_SIZE]
+                        [--blend_compression_level {0,1,2,3,4,5,6,7,8,9}]
+vesuvius.predict: error: --blend_run_id is required with split --blend_in_memory; share one fresh ID across all parts of each run.
+_________ test_main_rejects_invalid_blend_initialization[extra_args2] __________
+----------------------------- Captured stderr call -----------------------------
+usage: vesuvius.predict [-h] --model_path MODEL_PATH --input_dir INPUT_DIR
+                        [--input_anon] --output_dir OUTPUT_DIR
+                        [--tta_type {mirroring,rotation}] [--disable_tta]
+                        [--num_parts NUM_PARTS] [--part_id PART_ID]
+                        [--overlap OVERLAP] [--batch_size BATCH_SIZE]
+                        [--patch_size PATCH_SIZE] [--save_softmax]
+                        [--normalization NORMALIZATION] [--device DEVICE]
+                        [--num_workers NUM_WORKERS]
+                        [--writer_workers WRITER_WORKERS] [--verbose]
+                        [--skip_empty_patches] [--no_skip_empty_patches]
+                        [--zarr_compressor {zstd,lz4,zlib,none}]
+                        [--zarr_compression_level ZARR_COMPRESSION_LEVEL]
+                        [--hf_token HF_TOKEN]
+                        [--model_type {auto,nnunet,train_py,resnet}]
+                        [--model_cache_dir MODEL_CACHE_DIR]
+                        [--chunk_cache_mb CHUNK_CACHE_MB]
+                        [--max_patches MAX_PATCHES] [--bbox BBOX]
+                        [--blend_in_memory OUTPUT_PATH]
+                        [--blend_run_id BLEND_RUN_ID]
+                        [--blend_wait_timeout SECONDS]
+                        [--mode {binary,multiclass}] [--threshold]
+                        [--threshold_value THRESHOLD_VALUE]
+                        [--blend_sigma_scale BLEND_SIGMA_SCALE]
+                        [--blend_chunk_size BLEND_CHUNK_SIZE]
+                        [--blend_compression_level {0,1,2,3,4,5,6,7,8,9}]
+vesuvius.predict: error: --blend_wait_timeout must be positive.
+_________ test_main_rejects_invalid_blend_initialization[extra_args3] __________
+----------------------------- Captured stderr call -----------------------------
+usage: vesuvius.predict [-h] --model_path MODEL_PATH --input_dir INPUT_DIR
+                        [--input_anon] --output_dir OUTPUT_DIR
+                        [--tta_type {mirroring,rotation}] [--disable_tta]
+                        [--num_parts NUM_PARTS] [--part_id PART_ID]
+                        [--overlap OVERLAP] [--batch_size BATCH_SIZE]
+                        [--patch_size PATCH_SIZE] [--save_softmax]
+                        [--normalization NORMALIZATION] [--device DEVICE]
+                        [--num_workers NUM_WORKERS]
+                        [--writer_workers WRITER_WORKERS] [--verbose]
+                        [--skip_empty_patches] [--no_skip_empty_patches]
+                        [--zarr_compressor {zstd,lz4,zlib,none}]
+                        [--zarr_compression_level ZARR_COMPRESSION_LEVEL]
+                        [--hf_token HF_TOKEN]
+                        [--model_type {auto,nnunet,train_py,resnet}]
+                        [--model_cache_dir MODEL_CACHE_DIR]
+                        [--chunk_cache_mb CHUNK_CACHE_MB]
+                        [--max_patches MAX_PATCHES] [--bbox BBOX]
+                        [--blend_in_memory OUTPUT_PATH]
+                        [--blend_run_id BLEND_RUN_ID]
+                        [--blend_wait_timeout SECONDS]
+                        [--mode {binary,multiclass}] [--threshold]
+                        [--threshold_value THRESHOLD_VALUE]
+                        [--blend_sigma_scale BLEND_SIGMA_SCALE]
+                        [--blend_chunk_size BLEND_CHUNK_SIZE]
+                        [--blend_compression_level {0,1,2,3,4,5,6,7,8,9}]
+vesuvius.predict: error: --blend_wait_timeout must be positive.
+_______________________ test_main_passes_chunk_cache_mb ________________________
+----------------------------- Captured stdout call -----------------------------
+
+--- Initializing Inferer ---
+
+--- Starting Inference ---
+
+--- Inference Finished ---
+Output logits saved to: <tmp>/test_main_passes_chunk_cache_m0/logits_part_0.zarr
+
+--- Inspecting Output Store ---
+Could not inspect output Zarr: no Zarr array at <tmp>/test_main_passes_chunk_cache_m0/logits_part_0.zarr (.zarray/zarr.json not found)
+
+--- Inspecting Coordinate Store ---
+Could not inspect coordinate Zarr: no Zarr array at <tmp>/test_main_passes_chunk_cache_m0/coordinates_part_0.zarr (.zarray/zarr.json not found)
+____________ test_inferer_forwards_chunk_cache_to_dataset[0-False] _____________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_inferer_forwards_chunk_ca0/out'
+____________ test_inferer_forwards_chunk_cache_to_dataset[512-True] ____________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_inferer_forwards_chunk_ca1/out'
+_________________ test_inferer_rejects_negative_chunk_cache_mb _________________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_inferer_rejects_negative_0/out'
+_________ test_load_train_py_model_supports_legacy_checkpoint_with_ema _________
+----------------------------- Captured stdout call -----------------------------
+Using 3D operations based on patch_size (8, 8, 8)
+Using 3D convolutions (nn.Conv3d)
+Using 3D normalization (nn.InstanceNorm3d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [4, 8]
+Detected 2 stages from features_per_stage
+Patch size adjusted from (8, 8, 8) to (8, 8, 8) to ensure divisibility by pooling factors [2 2 2]
+Using provided n_blocks_per_stage: [1, 1]
+Task 'ink' configured with shared decoder + head (1 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: tiny_legacy
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [4, 8]
+  num_stages: 2
+  n_blocks_per_stage: [1, 1]
+  n_conv_per_stage_decoder: [1]
+  kernel_sizes: [[3, 3, 3], [3, 3, 3]]
+  pool_op_kernel_sizes: [[1, 1, 1], [2, 2, 2]]
+  conv_op: Conv3d
+  conv_bias: True
+  norm_op: InstanceNorm3d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1, 1], [2, 2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 4
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 3
+  patch_size: (8, 8, 8)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 1, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [1, 1, 1]
+  must_be_divisible_by: [2 2 2]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 3D operations based on patch_size (8, 8, 8)
+Using 3D convolutions (nn.Conv3d)
+Using 3D normalization (nn.InstanceNorm3d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [4, 8]
+Detected 2 stages from features_per_stage
+Patch size adjusted from (8, 8, 8) to (8, 8, 8) to ensure divisibility by pooling factors [2 2 2]
+Using provided n_blocks_per_stage: [1, 1]
+Task 'ink' configured with shared decoder + head (1 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: tiny_legacy
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [4, 8]
+  num_stages: 2
+  n_blocks_per_stage: [1, 1]
+  n_conv_per_stage_decoder: [1]
+  kernel_sizes: [[3, 3, 3], [3, 3, 3]]
+  pool_op_kernel_sizes: [[1, 1, 1], [2, 2, 2]]
+  conv_op: Conv3d
+  conv_bias: True
+  norm_op: InstanceNorm3d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1, 1], [2, 2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 4
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 3
+  patch_size: (8, 8, 8)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 1, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [1, 1, 1]
+  must_be_divisible_by: [2 2 2]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+_________________________ test_main_accepts_input_anon _________________________
+----------------------------- Captured stdout call -----------------------------
+
+--- Initializing Inferer ---
+
+--- Starting Inference ---
+
+--- Inference Finished ---
+Output logits saved to: <tmp>/test_main_accepts_input_anon0/logits_part_0.zarr
+
+--- Inspecting Output Store ---
+Could not inspect output Zarr: no Zarr array at <tmp>/test_main_accepts_input_anon0/logits_part_0.zarr (.zarray/zarr.json not found)
+
+--- Inspecting Coordinate Store ---
+Could not inspect coordinate Zarr: no Zarr array at <tmp>/test_main_accepts_input_anon0/coordinates_part_0.zarr (.zarray/zarr.json not found)
+________________ test_dataset_receives_ct_intensity_properties _________________
+----------------------------- Captured stdout call -----------------------------
+Part 0/1 has no patch positions; empty output stores will still be written so downstream blending can enumerate parts uniformly.
+___________________________ test_records_tta_enabled ___________________________
+----------------------------- Captured stdout call -----------------------------
+Creating output store at: <tmp>/test_records_tta_enabled0/logits_part_0.zarr
+Created zarr array at <tmp>/test_records_tta_enabled0/logits_part_0.zarr with shape (1, 2, 4, 4, 4)
+Creating coordinates store at: <tmp>/test_records_tta_enabled0/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_records_tta_enabled0/coordinates_part_0.zarr with shape (1, 3)
+__________________________ test_records_tta_disabled ___________________________
+----------------------------- Captured stdout call -----------------------------
+Creating output store at: <tmp>/test_records_tta_disabled0/logits_part_0.zarr
+Created zarr array at <tmp>/test_records_tta_disabled0/logits_part_0.zarr with shape (1, 2, 4, 4, 4)
+Creating coordinates store at: <tmp>/test_records_tta_disabled0/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_records_tta_disabled0/coordinates_part_0.zarr with shape (1, 3)
+__________________________ test_records_rotation_tta ___________________________
+----------------------------- Captured stdout call -----------------------------
+Creating output store at: <tmp>/test_records_rotation_tta0/logits_part_0.zarr
+Created zarr array at <tmp>/test_records_rotation_tta0/logits_part_0.zarr with shape (1, 2, 4, 4, 4)
+Creating coordinates store at: <tmp>/test_records_rotation_tta0/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_records_rotation_tta0/coordinates_part_0.zarr with shape (1, 3)
+______________________ test_tta_is_json_serialisable_bool ______________________
+----------------------------- Captured stdout call -----------------------------
+Creating output store at: <tmp>/test_tta_is_json_serialisable_0/logits_part_0.zarr
+Created zarr array at <tmp>/test_tta_is_json_serialisable_0/logits_part_0.zarr with shape (1, 2, 4, 4, 4)
+Creating coordinates store at: <tmp>/test_tta_is_json_serialisable_0/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_tta_is_json_serialisable_0/coordinates_part_0.zarr with shape (1, 3)
+______________________ test_existing_attrs_still_written _______________________
+----------------------------- Captured stdout call -----------------------------
+Creating output store at: <tmp>/test_existing_attrs_still_writ0/logits_part_0.zarr
+Created zarr array at <tmp>/test_existing_attrs_still_writ0/logits_part_0.zarr with shape (1, 2, 4, 4, 4)
+Creating coordinates store at: <tmp>/test_existing_attrs_still_writ0/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_existing_attrs_still_writ0/coordinates_part_0.zarr with shape (1, 3)
+_________________ test_predict_keeps_normals_with_default_tta __________________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_predict_keeps_normals_wit0/parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_predict_keeps_normals_wit0/volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_predict_keeps_normals_wit0/volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_predict_keeps_normals_wit0/volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.4 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_predict_keeps_normals_wit0/tta.zarr
+  Shape: (5, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_predict_keeps_normals_wit0/parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache HIT (sidecar:<tmp>/test_predict_keeps_normals_wit0/volume.zarr/.chunk_occupancy.npz): 8/8 (100.0%) chunks occupied for <tmp>/test_predict_keeps_normals_wit0/volume.zarr
+In-memory blending: the blend sums need 0.0 GiB (11.4 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_predict_keeps_normals_wit0/no_tta.zarr
+  Shape: (5, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  30%|██▉       | 8/27 [00:00<00:00, 75.34it/s]Inferring Part 0:  59%|█████▉    | 16/27 [00:00<00:00, 75.99it/s]Inferring Part 0:  89%|████████▉ | 24/27 [00:00<00:00, 75.95it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 76.02it/s]
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 409.92it/s]
+_________ test_component_transform_keeps_peak_memory[normals-batched] __________
+----------------------------- Captured stderr call -----------------------------
+________ test_component_transform_keeps_peak_memory[normals-sequential] ________
+----------------------------- Captured stderr call -----------------------------
+________ test_component_transform_keeps_peak_memory[direction-batched] _________
+----------------------------- Captured stderr call -----------------------------
+_______ test_component_transform_keeps_peak_memory[direction-sequential] _______
+----------------------------- Captured stderr call -----------------------------
+_____________ test_overlapping_patches_keep_a_sign_ambiguous_axis ______________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_overlapping_patches_keep_0/seam_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_overlapping_patches_keep_0/seam_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_overlapping_patches_keep_0/seam_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_overlapping_patches_keep_0/seam_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_overlapping_patches_keep_0/seam.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 148.20it/s]
+_________ test_predict_multiclass_classes_come_from_segmentation_heads _________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_predict_multiclass_classe0/multiclass_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_predict_multiclass_classe0/multiclass_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_predict_multiclass_classe0/multiclass_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_predict_multiclass_classe0/multiclass_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (3, 32, 32, 32)
+Creating final output store: <tmp>/test_predict_multiclass_classe0/multiclass.zarr
+  Shape: (3, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  30%|██▉       | 8/27 [00:00<00:00, 73.01it/s]Inferring Part 0:  59%|█████▉    | 16/27 [00:00<00:00, 70.63it/s]Inferring Part 0:  89%|████████▉ | 24/27 [00:00<00:00, 69.77it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 70.30it/s]
+____________ test_finalize_logits_multiclass_skips_auxiliary_heads _____________
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes
+Opening input logits: <tmp>/test_finalize_logits_multiclas0/logits.zarr
+Mode: multiclass, Threshold: off
+Input shape: (5, 4, 4, 4), Num classes: 5
+Multi-task model detected with targets: ['normals', 'surface']
+Class scores: 2 segmentation channels (auxiliary heads left out)
+Output will have 3 channels: [softmax_c0...softmax_cN, argmax]
+Creating output store: <tmp>/test_finalize_logits_multiclas0/final.zarr
+  Shape: (3, 4, 4, 4), Chunks: (1, 4, 4, 4)
+Processing data in 1 chunks using 1 worker processes...
+
+Output processing complete. Processed 1 chunks, skipped 0 empty chunks (0.00%).
+Final output saved to: <tmp>/test_finalize_logits_multiclas0/final.zarr
+__________ test_predict_keeps_a_sign_invariant_nearest_component_axis __________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_predict_keeps_a_sign_inva0/nearest_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_predict_keeps_a_sign_inva0/nearest_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_predict_keeps_a_sign_inva0/nearest_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_predict_keeps_a_sign_inva0/nearest_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_predict_keeps_a_sign_inva0/nearest.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  52%|█████▏    | 14/27 [00:00<00:00, 133.32it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 145.68it/s]
+_______ test_predict_never_reverses_a_signed_nearest_component[losses0] ________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_predict_never_reverses_a_0/tta_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_predict_never_reverses_a_0/tta_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_predict_never_reverses_a_0/tta_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_predict_never_reverses_a_0/tta_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_predict_never_reverses_a_0/tta.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_predict_never_reverses_a_0/no_tta_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_predict_never_reverses_a_0/no_tta_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_predict_never_reverses_a_0/no_tta_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_predict_never_reverses_a_0/no_tta_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_predict_never_reverses_a_0/no_tta.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  30%|██▉       | 8/27 [00:00<00:00, 74.24it/s]Inferring Part 0:  59%|█████▉    | 16/27 [00:00<00:00, 71.42it/s]Inferring Part 0:  89%|████████▉ | 24/27 [00:00<00:00, 70.58it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 71.18it/s]
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 351.40it/s]
+_______ test_predict_never_reverses_a_signed_nearest_component[losses1] ________
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_predict_never_reverses_a_1/tta_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_predict_never_reverses_a_1/tta_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_predict_never_reverses_a_1/tta_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_predict_never_reverses_a_1/tta_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_predict_never_reverses_a_1/tta.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_predict_never_reverses_a_1/no_tta_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_predict_never_reverses_a_1/no_tta_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_predict_never_reverses_a_1/no_tta_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_predict_never_reverses_a_1/no_tta_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_predict_never_reverses_a_1/no_tta.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  30%|██▉       | 8/27 [00:00<00:00, 71.27it/s]Inferring Part 0:  59%|█████▉    | 16/27 [00:00<00:00, 71.45it/s]Inferring Part 0:  89%|████████▉ | 24/27 [00:00<00:00, 71.64it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 71.64it/s]
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 348.35it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-opposite on the plane] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th0/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th0/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th0/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th0/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th0/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th0/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th0/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th0/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th0/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th0/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th0/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th0/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th0/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th0/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th0/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th0/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 117.46it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 117.64it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-either side of the plane] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th1/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th1/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th1/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th1/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th1/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th1/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th1/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th1/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th1/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th1/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th1/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th1/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th1/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th1/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th1/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th1/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 106.78it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 134.41it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-opposite, tilted] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th2/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th2/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th2/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th2/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th2/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th2/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th2/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th2/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th2/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th2/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th2/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th2/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th2/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th2/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th2/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th2/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 135.20it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 135.05it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-opposite on the plane] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th3/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th3/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th3/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th3/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th3/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th3/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th3/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th3/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th3/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th3/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th3/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th3/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th3/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th3/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th3/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th3/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 109.55it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 107.73it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-either side of the plane] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th4/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th4/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th4/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th4/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th4/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th4/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th4/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th4/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th4/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th4/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th4/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th4/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th4/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th4/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th4/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th4/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 104.40it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 104.16it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-opposite, tilted] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th5/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th5/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th5/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th5/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th5/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th5/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th5/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th5/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th5/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th5/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th5/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th5/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th5/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th5/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th5/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th5/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 119.18it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 120.86it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-opposite on the plane] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th6/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th6/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th6/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th6/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th6/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th6/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th6/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th6/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th6/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th6/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th6/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th6/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th6/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th6/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th6/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th6/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 599.40it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 475.06it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-either side of the plane] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th7/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th7/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th7/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th7/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th7/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th7/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th7/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th7/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th7/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th7/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th7/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th7/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th7/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th7/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th7/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th7/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 514.51it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 593.42it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-opposite, tilted] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th8/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th8/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th8/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th8/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th8/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th8/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th8/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th8/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th8/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th8/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th8/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th8/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th8/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th8/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th8/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th8/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 560.66it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 579.88it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-opposite on the plane] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th9/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th9/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th9/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th9/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th9/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th9/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th9/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th9/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th9/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th9/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th9/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th9/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th9/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th9/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th9/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th9/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 528.52it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 537.70it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-either side of the plane] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th10/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th10/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th10/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th10/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th10/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th10/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th10/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th10/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th10/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th10/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th10/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th10/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th10/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th10/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th10/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th10/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 447.73it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 550.33it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-opposite, tilted] _
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th11/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th11/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th11/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th11/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (11.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th11/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '<tmp>/test_blending_keeps_an_axis_th11/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for <tmp>/test_blending_keeps_an_axis_th11/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for <tmp>/test_blending_keeps_an_axis_th11/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: <tmp>/test_blending_keeps_an_axis_th11/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: <tmp>/test_blending_keeps_an_axis_th11/staged_parts/logits_part_0.zarr
+Created zarr array at <tmp>/test_blending_keeps_an_axis_th11/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: <tmp>/test_blending_keeps_an_axis_th11/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at <tmp>/test_blending_keeps_an_axis_th11/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <tmp>/test_blending_keeps_an_axis_th11/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: <tmp>/test_blending_keeps_an_axis_th11/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <tmp>/test_blending_keeps_an_axis_th11/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 572.91it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 559.58it/s]
+=========================== short test summary info ============================
+PASSED tests/models/run/test_blend_finalize_pipeline.py::test_blend_then_finalize
+PASSED tests/models/run/test_finalize_multiclass_scale.py::test_argmax_channel_holds_the_raw_class_index
+PASSED tests/models/run/test_finalize_multiclass_scale.py::test_probability_of_one_is_255_in_every_chunk
+PASSED tests/models/run/test_finalize_multiclass_scale.py::test_probabilities_are_on_the_binary_path_scale
+PASSED tests/models/run/test_finalize_multiclass_scale.py::test_threshold_multiclass_emits_raw_argmax_only
+PASSED tests/models/run/test_finalize_multiclass_scale.py::test_chunk_encoding_is_continuous_across_chunks
+PASSED tests/models/run/test_finalize_multiclass_scale.py::test_homogeneous_chunk_is_still_skipped
+PASSED tests/models/run/test_finalize_multiclass_scale.py::test_too_many_classes_for_uint8_is_rejected
+PASSED tests/models/run/test_finalize_multiclass_scale.py::test_binary_path_is_unchanged
+PASSED tests/models/run/test_finalize_uncovered_voxels.py::test_uncovered_voxels_are_background_with_threshold
+PASSED tests/models/run/test_finalize_uncovered_voxels.py::test_uncovered_voxels_are_background_in_probability_map
+PASSED tests/models/run/test_finalize_uncovered_voxels.py::test_uncovered_voxels_are_background_in_multiclass
+PASSED tests/models/run/test_finalize_uncovered_voxels.py::test_single_channel_zero_logit_is_unchanged
+PASSED tests/models/run/test_in_memory_blend.py::test_in_memory_blend_matches_blend_and_finalize[2-finalize_config0-False]
+PASSED tests/models/run/test_in_memory_blend.py::test_in_memory_blend_matches_blend_and_finalize[2-finalize_config1-False]
+PASSED tests/models/run/test_in_memory_blend.py::test_in_memory_blend_matches_blend_and_finalize[3-finalize_config2-False]
+PASSED tests/models/run/test_in_memory_blend.py::test_in_memory_blend_matches_blend_and_finalize[2-None-False]
+PASSED tests/models/run/test_in_memory_blend.py::test_in_memory_blend_matches_blend_and_finalize[2-finalize_config4-True]
+PASSED tests/models/run/test_in_memory_blend.py::test_in_memory_blend_covers_only_the_patch_extent
+PASSED tests/models/run/test_in_memory_blend.py::test_blend_in_memory_is_off_by_default
+PASSED tests/models/run/test_in_memory_blend.py::test_main_passes_in_memory_blend_settings
+PASSED tests/models/run/test_in_memory_blend.py::test_main_passes_parts_with_blend_in_memory
+PASSED tests/models/run/test_in_memory_blend.py::test_split_in_memory_blend_matches_blend_and_finalize[finalize_config0-2]
+PASSED tests/models/run/test_in_memory_blend.py::test_split_in_memory_blend_matches_blend_and_finalize[finalize_config0-3]
+PASSED tests/models/run/test_in_memory_blend.py::test_split_in_memory_blend_matches_blend_and_finalize[finalize_config0-4]
+PASSED tests/models/run/test_in_memory_blend.py::test_split_in_memory_blend_matches_blend_and_finalize[None-2]
+PASSED tests/models/run/test_in_memory_blend.py::test_split_in_memory_blend_matches_blend_and_finalize[None-3]
+PASSED tests/models/run/test_in_memory_blend.py::test_split_in_memory_blend_matches_blend_and_finalize[None-4]
+PASSED tests/models/run/test_in_memory_blend.py::test_part_slabs_follow_the_covered_extent
+PASSED tests/models/run/test_in_memory_blend.py::test_write_rejects_a_slab_that_cuts_a_chunk
+PASSED tests/models/run/test_in_memory_blend.py::test_inferer_runs_the_patches_that_reach_its_slab
+PASSED tests/models/run/test_in_memory_blend.py::test_inferer_prepares_blend_output_before_processing[False]
+PASSED tests/models/run/test_in_memory_blend.py::test_inferer_prepares_blend_output_before_processing[True]
+PASSED tests/models/run/test_in_memory_blend.py::test_blend_part_waits_for_this_runs_initialization[None]
+PASSED tests/models/run/test_in_memory_blend.py::test_blend_part_waits_for_this_runs_initialization[old-run]
+PASSED tests/models/run/test_in_memory_blend.py::test_blend_ready_marker_is_published_after_creation
+PASSED tests/models/run/test_in_memory_blend.py::test_failed_blend_creation_does_not_publish_ready
+PASSED tests/models/run/test_in_memory_blend.py::test_split_inferer_requires_run_id[None]
+PASSED tests/models/run/test_in_memory_blend.py::test_split_inferer_requires_run_id[]
+PASSED tests/models/run/test_in_memory_blend.py::test_split_inferer_requires_run_id[ ]
+PASSED tests/models/run/test_in_memory_blend.py::test_main_rejects_invalid_blend_initialization[extra_args0]
+PASSED tests/models/run/test_in_memory_blend.py::test_main_rejects_invalid_blend_initialization[extra_args1]
+PASSED tests/models/run/test_in_memory_blend.py::test_main_rejects_invalid_blend_initialization[extra_args2]
+PASSED tests/models/run/test_in_memory_blend.py::test_main_rejects_invalid_blend_initialization[extra_args3]
+PASSED tests/models/run/test_inference_chunk_cache.py::test_chunk_cache_is_off_by_default
+PASSED tests/models/run/test_inference_chunk_cache.py::test_main_passes_chunk_cache_mb
+PASSED tests/models/run/test_inference_chunk_cache.py::test_inferer_forwards_chunk_cache_to_dataset[0-False]
+PASSED tests/models/run/test_inference_chunk_cache.py::test_inferer_forwards_chunk_cache_to_dataset[512-True]
+PASSED tests/models/run/test_inference_chunk_cache.py::test_inferer_rejects_negative_chunk_cache_mb
+PASSED tests/models/run/test_inference_chunk_cache.py::test_vcdataset_chunk_cache_survives_pickling_and_reads_identically
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_legacy_checkpoint_config_and_ema_selection
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_legacy_checkpoint_raw_weights_when_ema_validation_disabled
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_select_evenly_spaced_middle_indices_prefers_middle_for_one_patch
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_max_patches_prefers_non_empty_candidates
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_max_patches_keeps_empty_fallback_when_no_non_empty_candidates
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_load_train_py_model_supports_legacy_checkpoint_with_ema
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_percentile_minmax_normalization
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_percentile_minmax_constant_input_returns_zero
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_vcdataset_passes_anon_to_reader
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_main_accepts_input_anon
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_finalization_handles_single_channel_multitask_probabilities
+PASSED tests/models/run/test_inference_legacy_checkpoint.py::test_finalization_handles_single_channel_multitask_threshold
+PASSED tests/models/run/test_inference_nnunet_normalization.py::test_nnunet_ct_normalization_uses_channel_zero_fingerprint
+PASSED tests/models/run/test_inference_nnunet_normalization.py::test_volume_ct_normalization_matches_nnunet
+PASSED tests/models/run/test_inference_nnunet_normalization.py::test_nnunet_supported_normalization_mapping[ZScoreNormalization-instance_zscore]
+PASSED tests/models/run/test_inference_nnunet_normalization.py::test_nnunet_supported_normalization_mapping[NoNormalization-none]
+PASSED tests/models/run/test_inference_nnunet_normalization.py::test_nnunet_supported_normalization_mapping[RescaleTo01Normalization-instance_minmax]
+PASSED tests/models/run/test_inference_nnunet_normalization.py::test_nnunet_unknown_normalization_fails_instead_of_silent_fallback
+PASSED tests/models/run/test_inference_nnunet_normalization.py::test_nnunet_masked_zscore_fails_instead_of_changing_semantics
+PASSED tests/models/run/test_inference_nnunet_normalization.py::test_nnunet_multichannel_normalization_fails_explicitly
+PASSED tests/models/run/test_inference_nnunet_normalization.py::test_dataset_receives_ct_intensity_properties
+PASSED tests/models/run/test_inference_non_cuda_devices.py::test_device_defaults_to_none_so_the_accelerator_is_detected
+PASSED tests/models/run/test_inference_non_cuda_devices.py::test_mirroring_tta_runs_sequentially_off_cuda
+PASSED tests/models/run/test_inference_run_config_attrs.py::test_records_tta_enabled
+PASSED tests/models/run/test_inference_run_config_attrs.py::test_records_tta_disabled
+PASSED tests/models/run/test_inference_run_config_attrs.py::test_records_rotation_tta
+PASSED tests/models/run/test_inference_run_config_attrs.py::test_tta_is_json_serialisable_bool
+PASSED tests/models/run/test_inference_run_config_attrs.py::test_existing_attrs_still_written
+PASSED tests/models/run/test_lock_file_exclusive.py::test_retries_until_contention_clears
+PASSED tests/models/run/test_lock_file_exclusive.py::test_non_contention_errors_propagate[9]
+PASSED tests/models/run/test_lock_file_exclusive.py::test_non_contention_errors_propagate[28]
+PASSED tests/models/run/test_lock_file_exclusive.py::test_non_contention_errors_propagate[22]
+PASSED tests/models/run/test_lock_file_exclusive.py::test_posix_branch_uses_flock
+PASSED tests/models/run/test_pipeline_cli.py::test_pipeline_accepts_both_flag_spellings[predict--]
+PASSED tests/models/run/test_pipeline_cli.py::test_pipeline_accepts_both_flag_spellings[predict-_]
+PASSED tests/models/run/test_pipeline_cli.py::test_pipeline_accepts_both_flag_spellings[blend_logits--]
+PASSED tests/models/run/test_pipeline_cli.py::test_pipeline_accepts_both_flag_spellings[blend_logits-_]
+PASSED tests/models/run/test_pipeline_cli.py::test_pipeline_accepts_both_flag_spellings[blend_and_finalize--]
+PASSED tests/models/run/test_pipeline_cli.py::test_pipeline_accepts_both_flag_spellings[blend_and_finalize-_]
+PASSED tests/models/run/test_pipeline_cli.py::test_pipeline_accepts_both_flag_spellings[finalize_outputs--]
+PASSED tests/models/run/test_pipeline_cli.py::test_pipeline_accepts_both_flag_spellings[finalize_outputs-_]
+PASSED tests/models/run/test_pipeline_cli.py::test_finalize_defaults
+PASSED tests/models/run/test_pipeline_cli.py::test_finalize_main_dispatches_parsed_settings[binary-threshold_args0-None]
+PASSED tests/models/run/test_pipeline_cli.py::test_finalize_main_dispatches_parsed_settings[multiclass-threshold_args1-0.5]
+PASSED tests/models/run/test_pipeline_cli.py::test_finalize_main_dispatches_parsed_settings[binary-threshold_args2-0.3]
+PASSED tests/models/run/test_pipeline_cli.py::test_invalid_arguments_report_usage_error[inference-argv0-bbox]
+PASSED tests/models/run/test_pipeline_cli.py::test_invalid_arguments_report_usage_error[finalize_outputs-argv1-part_id]
+PASSED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[3-mirroring]
+PASSED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[3-rotation]
+PASSED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[2-mirroring]
+PASSED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[2-rotation]
+PASSED tests/models/run/test_tta_vector_heads.py::test_batched_mirroring_matches_sequential
+PASSED tests/models/run/test_tta_vector_heads.py::test_segmentation_only_models_average_as_before
+PASSED tests/models/run/test_tta_vector_heads.py::test_predict_keeps_normals_with_default_tta
+PASSED tests/models/run/test_tta_vector_heads.py::test_half_precision_sign_alignment_keeps_small_directions[batched]
+PASSED tests/models/run/test_tta_vector_heads.py::test_half_precision_sign_alignment_keeps_small_directions[sequential]
+PASSED tests/models/run/test_tta_vector_heads.py::test_component_transform_keeps_peak_memory[normals-batched]
+PASSED tests/models/run/test_tta_vector_heads.py::test_component_transform_keeps_peak_memory[normals-sequential]
+PASSED tests/models/run/test_tta_vector_heads.py::test_component_transform_keeps_peak_memory[direction-batched]
+PASSED tests/models/run/test_tta_vector_heads.py::test_component_transform_keeps_peak_memory[direction-sequential]
+PASSED tests/models/run/test_tta_vector_heads.py::test_overlapping_patches_keep_a_sign_ambiguous_axis
+PASSED tests/models/run/test_tta_vector_heads.py::test_predict_multiclass_classes_come_from_segmentation_heads
+PASSED tests/models/run/test_tta_vector_heads.py::test_multiclass_finalization_skips_auxiliary_heads
+PASSED tests/models/run/test_tta_vector_heads.py::test_finalize_logits_multiclass_skips_auxiliary_heads
+PASSED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head0-axial]
+PASSED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head1-vector]
+PASSED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head2-vector]
+PASSED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head3-vector]
+PASSED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head4-vector]
+PASSED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head5-axial]
+PASSED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head6-vector]
+PASSED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head7-axial]
+PASSED tests/models/run/test_tta_vector_heads.py::test_predict_keeps_a_sign_invariant_nearest_component_axis
+PASSED tests/models/run/test_tta_vector_heads.py::test_predict_never_reverses_a_signed_nearest_component[losses0]
+PASSED tests/models/run/test_tta_vector_heads.py::test_predict_never_reverses_a_signed_nearest_component[losses1]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-opposite on the plane]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-either side of the plane]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-opposite, tilted]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-opposite on the plane]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-either side of the plane]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-opposite, tilted]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-opposite on the plane]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-either side of the plane]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-opposite, tilted]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-opposite on the plane]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-either side of the plane]
+PASSED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-opposite, tilted]
+======================== 137 passed in 75.23s (0:01:15) ========================

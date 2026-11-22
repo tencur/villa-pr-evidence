@@ -1,0 +1,64 @@
+## main-c8f3ba453: repro_tta_vector_heads.py (48^3, real Inferer + in-memory blend)
+voxels compared: 25407
+no TTA           seg max|diff vs no-TTA| 0.0000 | normals mean |n| 1.0000, median angle to truth   0.00 deg, >10 deg   0.0% | tensor mean |off-diag| 0.0957 (truth 0.0957), mean |diag err| 0.0000
+TTA mirroring    seg max|diff vs no-TTA| 0.0000 | normals mean |n| 0.0000, median angle to truth  90.00 deg, >10 deg 100.0% | tensor mean |off-diag| 0.0000 (truth 0.0957), mean |diag err| 0.0000
+TTA rotation     seg max|diff vs no-TTA| 0.0000 | normals mean |n| 0.6920, median angle to truth  14.47 deg, >10 deg  96.0% | tensor mean |off-diag| 0.0484 (truth 0.0957), mean |diag err| 0.0489
+## main-c8f3ba453: review_seam_fixture.py
+Gaussian weight at voxel (8, 8, 12): patch x=0 (index 12) 0.135335, patch x=8 (index 4) 0.135335
+mirroring TTA (default)  blended direction at the seam voxel (8, 8, 12): x 0.8750, y 0.0000, z 0.0000 | interior min |x| 0.7500
+no TTA                   blended direction at the seam voxel (8, 8, 12): x 0.0000, y 0.0000, z 0.0000 | interior min |x| 0.0000
+## main-c8f3ba453: review_multiclass_cli.py
+case A: 2 surface scores + normals, default TTA: exit 0, output shape (6, 32, 32, 32), class at (16, 16, 16) = 1 (expected 1); interior: class 1: 21952
+case B: 3 surface scores + normals, --disable_tta: exit 0, output shape (7, 32, 32, 32), class at (16, 16, 16) = 3 (expected 1); interior: class 3: 21952
+## main-c8f3ba453: review_fp16_small_direction.py
+(this revision has no channel groups: components are averaged as they come)
+product in float16: -0.0
+batched    output dtype torch.float16, mean direction x 0.000100 y 0.000000 z 0.000000
+sequential output dtype torch.float16, mean direction x 0.000100 y 0.000000 z 0.000000
+## main-c8f3ba453: review_peak_memory.py
+one float16 output variant (5 x 128^3): 20.0 MiB
+batched    plain              peak over baseline 612.6 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+batched    surface_normals    peak over baseline n/a (no channel groups in this revision)
+batched    inplane_direction  peak over baseline n/a (no channel groups in this revision)
+sequential plain              peak over baseline 855.0 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+sequential surface_normals    peak over baseline n/a (no channel groups in this revision)
+sequential inplane_direction  peak over baseline n/a (no channel groups in this revision)
+## main-c8f3ba453: review_nearest_component_shipped.py
+Inferer in-memory blend        default mirroring  saved (x, y, z, distance) at (16, 16, 16): (1.0000, 0.0000, 0.0000, 2.0000)
+Inferer in-memory blend        --disable_tta      saved (x, y, z, distance) at (16, 16, 16): (1.0000, 0.0000, 0.0000, 2.0000)
+Inferer staged (blend_logits)  default mirroring  saved (x, y, z, distance) at (16, 16, 16): (1.0000, 0.0000, 0.0000, 2.0000)
+Inferer staged (blend_logits)  --disable_tta      saved (x, y, z, distance) at (16, 16, 16): (1.0000, 0.0000, 0.0000, 2.0000)
+channel groups for the shipped head: n/a (no channel groups in this revision)
+helper batched    mirroring, mean (x, y, z, distance) over the patch: (1.0000, 0.0000, 0.0000, 2.0000)
+helper sequential mirroring, mean (x, y, z, distance) over the patch: (1.0000, 0.0000, 0.0000, 2.0000)
+## main-c8f3ba453: review_overlap_seam.py
+seam inplane_direction opposite on the plane    default mirroring length at (8, 8, 12): in-memory 0.00000 | staged 0.00000
+seam inplane_direction opposite on the plane    --disable_tta     length at (8, 8, 12): in-memory 0.00000 | staged 0.00000
+seam inplane_direction either side of the plane default mirroring length at (8, 8, 12): in-memory 0.00000 | staged 0.00000
+seam inplane_direction either side of the plane --disable_tta     length at (8, 8, 12): in-memory 1.00012 | staged 1.00012
+seam inplane_direction opposite, tilted         default mirroring length at (8, 8, 12): in-memory 0.00000 | staged 0.00000
+seam inplane_direction opposite, tilted         --disable_tta     length at (8, 8, 12): in-memory 0.02235 | staged 0.02235
+seam nearest_component opposite on the plane    default mirroring length at (8, 8, 12): in-memory 0.00000 (distance 3.000) | staged 0.00000 (distance 3.000)
+seam nearest_component opposite on the plane    --disable_tta     length at (8, 8, 12): in-memory 0.00000 (distance 3.000) | staged 0.00000 (distance 3.000)
+seam nearest_component either side of the plane default mirroring length at (8, 8, 12): in-memory 0.00000 (distance 3.000) | staged 0.00000 (distance 3.000)
+seam nearest_component either side of the plane --disable_tta     length at (8, 8, 12): in-memory 1.00012 (distance 3.000) | staged 1.00012 (distance 3.000)
+seam nearest_component opposite, tilted         default mirroring length at (8, 8, 12): in-memory 0.00000 (distance 3.000) | staged 0.00000 (distance 3.000)
+seam nearest_component opposite, tilted         --disable_tta     length at (8, 8, 12): in-memory 0.02235 (distance 3.000) | staged 0.02235 (distance 3.000)
+## main-c8f3ba453: review_multiclass_uniform.py
+voxels where the tensor component outscores class 1: 6235 of 32768
+multiclass --threshold, in-memory (predict --blend_in_memory): exit 0, output shape (1, 32, 32, 32); saved class 1: 26539, class 2: 6229
+multiclass --threshold, staged finalize (logits deleted: True): exit 0, output shape (1, 32, 32, 32); saved class 1: 26539, class 2: 6229
+multiclass --threshold, blend_and_finalize: exit 0, output shape (1, 32, 32, 32); saved class 1: 26539, class 2: 6229
+## main-c8f3ba453: review_alloc_memory.py
+one float16 output variant (5 x 128^3): 20.0 MiB
+batched    plain              peak 384.0 MiB live tensors,   0.97 s  (groups: -)
+batched    surface_normals    peak n/a (no channel groups in this revision)
+batched    inplane_direction  peak n/a (no channel groups in this revision)
+batched    plain_6ch          peak 448.0 MiB live tensors,   1.10 s  (groups: -)
+batched    nearest_component  peak n/a (no channel groups in this revision)
+sequential plain              peak 480.0 MiB live tensors,   0.97 s  (groups: -)
+sequential surface_normals    peak n/a (no channel groups in this revision)
+sequential inplane_direction  peak n/a (no channel groups in this revision)
+sequential plain_6ch          peak 576.0 MiB live tensors,   1.07 s  (groups: -)
+sequential nearest_component  peak n/a (no channel groups in this revision)
+in-memory blend sums per voxel, 5 channels: 24 bytes; with one axis head: 24 bytes

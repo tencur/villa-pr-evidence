@@ -1,0 +1,1012 @@
+From bfe60e913916faaa04500881e81a1d191ca7fa2f Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 17:12:16 +0000
+Subject: [PATCH 1/3] vesuvius.predict TTA: read a direction's sign convention
+ from its training losses
+
+The shipped nearest_component_3d.yaml trains the direction with
+SignInvariantCosineLoss (ChannelSelectLoss on all but the last channel)
+and the trailing distance with SmoothL1Loss. The TTA transformed that
+direction as a signed vector, so a network that reports the axis with the
+same sign in every mirrored frame, which the loss allows, averaged to
+(0, 0, 0, d) under default mirroring where main kept (1, 0, 0, d).
+
+A vector head is now an axis when every loss configured on its direction
+channels is SignInvariantCosineLoss (directly, or as the base of a
+ChannelSelectLoss that does not select only the last channel). Any other
+loss there (CosineSimilarityLoss, NormalSmoothnessLoss, a regression loss)
+can supervise the orientation, so the head stays signed and is never
+flipped, also when it is combined with a sign-invariant loss. Without a
+configured direction loss, inplane_direction stays an axis and the other
+vector heads stay signed. The nearest_component distance stays a scalar
+average.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ vesuvius/src/vesuvius/models/run/tta.py       | 64 +++++++++++++--
+ .../tests/models/run/test_tta_vector_heads.py | 82 +++++++++++++++++++
+ 2 files changed, 139 insertions(+), 7 deletions(-)
+
+diff --git a/vesuvius/src/vesuvius/models/run/tta.py b/vesuvius/src/vesuvius/models/run/tta.py
+index 2d0cbfb47..98eb5bc9a 100644
+--- a/vesuvius/src/vesuvius/models/run/tta.py
++++ b/vesuvius/src/vesuvius/models/run/tta.py
+@@ -15,8 +15,12 @@ def _concat_if_multi_task(output, is_multi_task: bool, concat_fn):
+ # both before averaging; otherwise the variants cancel (normals average to zero).
+ # Spatial axes are named by their tensor dim: z = -3, y = -2, x = -1.
+ _AXES = {'z': -3, 'y': -2, 'x': -1}
+-# task_type -> whether the direction's sign is arbitrary (an eigenvector)
+-_VECTOR_TASKS = {'surface_normals': False, 'nearest_component': False, 'inplane_direction': True}
++_VECTOR_TASKS = ('surface_normals', 'nearest_component', 'inplane_direction')
++# Vector heads that are axes when their configuration names no direction loss: an in-plane
++# direction is an eigenvector, so its sign is arbitrary.
++_AXIS_TASKS_BY_DEFAULT = ('inplane_direction',)
++# Direction losses that do not depend on the sign of the prediction.
++_SIGN_INVARIANT_LOSSES = ('SignInvariantCosineLoss',)
+ _TENSOR_ORDER = {3: ('zz', 'zy', 'zx', 'yy', 'yx', 'xx'), 2: ('yy', 'yx', 'xx')}
+ # A sign-ambiguous direction is reported in the half-space 4x + 2y + z >= 0 of the input frame.
+ # A sign chosen per patch would let two overlapping patches that agree up to sign cancel when
+@@ -25,21 +29,67 @@ _TENSOR_ORDER = {3: ('zz', 'zy', 'zx', 'yy', 'yx', 'xx'), 2: ('yy', 'yx', 'xx')}
+ _AXIAL_HALF_SPACE = {-1: 4.0, -2: 2.0, -3: 1.0}
+ 
+ 
++def _direction_losses(target_config):
++    """Names of the losses configured for a vector head's direction channels.
++
++    A `ChannelSelectLoss` counts with its base loss, unless it selects only the last channel
++    (the distance of `nearest_component`)."""
++    losses = target_config.get('losses')
++    if not losses and target_config.get('loss_fn'):
++        losses = [{'name': target_config['loss_fn']}]
++    names = []
++    for loss in losses or ():
++        name = loss.get('name')
++        if name == 'ChannelSelectLoss':
++            kwargs = loss.get('kwargs') or {}
++            if kwargs.get('channels', loss.get('channels', 'all_but_last')) == 'last':
++                continue
++            name = (kwargs.get('base') or loss.get('base') or {}).get('name')
++        names.append(name)
++    return names
++
++
++def is_axis_head(target_config, out_channels=None, spatial_dims=3) -> bool:
++    """Whether a head's leading channels are an axis: a direction whose sign is arbitrary.
++
++    Read from the losses the head was trained with. When every loss on the direction channels
++    is `SignInvariantCosineLoss` (as configured for `inplane_direction` and for the direction
++    of `nearest_component`), the network may report either sign, so TTA variants and
++    overlapping patches can disagree in sign while they agree on the axis. Any other loss on
++    those channels (`CosineSimilarityLoss`, `NormalSmoothnessLoss`, a regression loss) can
++    supervise the orientation, so the head is signed and is never flipped, also when it is
++    combined with a sign-invariant loss. Without a direction loss in the configuration,
++    in-plane directions are axes and the other vector heads signed.
++    """
++    cfg = target_config or {}
++    task = str(cfg.get('task_type', '')).lower()
++    count = cfg.get('out_channels') if out_channels is None else out_channels
++    if task not in _VECTOR_TASKS or (count is not None and int(count) < spatial_dims):
++        return False
++    names = _direction_losses(cfg)
++    if not names:
++        return task in _AXIS_TASKS_BY_DEFAULT
++    return all(name in _SIGN_INVARIANT_LOSSES for name in names)
++
++
+ def tta_channel_groups(targets, target_info, spatial_dims: int):
+     """Geometric channel groups of a multi-task output, for `infer_with_tta(channel_groups=...)`.
+ 
+     `targets` is the checkpoint's target configuration (with each auxiliary head's
+-    `task_type`), `target_info` the channel range of each target in the concatenated output.
+-    Each group maps a tuple of spatial dims to an output channel: (axis,) for a vector
+-    component, (axis_a, axis_b) for a structure tensor component.
++    `task_type` and losses), `target_info` the channel range of each target in the concatenated
++    output. Each group maps a tuple of spatial dims to an output channel: (axis,) for a vector
++    component, (axis_a, axis_b) for a structure tensor component. Vector heads are 'axial'
++    when `is_axis_head`, otherwise 'vector'.
+     """
+     groups = []
+     for name, info in (target_info or {}).items():
+-        task = str(((targets or {}).get(name) or {}).get('task_type', '')).lower()
++        cfg = (targets or {}).get(name) or {}
++        task = str(cfg.get('task_type', '')).lower()
+         start, count = int(info['start_channel']), int(info['out_channels'])
+         if task in _VECTOR_TASKS and count >= spatial_dims:
+             channels = {(_AXES[a],): start + i for i, a in enumerate('xyz'[:spatial_dims])}
+-            groups.append({'kind': 'axial' if _VECTOR_TASKS[task] else 'vector', 'channels': channels})
++            kind = 'axial' if is_axis_head(cfg, count, spatial_dims) else 'vector'
++            groups.append({'kind': kind, 'channels': channels})
+         elif task == 'structure_tensor' and count == len(_TENSOR_ORDER[spatial_dims]):
+             channels = {(_AXES[c[0]], _AXES[c[1]]): start + i
+                         for i, c in enumerate(_TENSOR_ORDER[spatial_dims])}
+diff --git a/vesuvius/tests/models/run/test_tta_vector_heads.py b/vesuvius/tests/models/run/test_tta_vector_heads.py
+index b3f586c6e..667653ab4 100644
+--- a/vesuvius/tests/models/run/test_tta_vector_heads.py
++++ b/vesuvius/tests/models/run/test_tta_vector_heads.py
+@@ -7,11 +7,15 @@ Jyx Jxx) therefore need more than the spatial un-flip, or the TTA variants cance
+ """
+ from __future__ import annotations
+ 
++from pathlib import Path
++
+ import numpy as np
+ import pytest
+ import torch
++import yaml
+ 
+ from vc_reader.reader import ZarrWriter, open_zarr
++import vesuvius.models
+ from vesuvius.models.run import inference, tta
+ from vesuvius.models.run.inference import Inferer
+ 
+@@ -319,3 +323,81 @@ def test_finalize_logits_multiclass_skips_auxiliary_heads(tmp_path):
+     out = np.asarray(open_zarr(str(tmp_path / "final.zarr"))[:])
+     assert out.shape == (3, 4, 4, 4)
+     assert np.unique(out[-1]).tolist() == [1]
++
++
++# --- The checkpoint's losses decide whether a direction is an axis (no sign) ---------------------
++
++def _shipped_nearest_component():
++    """The nearest_component head as the shipped nearest_component_3d.yaml trains it: the direction
++    with SignInvariantCosineLoss, the trailing distance with SmoothL1Loss."""
++    path = Path(vesuvius.models.__file__).parent / "configuration" / "aux_tasks" / "nearest_component_3d.yaml"
++    losses = yaml.safe_load(path.read_text())["auxiliary_tasks"]["nearest_component"]["losses"]
++    return {"out_channels": 4, "auxiliary_task": True, "task_type": "nearest_component", "losses": losses}
++
++
++def _nearest_component(*direction_losses):
++    """The shipped head with other losses on the direction channels (the distance keeps SmoothL1Loss)."""
++    head = _shipped_nearest_component()
++    distance = [loss for loss in head["losses"] if loss["kwargs"]["channels"] == "last"]
++    head["losses"] = [{"name": "ChannelSelectLoss", "weight": 1.0,
++                       "kwargs": {"channels": "all_but_last", "base": {"name": name, "kwargs": {}}}}
++                      for name in direction_losses] + distance
++    return head
++
++
++@pytest.mark.parametrize(("head", "kind"), [
++    (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
++    (_nearest_component("CosineSimilarityLoss"), "vector"),
++    # orientation supervised by any loss: signed, also next to a sign-invariant loss
++    (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
++    (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
++    ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
++    ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
++    ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
++    ({**TARGETS["direction"]}, "axial"),
++])
++def test_direction_kind_comes_from_the_training_losses(head, kind):
++    targets = {"surface": TARGETS["surface"], "h": head}
++    groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
++    assert [g["kind"] for g in groups] == [kind]
++    assert sorted(groups[0]["channels"].values()) == [2, 3, 4]  # a nearest_component distance (5) stays scalar
++
++
++class SameSignXAxis(torch.nn.Module):
++    """Reports the x axis with the same sign in every mirrored frame, at distance 2. Under the
++    shipped SignInvariantCosineLoss that is a perfect direction wherever x is the true axis."""
++
++    def forward(self, x):
++        s = x[:, :1].float()
++        one = torch.ones_like(s)
++        return {"surface": torch.cat([-s, s], dim=1),
++                "nearest": torch.cat([one, 0 * one, 0 * one, 2 * one], dim=1)}
++
++
++def test_predict_keeps_a_sign_invariant_nearest_component_axis(tmp_path, monkeypatch):
++    """Default mirroring with the shipped nearest_component losses keeps the axis and the
++    distance: (1, 0, 0, 2). As a signed vector the mirrored variants cancelled to (0, 0, 0, 2)."""
++    targets = {"surface": TARGETS["surface"], "nearest": _shipped_nearest_component()}
++    out = _predict(tmp_path, monkeypatch, _volume((32, 32, 32)).numpy(), SameSignXAxis(), targets,
++                   (16, 16, 16), "nearest").astype(np.float32)
++    nearest = out[2:6]
++    assert nearest[:, 16, 16, 16].tolist() == [1.0, 0.0, 0.0, 2.0], nearest[:, 16, 16, 16]
++    inner = nearest[:, 4:28, 4:28, 4:28]  # away from the volume faces, where the weights vanish
++    assert np.abs(inner - np.array([1.0, 0, 0, 2.0]).reshape(4, 1, 1, 1)).max() < 1e-3
++
++
++@pytest.mark.parametrize("losses", [("CosineSimilarityLoss",), ("SignInvariantCosineLoss", "CosineSimilarityLoss")])
++def test_predict_never_reverses_a_signed_nearest_component(tmp_path, monkeypatch, losses):
++    """With a signed loss on the direction (alone or next to a sign-invariant one), TTA and blending
++    keep the predicted orientation, also where it points out of the half-space axes are written in."""
++    targets = {"surface": TARGETS["surface"], "nearest": _nearest_component(*losses)}
++    volume = _volume((32, 32, 32)).numpy()
++    with_tta = _predict(tmp_path, monkeypatch, volume, Oracle(), targets, (16, 16, 16), "tta").astype(np.float32)
++    without = _predict(tmp_path, monkeypatch, volume, Oracle(), targets, (16, 16, 16), "no_tta",
++                       do_tta=False).astype(np.float32)
++    mask = _defined(torch.from_numpy(volume)[None, None]).numpy()
++    mask[[0, -1]] = mask[:, [0, -1]] = mask[:, :, [0, -1]] = False
++    assert np.abs(with_tta[2:6] - without[2:6])[:, mask].max() < 1e-2
++    # the Oracle's direction points inwards: a good part of it lies outside the half-space
++    side = 4 * with_tta[2] + 2 * with_tta[3] + with_tta[4]
++    assert (side[mask] < -0.5).mean() > 0.3
+-- 
+2.47.3
+
+
+From bb96fcddb07a1ae09303a01837d0774aac9a88f7 Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 17:13:47 +0000
+Subject: [PATCH 2/3] vesuvius.predict: average sign-invariant directions as
+ orientation tensors
+
+TTA variants and overlapping patches may report an axis with either sign.
+The fixed half-space 4x + 2y + z >= 0 left exact opposites on its plane,
+such as (1, -2, 0) and (-1, 2, 0), opposite, and gave nearly parallel
+axes on either side of it, such as (1, -1.999, 0) and (1, -2.001, 0),
+opposite signs, so they cancelled where the patches overlap, in the
+in-memory and in the staged blend. With TTA disabled, axes reported with
+opposite signs cancelled the same way, as on main.
+
+Axis heads (inplane_direction, and nearest_component trained with the
+shipped sign-invariant loss) are now averaged as the orientation tensor
+v v^T, which does not depend on the sign or order of the predictions: over
+the TTA variants, and in both blenders, which accumulate the three
+off-diagonal components in extra float32 sums after the output channels.
+The mean tensor is reduced to its principal eigenvector (repeated
+squaring, a fixed number of rows at a time), scaled to the square root of
+the largest eigenvalue: predictions that agree up to sign keep their
+common vector and length. The output keeps three components per axis
+head, written in the half-space above as a sign convention; signed heads
+and the nearest_component distance are averaged as before.
+
+vesuvius.predict marks these heads `sign_invariant` in target_info (also in
+the logits attrs) for blend_logits and blend_and_finalize; logits written
+without the mark are blended as before.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ vesuvius/src/vesuvius/models/run/blending.py  |  84 +++++++---
+ vesuvius/src/vesuvius/models/run/inference.py |  16 +-
+ vesuvius/src/vesuvius/models/run/tta.py       | 158 ++++++++++++++----
+ .../tests/models/run/test_tta_vector_heads.py | 103 +++++++++++-
+ 4 files changed, 303 insertions(+), 58 deletions(-)
+
+diff --git a/vesuvius/src/vesuvius/models/run/blending.py b/vesuvius/src/vesuvius/models/run/blending.py
+index b683567f1..c2e82b96a 100644
+--- a/vesuvius/src/vesuvius/models/run/blending.py
++++ b/vesuvius/src/vesuvius/models/run/blending.py
+@@ -9,10 +9,13 @@ from collections import defaultdict
+ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+ 
+ import numpy as np
++import torch
+ from scipy.ndimage import gaussian_filter
+ from tqdm.auto import tqdm
+ 
+ from vc_reader.reader import ObjectStore, ZarrWriter, open_zarr
++from vesuvius.models.run.tta import (accumulator_channels, axis_head_channels, orientation_layouts,
++                                     reduce_orientation_tensors)
+ from vesuvius.utils.io.zarr_utils import mark_zarr_ready, wait_for_zarr_creation
+ from vesuvius.utils.k8s import get_tqdm_kwargs
+ from vesuvius.utils.cli import HyphenUnderscoreParser
+@@ -340,13 +343,35 @@ def generate_gaussian_map(patch_size: tuple, sigma_scale: float = 8.0, dtype=np.
+     return gaussian_map_np
+ 
+ 
++def _weigh_patch(patch_logits, weight, layouts, out):
++    """The weighted contribution of one patch to the blend sums, written into `out` (float32).
++
++    `out[:C]` gets w * logits. For each axis head (`orientation_layouts`) the channels of its
++    layout get w * v_i * v_j instead, so the blend averages the orientation tensor v v^T: two
++    overlapping patches that report one axis with opposite signs then add up instead of
++    cancelling. Both blenders weigh patches with this function.
++    """
++    num_channels = patch_logits.shape[0]
++    np.multiply(patch_logits, weight[np.newaxis], out=out[:num_channels])
++    for layout in layouts:
++        diagonal = [ch for (i, j), ch in sorted(layout.items()) if i == j]
++        for (i, j), ch in layout.items():
++            if i != j:  # w v_i * v_j, before the diagonal channels are squared below
++                np.multiply(out[diagonal[i]], patch_logits[diagonal[j]], out=out[ch])
++        for ch in diagonal:
++            np.multiply(out[ch], patch_logits[ch], out=out[ch])
++    return out
++
++
+ def _write_blended_chunk(output_store, chunk_info, chunk_logits, chunk_weights, num_classes,
+-                         finalize_config=None, epsilon=1e-8):
++                         finalize_config=None, epsilon=1e-8, layouts=()):
+     """Normalise one chunk's weighted logit sum and write it to the output store.
+ 
+-    `chunk_logits` (C, Z, Y, X) holds sum(w * logits) and `chunk_weights` (Z, Y, X) holds
+-    sum(w); `chunk_logits` is divided in place. With `finalize_config` the chunk is
+-    finalized (softmax + uint8) before writing, otherwise it is written as float16 logits.
++    `chunk_logits` (C_acc, Z, Y, X) holds sum(w * logits) and `chunk_weights` (Z, Y, X) holds
++    sum(w); `chunk_logits` is divided in place. The orientation tensors of axis heads
++    (`layouts`, accumulated after the `num_classes` channels) are then reduced to their
++    principal axis. With `finalize_config` the chunk is finalized (softmax + uint8) before
++    writing, otherwise it is written as float16 logits.
+     """
+     z_start, z_end = chunk_info['z_start'], chunk_info['z_end']
+     y_start, y_end = chunk_info['y_start'], chunk_info['y_end']
+@@ -363,6 +388,9 @@ def _write_blended_chunk(output_store, chunk_info, chunk_logits, chunk_weights,
+     weights_b = chunk_weights[np.newaxis, :, :, :]
+     np.divide(chunk_logits, weights_b + epsilon,
+               out=chunk_logits, where=weights_b > 0)
++    if layouts:
++        reduce_orientation_tensors(torch.from_numpy(chunk_logits), layouts)
++        chunk_logits = chunk_logits[:num_classes]
+ 
+     if finalize_config is not None:
+         from vesuvius.models.run.finalize_outputs import apply_finalization
+@@ -380,7 +408,7 @@ _worker_state = {}
+ 
+ 
+ def _init_worker(part_files, output_path, gaussian_map, patch_size, num_classes, is_s3,
+-                 finalize_config=None):
++                 finalize_config=None, layouts=()):
+     """Initialize per-worker process state with cached zarr stores.
+ 
+     Called once when each worker process starts. Zarr stores (and their
+@@ -390,6 +418,7 @@ def _init_worker(part_files, output_path, gaussian_map, patch_size, num_classes,
+     Args:
+         finalize_config: Optional FinalizeConfig. When set, chunks are finalized
+             (softmax + uint8) inline instead of writing float16 blended logits.
++        layouts: `orientation_layouts` of the axis heads, blended as orientation tensors.
+     """
+     _worker_state.update({
+         'part_files': part_files,
+@@ -400,6 +429,7 @@ def _init_worker(part_files, output_path, gaussian_map, patch_size, num_classes,
+         'logits_stores': {},
+         'output_store': ZarrWriter.open(output_path, skip_empty=True),
+         'finalize_config': finalize_config,
++        'layouts': layouts,
+     })
+ 
+ 
+@@ -422,6 +452,7 @@ def process_chunk(chunk_info, chunk_patches, epsilon=1e-8):
+     is_s3 = _worker_state['is_s3']
+     logits_stores = _worker_state['logits_stores']
+     output_store = _worker_state['output_store']
++    layouts = _worker_state.get('layouts', ())
+ 
+     z_start, z_end = chunk_info['z_start'], chunk_info['z_end']
+     y_start, y_end = chunk_info['y_start'], chunk_info['y_end']
+@@ -431,7 +462,8 @@ def process_chunk(chunk_info, chunk_patches, epsilon=1e-8):
+ 
+     gaussian_map_spatial_np = gaussian_map[0]  # Shape (pZ, pY, pX)
+ 
+-    chunk_shape = (num_classes, z_end - z_start, y_end - y_start, x_end - x_start)
++    chunk_shape = (accumulator_channels(layouts, num_classes),
++                   z_end - z_start, y_end - y_start, x_end - x_start)
+     weights_shape = (z_end - z_start, y_end - y_start, x_end - x_start)
+ 
+     chunk_logits = np.zeros(chunk_shape, dtype=np.float32)
+@@ -491,7 +523,8 @@ def process_chunk(chunk_info, chunk_patches, epsilon=1e-8):
+                 slice(px_start, px_end)
+             ]
+ 
+-            weighted_patch = logit_patch * weight_patch[np.newaxis, :, :, :]
++            weighted_patch = _weigh_patch(logit_patch, weight_patch, layouts,
++                                          np.empty((chunk_shape[0], *weight_patch.shape), dtype=np.float32))
+ 
+             chunk_logits[
+                 :,  # All classes
+@@ -510,7 +543,7 @@ def process_chunk(chunk_info, chunk_patches, epsilon=1e-8):
+ 
+     if patches_processed > 0:
+         _write_blended_chunk(output_store, chunk_info, chunk_logits, chunk_weights, num_classes,
+-                             _worker_state.get('finalize_config'), epsilon)
++                             _worker_state.get('finalize_config'), epsilon, layouts)
+ 
+     return {
+         'chunk': chunk_info,
+@@ -642,17 +675,24 @@ class InMemoryBlender:
+     above or below add their overlapping part, so every output chunk inside the slab gets the
+     same sums as when the whole region is blended at once. A split run gives each part its own
+     chunk-aligned slab (see `part_z_range`), so the parts write disjoint chunks.
++
++    `axis_channels` lists the (x, y, z) channels of heads whose direction has no sign
++    (`tta.axis_head_channels`); they are blended as orientation tensors, which takes three
++    more float32 sums per head.
+     """
+ 
+-    def __init__(self, patch_coords, patch_size, num_classes, volume_shape, sigma_scale=8.0, z_range=None):
++    def __init__(self, patch_coords, patch_size, num_classes, volume_shape, sigma_scale=8.0, z_range=None,
++                 axis_channels=()):
+         self.patch_size = tuple(int(p) for p in patch_size)
+         self.num_classes = int(num_classes)
++        self.layouts = orientation_layouts(axis_channels, self.num_classes)
++        self.num_sums = accumulator_channels(self.layouts, self.num_classes)
+         self.volume_shape = tuple(int(v) for v in volume_shape)
+         self.coords = np.asarray(patch_coords, dtype=np.int64).reshape(-1, 3)
+         self.z_range = None if z_range is None else (int(z_range[0]), int(z_range[1]))
+         self.origin, self.shape = self.extent(self.coords, self.patch_size, self.volume_shape, self.z_range)
+         self.gaussian = generate_gaussian_map(self.patch_size, sigma_scale=sigma_scale)[0]
+-        self.logits = np.zeros((self.num_classes, *self.shape), dtype=np.float32)
++        self.logits = np.zeros((self.num_sums, *self.shape), dtype=np.float32)
+         self.weights = np.zeros(self.shape, dtype=np.float32)
+         self.patches_added = 0
+         self.patches_skipped_empty = 0
+@@ -672,10 +712,13 @@ class InMemoryBlender:
+         return tuple(int(v) for v in lo), tuple(int(v) for v in np.maximum(hi - lo, 0))
+ 
+     @classmethod
+-    def required_bytes(cls, patch_coords, patch_size, num_classes, volume_shape, z_range=None):
+-        """Memory the float32 sums take: one array per class plus the weights."""
++    def required_bytes(cls, patch_coords, patch_size, num_classes, volume_shape, z_range=None,
++                       axis_channels=()):
++        """Memory the float32 sums take: one array per class (and per extra orientation
++        tensor component of an axis head) plus the weights."""
+         _, shape = cls.extent(patch_coords, patch_size, volume_shape, z_range)
+-        return (int(num_classes) + 1) * 4 * int(np.prod(shape, dtype=np.int64))
++        sums = accumulator_channels(orientation_layouts(axis_channels, num_classes), num_classes)
++        return (sums + 1) * 4 * int(np.prod(shape, dtype=np.int64))
+ 
+     def add(self, patch_index, patch_logits):
+         """Accumulate one patch, (C, pZ, pY, pX), placed at `patch_coords[patch_index]`.
+@@ -695,11 +738,11 @@ class InMemoryBlender:
+             canvas.append(slice(lo, hi))
+             patch.append(slice(lo - s, hi - s))
+         weight = self.gaussian[tuple(patch)]
+-        # Same float32 product as process_chunk computes, written into a reused buffer.
++        # Same float32 products as process_chunk computes, written into a reused buffer.
+         if self._scratch is None:
+-            self._scratch = np.empty((self.num_classes, *self.patch_size), dtype=np.float32)
++            self._scratch = np.empty((self.num_sums, *self.patch_size), dtype=np.float32)
+         weighted = self._scratch[(slice(None), *(slice(0, s.stop - s.start) for s in patch))]
+-        np.multiply(patch_logits[(slice(None), *patch)], weight[np.newaxis], out=weighted)
++        _weigh_patch(patch_logits[(slice(None), *patch)], weight, self.layouts, weighted)
+         self.logits[(slice(None), *canvas)] += weighted
+         self.weights[tuple(canvas)] += weight
+         self.patches_added += 1
+@@ -763,13 +806,13 @@ class InMemoryBlender:
+             chunk_weights[tuple(in_chunk)] = self.weights[tuple(in_canvas)]
+             if not np.any(chunk_weights > 0):
+                 return False
+-            chunk_logits = np.zeros((self.num_classes, *chunk_weights.shape), dtype=np.float32)
++            chunk_logits = np.zeros((self.num_sums, *chunk_weights.shape), dtype=np.float32)
+             chunk_logits[(slice(None), *in_chunk)] = self.logits[(slice(None), *in_canvas)]
+             chunk_info = {'z_start': chunk[0][0], 'z_end': chunk[0][1],
+                           'y_start': chunk[1][0], 'y_end': chunk[1][1],
+                           'x_start': chunk[2][0], 'x_end': chunk[2][1]}
+             _write_blended_chunk(output_store, chunk_info, chunk_logits, chunk_weights,
+-                                 self.num_classes, finalize_config, epsilon)
++                                 self.num_classes, finalize_config, epsilon, self.layouts)
+             return True
+ 
+         if num_workers is None:
+@@ -866,6 +909,8 @@ def merge_inference_outputs(
+         patch_size = tuple(meta_attrs['patch_size'])
+         original_volume_shape = tuple(meta_attrs['original_volume_shape'])  # MUST exist
+         num_classes = part0_logits_store.shape[1]  # (N, C, pZ, pY, pX) -> C
++        # Heads whose direction has no sign are blended as orientation tensors.
++        layouts = orientation_layouts(axis_head_channels(meta_attrs.get('target_info', None)), num_classes)
+ 
+     except Exception as e:
+         traceback.print_exc()
+@@ -996,7 +1041,8 @@ def merge_inference_outputs(
+     with ProcessPoolExecutor(
+         max_workers=num_workers,
+         initializer=_init_worker,
+-        initargs=(part_files, output_path, gaussian_map, patch_size, num_classes, is_s3, finalize_config)
++        initargs=(part_files, output_path, gaussian_map, patch_size, num_classes, is_s3, finalize_config,
++                  layouts)
+     ) as executor:
+         future_to_chunk = {
+             executor.submit(
+diff --git a/vesuvius/src/vesuvius/models/run/inference.py b/vesuvius/src/vesuvius/models/run/inference.py
+index 54cc1b105..afbe254b2 100644
+--- a/vesuvius/src/vesuvius/models/run/inference.py
++++ b/vesuvius/src/vesuvius/models/run/inference.py
+@@ -24,7 +24,7 @@ from vc_reader.reader import ObjectStore, ZarrWriter, open_zarr
+ from pathlib import Path
+ from vesuvius.models.build.build_network_from_config import NetworkFromConfig
+ from vesuvius.models.run.external_models.load_resnet import try_load_external_resnet34_model
+-from vesuvius.models.run.tta import infer_with_tta, tta_channel_groups
++from vesuvius.models.run.tta import axis_head_channels, infer_with_tta, is_axis_head, tta_channel_groups
+ from vesuvius.models.run.patch_writer import BoundedPatchWriter
+ from vesuvius.models.run.blending import InMemoryBlender, part_z_range, patches_in_z_range
+ from vesuvius.utils.k8s import get_tqdm_kwargs
+@@ -596,8 +596,12 @@ class Inferer():
+                 print(f"Warning: Using user-provided patch size {self.patch_size} instead of model's default: {self.model_patch_size}")
+         
+         if self.is_multi_task and self.target_info and self.patch_size is not None:
+-            self.tta_channel_groups = tta_channel_groups(
+-                model_info.get('targets'), self.target_info, len(self.patch_size))
++            targets = model_info.get('targets') or {}
++            self.tta_channel_groups = tta_channel_groups(targets, self.target_info, len(self.patch_size))
++            for target_name, info in self.target_info.items():
++                if is_axis_head(targets.get(target_name), info['out_channels'], len(self.patch_size)):
++                    # a direction without sign: TTA and blending average it as an axis
++                    info['sign_invariant'] = True
+             if self.verbose and self.tta_channel_groups:
+                 print(f"TTA transforms the components of {len(self.tta_channel_groups)} vector/tensor head(s)")
+ 
+@@ -996,7 +1000,9 @@ class Inferer():
+             raise RuntimeError("In-memory blending needs the input volume shape, which the dataset does not expose.")
+         coords = np.asarray(self.patch_start_coords_list, dtype=np.int64).reshape(-1, 3)
+         z_range = getattr(self, '_blend_z_range', None)
+-        needed = InMemoryBlender.required_bytes(coords, self.patch_size, self.num_classes, volume_shape, z_range)
++        axis_channels = axis_head_channels(self.target_info) if self.is_multi_task else []
++        needed = InMemoryBlender.required_bytes(coords, self.patch_size, self.num_classes, volume_shape, z_range,
++                                                axis_channels=axis_channels)
+         available = psutil.virtual_memory().available
+         print(f"In-memory blending: the blend sums need {needed / 2**30:.1f} GiB "
+               f"({available / 2**30:.1f} GiB available)")
+@@ -1007,7 +1013,7 @@ class Inferer():
+                 f"or drop --blend_in_memory and blend the written logits with blend_and_finalize.")
+         self.blender = InMemoryBlender(coords, self.patch_size, self.num_classes, volume_shape,
+                                        sigma_scale=self.in_memory_blend.get('sigma_scale', 8.0),
+-                                       z_range=z_range)
++                                       z_range=z_range, axis_channels=axis_channels)
+         self.coords_store_path = None
+         self._prepare_in_memory_blend()
+         return self.blender
+diff --git a/vesuvius/src/vesuvius/models/run/tta.py b/vesuvius/src/vesuvius/models/run/tta.py
+index 98eb5bc9a..26c8031cb 100644
+--- a/vesuvius/src/vesuvius/models/run/tta.py
++++ b/vesuvius/src/vesuvius/models/run/tta.py
+@@ -1,3 +1,5 @@
++import math
++
+ import torch
+ 
+ 
+@@ -22,11 +24,14 @@ _AXIS_TASKS_BY_DEFAULT = ('inplane_direction',)
+ # Direction losses that do not depend on the sign of the prediction.
+ _SIGN_INVARIANT_LOSSES = ('SignInvariantCosineLoss',)
+ _TENSOR_ORDER = {3: ('zz', 'zy', 'zx', 'yy', 'yx', 'xx'), 2: ('yy', 'yx', 'xx')}
+-# A sign-ambiguous direction is reported in the half-space 4x + 2y + z >= 0 of the input frame.
+-# A sign chosen per patch would let two overlapping patches that agree up to sign cancel when
+-# blended; a fixed half-space gives them the same sign. No axis or axis diagonal lies on its
+-# boundary plane.
+-_AXIAL_HALF_SPACE = {-1: 4.0, -2: 2.0, -3: 1.0}
++# An axis is written in the half-space 4x + 2y + z >= 0 of the input frame (x, y, z weights), so
++# the output has one sign convention. No coordinate axis or axis diagonal lies on its boundary.
++_HALF_SPACE = (4.0, 2.0, 1.0)
++# The orientation tensors of an axis head are reduced this many voxels (whole rows) at a time,
++# so their float32 temporaries have a fixed size instead of growing with the patch or chunk.
++_SLAB_VOXELS = 1 << 18
++# Squarings in `principal_axis`: the axis error falls like (l2 / l1) ** (2 ** _SQUARINGS).
++_SQUARINGS = 6
+ 
+ 
+ def _direction_losses(target_config):
+@@ -72,6 +77,13 @@ def is_axis_head(target_config, out_channels=None, spatial_dims=3) -> bool:
+     return all(name in _SIGN_INVARIANT_LOSSES for name in names)
+ 
+ 
++def axis_head_channels(target_info, spatial_dims=3):
++    """The (x, y[, z]) channels of each head marked `sign_invariant` in `target_info`."""
++    heads = sorted((target_info or {}).values(), key=lambda info: info['start_channel'])
++    return [tuple(range(int(info['start_channel']), int(info['start_channel']) + spatial_dims))
++            for info in heads if info.get('sign_invariant', False)]
++
++
+ def tta_channel_groups(targets, target_info, spatial_dims: int):
+     """Geometric channel groups of a multi-task output, for `infer_with_tta(channel_groups=...)`.
+ 
+@@ -130,48 +142,130 @@ def _undo_component_change(output: torch.Tensor, channel_groups, flipped=(), swa
+     return output
+ 
+ 
+-def _dot32(a: torch.Tensor, b: torch.Tensor, channels) -> torch.Tensor:
+-    """Per-voxel dot product of a and b over `channels`, in float32: half-precision products
+-    of small components underflow to zero. One channel at a time, so temporaries stay small."""
+-    dot = None
+-    for ch in channels:
+-        term = a[:, ch].float() * b[:, ch].float()
+-        dot = term if dot is None else dot.add_(term)
+-    return dot
++def _pairs(d):
++    return [(i, j) for i in range(d) for j in range(i, d)]
++
+ 
++def _row_slabs(rows, row_voxels):
++    """Slices of whole rows (the first spatial dim) holding about `_SLAB_VOXELS` voxels each."""
++    step = max(1, _SLAB_VOXELS // max(1, int(row_voxels)))
++    return [slice(s, min(s + step, rows)) for s in range(0, rows, step)]
+ 
+-def _flip_where(output: torch.Tensor, channels, negative: torch.Tensor) -> None:
+-    """Negate `channels` of `output` in place where `negative` is True."""
+-    sign = 1 - 2 * negative.to(output.dtype)
+-    for ch in channels:
+-        output[:, ch].mul_(sign)
++
++def principal_axis(m, d):
++    """The principal axis of per-voxel orientation tensors.
++
++    `m` maps (i, j), i <= j < d, to float32 tensors: the components of the (weighted) mean of
++    v v^T over the predictions v of each voxel. Returns the d components of the eigenvector of
++    its largest eigenvalue, scaled to the square root of that eigenvalue and put in the
++    half-space `_HALF_SPACE`. Predictions that agree up to sign give their common vector (with
++    its length); in general the length is the root mean square of their projections on the
++    axis. The result does not depend on the predictions' signs or order.
++    """
++    def at(p, i, j):
++        return p[(i, j) if i <= j else (j, i)]
++
++    def normalized(p):
++        trace = sum(p[(i, i)] for i in range(d))
++        inv = torch.where(trace > 0, trace.reciprocal(), torch.zeros_like(trace))
++        return {key: value * inv for key, value in p.items()}
++
++    # Repeated squaring: (M / tr M) ** (2 ** k), renormalised, tends to the projector on the axis.
++    p = normalized(m)
++    for _ in range(_SQUARINGS):
++        p = normalized({(i, j): sum(at(p, i, k) * at(p, k, j) for k in range(d)) for i, j in _pairs(d)})
++    # Its column with the largest diagonal entry is a nonzero multiple of the axis (unless M = 0).
++    column, diagonal = [at(p, i, 0) for i in range(d)], p[(0, 0)]
++    for j in range(1, d):
++        take = p[(j, j)] > diagonal
++        diagonal = torch.where(take, p[(j, j)], diagonal)
++        column = [torch.where(take, at(p, i, j), c) for i, c in enumerate(column)]
++    norm = torch.sqrt(sum(c * c for c in column))
++    inv = torch.where(norm > 0, norm.reciprocal(), torch.zeros_like(norm))
++    axis = [c * inv for c in column]
++    eigenvalue = sum(at(m, i, j) * axis[i] * axis[j] for i in range(d) for j in range(d))
++    length = torch.sqrt(eigenvalue.clamp_min(0))
++    side = sum(w * c for w, c in zip(_HALF_SPACE, axis))
++    length = torch.where(side < 0, -length, length)
++    return [c * length for c in axis]
++
++
++def _average_axis(mean: torch.Tensor, variants, channels) -> None:
++    """Write the variants' mean axis into `channels` (x, y[, z]) of `mean` (B, C, *spatial).
++
++    The variants are averaged as orientation tensors v v^T, in float32 (half-precision
++    products of small components underflow), and reduced to their principal axis. Signs
++    the variants or the network chose do not matter.
++    """
++    d, count = len(channels), len(variants)
++    row_voxels = mean.shape[0] * math.prod(mean.shape[3:])
++    for rows in _row_slabs(mean.shape[2], row_voxels):
++        m = {}
++        for variant in variants:
++            v = [variant[:, c, rows].float() for c in channels]
++            for i, j in _pairs(d):
++                term = v[i] * v[j]
++                m[(i, j)] = term if (i, j) not in m else m[(i, j)].add_(term)
++        axis = principal_axis({key: value.div_(count) for key, value in m.items()}, d)
++        for c, component in zip(channels, axis):
++            mean[:, c, rows] = component
+ 
+ 
+ def _average_variants(variants, channel_groups) -> torch.Tensor:
+     """Mean of the TTA variants (a list, or a tensor stacked on dim 0).
+ 
+-    Sign-ambiguous directions are first aligned with the first variant (in place), and their
+-    mean is then put in the fixed half-space `_AXIAL_HALF_SPACE`.
++    Axis heads (directions without a sign, see `is_axis_head`) get the principal axis of the
++    variants' mean orientation tensor instead of the mean of their components.
+     """
+-    axial = [g['channels'] for g in (channel_groups or []) if g['kind'] == 'axial']
+-    for channels in axial:
+-        chs = list(channels.values())
+-        reference = variants[0]
+-        for variant in variants[1:]:
+-            _flip_where(variant, chs, _dot32(variant, reference, chs) < 0)
+     if torch.is_tensor(variants):
+         mean = variants.mean(dim=0)
+     else:
+         mean = torch.mean(torch.stack(list(variants), dim=0), dim=0)
+-    for channels in axial:
+-        side = None
+-        for (axis,), ch in channels.items():
+-            term = mean[:, ch].float() * _AXIAL_HALF_SPACE[axis]
+-            side = term if side is None else side.add_(term)
+-        _flip_where(mean, list(channels.values()), side < 0)
++    for group in channel_groups or ():
++        if group['kind'] == 'axial':
++            channels = group['channels']
++            _average_axis(mean, variants, [channels[(a,)] for a in (-1, -2, -3) if (a,) in channels])
+     return mean
+ 
+ 
++def orientation_layouts(axis_channels, num_channels):
++    """Where a blend accumulates the orientation tensors v v^T of its axis heads.
++
++    `axis_channels` holds the (x, y, z) channels of each axis head (see `axis_head_channels`).
++    The diagonal xx, yy, zz goes to the head's own channels, the off-diagonal xy, xz, yz to
++    three extra channels after the `num_channels` output channels. Returns one {(i, j): channel}
++    per head; the accumulator needs `num_channels + 3 * len(axis_channels)` channels (3D).
++    """
++    layouts, extra = [], int(num_channels)
++    for channels in axis_channels:
++        layout = {}
++        for i, j in _pairs(len(channels)):
++            if i == j:
++                layout[(i, i)] = int(channels[i])
++            else:
++                layout[(i, j)], extra = extra, extra + 1
++        layouts.append(layout)
++    return layouts
++
++
++def accumulator_channels(layouts, num_channels):
++    """Channel count of a blend accumulator with these `orientation_layouts`."""
++    return max([int(num_channels)] + [c + 1 for layout in layouts for c in layout.values()])
++
++
++def reduce_orientation_tensors(sums: torch.Tensor, layouts) -> None:
++    """In blended means `sums` (C_acc, Z, Y, X), replace the orientation tensor of each axis
++    head (`orientation_layouts`) by its principal axis, in the head's x, y, z channels."""
++    row_voxels = math.prod(sums.shape[2:])
++    for layout in layouts:
++        d = sum(1 for i, j in layout if i == j)
++        channels = [layout[(i, i)] for i in range(d)]
++        for rows in _row_slabs(sums.shape[1], row_voxels):
++            axis = principal_axis({key: sums[c, rows] for key, c in layout.items()}, d)
++            for c, component in zip(channels, axis):
++                sums[c, rows] = component
++
++
+ def infer_with_tta_batched_3d(model, inputs: torch.Tensor,
+                                *, is_multi_task: bool = False,
+                                concat_multi_task_outputs=None,
+diff --git a/vesuvius/tests/models/run/test_tta_vector_heads.py b/vesuvius/tests/models/run/test_tta_vector_heads.py
+index 667653ab4..c41e669c3 100644
+--- a/vesuvius/tests/models/run/test_tta_vector_heads.py
++++ b/vesuvius/tests/models/run/test_tta_vector_heads.py
+@@ -17,6 +17,7 @@ import yaml
+ from vc_reader.reader import ZarrWriter, open_zarr
+ import vesuvius.models
+ from vesuvius.models.run import inference, tta
++from vesuvius.models.run.blending import merge_inference_outputs
+ from vesuvius.models.run.inference import Inferer
+ 
+ TARGETS = {
+@@ -197,9 +198,12 @@ def _peak_bytes(fn):
+ 
+ @pytest.mark.parametrize("helper", ["batched", "sequential"])
+ @pytest.mark.parametrize("head", ["normals", "direction"])
+-def test_component_transform_keeps_peak_memory(helper, head):
++def test_component_transform_keeps_peak_memory(helper, head, monkeypatch):
+     """Undoing the component change works on the variants in place: no extra full-size copies
+-    of the output beyond what the plain mirroring average already holds."""
++    of the output beyond what the plain mirroring average already holds. An axis head's
++    orientation tensors are reduced a slab of rows at a time (here one 32 x 32 row), so their
++    float32 temporaries do not grow with the patch."""
++    monkeypatch.setattr(tta, "_SLAB_VOXELS", 32 * 32, raising=False)
+     targets = {name: TARGETS[name] for name in ("surface", head)}
+     groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+ 
+@@ -401,3 +405,98 @@ def test_predict_never_reverses_a_signed_nearest_component(tmp_path, monkeypatch
+     # the Oracle's direction points inwards: a good part of it lies outside the half-space
+     side = 4 * with_tta[2] + 2 * with_tta[3] + with_tta[4]
+     assert (side[mask] < -0.5).mean() > 0.3
++
++
++# --- Blending keeps an axis on which overlapping patches agree up to sign ---------------------------
++
++SEAM_VOLUME = (16, 16, 24)  # two 16^3 patches at x = 0 and x = 8 (50% overlap); equal weights at x = 12
++SEAM_VOXEL = (8, 8, 12)
++
++
++def _seam_volume():
++    z, y, x = np.meshgrid(*[np.arange(n, dtype=np.float32) for n in SEAM_VOLUME], indexing="ij")
++    return 0.2 + 0.01 * x + 0.004 * y + 0.002 * z  # a ramp: its slope signs reveal the mirroring
++
++
++class PatchAxes(torch.nn.Module):
++    """An axis per patch, equivariant up to sign: the patch at x = 0 reports `first`, the one at
++    x = 8 `second` (as a `direction` head, or as the direction of a `nearest` head at distance
++    2 and 4), each with a sign that changes with the mirroring."""
++
++    def __init__(self, first, second, head="direction"):
++        super().__init__()
++        self.first, self.second, self.head = torch.tensor(first), torch.tensor(second), head
++
++    def forward(self, x):
++        s = x[:, :1].float()
++        b = s.shape[0]
++        # slope signs of the ramp along x, y, z: -1 where the input was mirrored
++        fx = torch.sign(s[..., 1:] - s[..., :-1]).mean(dim=(1, 2, 3, 4))
++        fy = torch.sign(s[..., 1:, :] - s[..., :-1, :]).mean(dim=(1, 2, 3, 4))
++        fz = torch.sign(s[:, :, 1:] - s[:, :, :-1]).mean(dim=(1, 2, 3, 4))
++        second = s.mean(dim=(1, 2, 3, 4)) > 0.2 + 0.01 * 11.5 + 0.004 * 7.5 + 0.002 * 7.5
++        axis = torch.where(second[:, None], self.second, self.first)
++        axis = axis / axis.norm(dim=1, keepdim=True)
++        frame = axis * torch.stack([fx, fy, fz], dim=1) * (fx * fy * fz)[:, None]
++        out = frame[:, :, None, None, None].expand(b, 3, *s.shape[2:])
++        if self.head == "nearest":
++            distance = torch.where(second, 4.0, 2.0)[:, None, None, None, None].expand_as(s)
++            out = torch.cat([out, distance], dim=1)
++        return {"surface": torch.cat([-s, s], dim=1), self.head: out.contiguous()}
++
++
++SEAM_CASES = {
++    "opposite on the plane": ((1.0, -2.0, 0.0), (-1.0, 2.0, 0.0)),  # 4x + 2y + z = 0
++    "either side of the plane": ((1.0, -1.999, 0.0), (1.0, -2.001, 0.0)),
++    "opposite, tilted": ((1.0, -2.0, 0.05), (-1.0, 2.0, 0.05)),
++}
++
++
++def _predict_staged(tmp_path, monkeypatch, volume, network, targets, patch, name, finalize_config=None, **kwargs):
++    """vesuvius.predict writing patch logits, then vesuvius.blend_logits (or blend_and_finalize)."""
++    (tmp_path / "model.pth").write_bytes(b"")
++    writer = ZarrWriter.create(str(tmp_path / f"{name}_volume.zarr"), shape=volume.shape, chunks=patch,
++                               dtype=np.float32)
++    writer[:] = volume
++
++    def fake_load(self, checkpoint_path):
++        return {"network": network, "patch_size": patch, "num_input_channels": 1,
++                "num_seg_heads": sum(t["out_channels"] for t in targets.values()),
++                "targets": targets, "normalization_scheme": "none"}
++
++    monkeypatch.setattr(inference.Inferer, "_load_train_py_model", fake_load)
++    parts = tmp_path / f"{name}_parts"
++    Inferer(model_path=str(tmp_path / "model.pth"), input_dir=str(tmp_path / f"{name}_volume.zarr"),
++            output_dir=str(parts), model_type="train_py", device="cpu", num_dataloader_workers=0,
++            **kwargs).infer()
++    out = tmp_path / f"{name}.zarr"
++    merge_inference_outputs(str(parts), str(out), num_workers=1, verbose=False, finalize_config=finalize_config)
++    return np.asarray(open_zarr(str(out))[:]), parts
++
++
++@pytest.mark.parametrize("case", list(SEAM_CASES))
++@pytest.mark.parametrize("head", ["direction", "nearest"])
++@pytest.mark.parametrize("do_tta", [True, False])
++def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
++    """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
++    seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
++    cancelling. The nearest_component distance is averaged as a scalar."""
++    first, second = SEAM_CASES[case]
++    targets = {"surface": TARGETS["surface"],
++               head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
++    volume, model = _seam_volume(), PatchAxes(first, second, head)
++    in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
++                         do_tta=do_tta)[2:].astype(np.float32)
++    staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
++                             do_tta=do_tta)[0][2:].astype(np.float32)
++    units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
++    shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
++    for name, out in (("in-memory", in_memory), ("staged", staged)):
++        seam = out[(slice(0, 3), *SEAM_VOXEL)]
++        assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
++        assert abs(seam @ shared) > 0.99, f"{name}: axis {seam} at the seam"
++        lengths = np.linalg.norm(out[:3, 2:14, 2:14, 2:22], axis=0)
++        assert lengths.min() > 0.99, f"{name}: min length {lengths.min():.5f}"
++        if head == "nearest":
++            assert abs(out[(3, *SEAM_VOXEL)] - 3.0) < 1e-2, f"{name}: distance {out[(3, *SEAM_VOXEL)]}"
++    np.testing.assert_allclose(in_memory, staged, atol=2e-3)
+-- 
+2.47.3
+
+
+From 433dd618a9474eadc8b1296d510b66e9b33d7c46 Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 17:15:22 +0000
+Subject: [PATCH 3/3] vesuvius.predict: write multiclass chunks of a single
+ nonzero class
+
+With --mode multiclass --threshold only the argmax is written. Once the
+auxiliary heads are left out of the class selection, a chunk can hold
+class 1 in every voxel; the finalizer skipped any chunk whose bytes were
+all equal, so it read back as the fill value, class 0. That happened in
+the in-memory blend, in finalize_outputs and in blend_and_finalize, which
+share apply_finalization (segmentation-only outputs had the same problem
+on main).
+
+A finalized chunk is now skipped only when every byte equals the fill
+value 0. test_homogeneous_chunk_is_still_skipped asserted the old
+behaviour with a uniform class 2 chunk; it now checks a class 0 chunk,
+and a new test checks that a uniform class 2 chunk is written. The
+end-to-end test also runs finalize_outputs with --delete_intermediates,
+which removes the logits only after every chunk has been written.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../vesuvius/models/run/finalize_outputs.py   |  8 ++--
+ .../run/test_finalize_multiclass_scale.py     | 13 +++++-
+ .../tests/models/run/test_tta_vector_heads.py | 41 ++++++++++++++++++-
+ 3 files changed, 56 insertions(+), 6 deletions(-)
+
+diff --git a/vesuvius/src/vesuvius/models/run/finalize_outputs.py b/vesuvius/src/vesuvius/models/run/finalize_outputs.py
+index 8fd2555aa..d68959165 100644
+--- a/vesuvius/src/vesuvius/models/run/finalize_outputs.py
++++ b/vesuvius/src/vesuvius/models/run/finalize_outputs.py
+@@ -148,9 +148,11 @@ def apply_finalization(logits_np, num_classes, config: FinalizeConfig):
+         if uncovered is not None:
+             output_np[:, uncovered] = 0
+ 
+-        # Empty chunks were caught above; skip a finalized chunk only when
+-        # every byte is identical, which is what the old path did after scaling.
+-        if np.all(output_np == output_np.flat[0]):
++        # Empty chunks were caught above. Skip a finalized chunk only when every
++        # byte is the output's fill value 0: a chunk whose voxels all select
++        # class 1 (with --threshold only the argmax is written) is not empty,
++        # and skipping it would read back as class 0.
++        if not np.any(output_np):
+             return None, True
+         return output_np, False
+ 
+diff --git a/vesuvius/tests/models/run/test_finalize_multiclass_scale.py b/vesuvius/tests/models/run/test_finalize_multiclass_scale.py
+index 553129827..e76c4e7d3 100644
+--- a/vesuvius/tests/models/run/test_finalize_multiclass_scale.py
++++ b/vesuvius/tests/models/run/test_finalize_multiclass_scale.py
+@@ -84,13 +84,22 @@ def test_chunk_encoding_is_continuous_across_chunks():
+     np.testing.assert_array_equal(np.concatenate([left, right], axis=-1), whole)
+ 
+ 
+-def test_homogeneous_chunk_is_still_skipped():
++def test_homogeneous_background_chunk_is_still_skipped():
+     logits = np.zeros((NUM_CLASSES, 1, 2, 2), dtype=np.float32)
+-    logits[2] = 30.0  # every voxel class 2 with probability 1
++    logits[0] = 30.0  # every voxel class 0, the output's fill value
+     out, is_empty = apply_finalization(logits, NUM_CLASSES, FinalizeConfig(mode="multiclass", threshold=0.5))
+     assert is_empty and out is None
+ 
+ 
++def test_homogeneous_nonzero_class_chunk_is_written():
++    """A skipped chunk reads back as the fill value 0, i.e. class 0."""
++    logits = np.zeros((NUM_CLASSES, 1, 2, 2), dtype=np.float32)
++    logits[2] = 30.0  # every voxel class 2 with probability 1
++    out, is_empty = apply_finalization(logits, NUM_CLASSES, FinalizeConfig(mode="multiclass", threshold=0.5))
++    assert not is_empty
++    assert out.ravel().tolist() == [2, 2, 2, 2]
++
++
+ def test_too_many_classes_for_uint8_is_rejected():
+     logits = np.zeros((300, 1, 1, 2), dtype=np.float32)
+     logits[7, 0, 0, 0] = 1.0
+diff --git a/vesuvius/tests/models/run/test_tta_vector_heads.py b/vesuvius/tests/models/run/test_tta_vector_heads.py
+index c41e669c3..efa2f52a4 100644
+--- a/vesuvius/tests/models/run/test_tta_vector_heads.py
++++ b/vesuvius/tests/models/run/test_tta_vector_heads.py
+@@ -7,6 +7,7 @@ Jyx Jxx) therefore need more than the spatial un-flip, or the TTA variants cance
+ """
+ from __future__ import annotations
+ 
++import sys
+ from pathlib import Path
+ 
+ import numpy as np
+@@ -16,8 +17,9 @@ import yaml
+ 
+ from vc_reader.reader import ZarrWriter, open_zarr
+ import vesuvius.models
+-from vesuvius.models.run import inference, tta
++from vesuvius.models.run import blending, inference, tta
+ from vesuvius.models.run.blending import merge_inference_outputs
++from vesuvius.models.run.finalize_outputs import FinalizeConfig, finalize_logits
+ from vesuvius.models.run.inference import Inferer
+ 
+ TARGETS = {
+@@ -500,3 +502,40 @@ def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkey
+         if head == "nearest":
+             assert abs(out[(3, *SEAM_VOXEL)] - 3.0) < 1e-2, f"{name}: distance {out[(3, *SEAM_VOXEL)]}"
+     np.testing.assert_allclose(in_memory, staged, atol=2e-3)
++
++
++# --- Multiclass --threshold writes chunks of one nonzero class --------------------------------------
++
++class ClassOneAndLargeTensor(torch.nn.Module):
++    """Two segmentation scores that always favour class 1, and a structure tensor whose
++    components outscore them in part of the volume (they are not class scores)."""
++
++    def forward(self, x):
++        s = x[:, :1].float()
++        st = torch.cat([3 * s] + [torch.zeros_like(s)] * 5, dim=1)
++        return {"surface": torch.cat([torch.zeros_like(s), torch.full_like(s, 0.5)], dim=1), "st": st}
++
++
++def test_multiclass_threshold_writes_uniform_nonzero_class_chunks(tmp_path, monkeypatch):
++    """--mode multiclass --threshold, default mirroring: every voxel is class 1. A chunk of class 1
++    only was treated as empty and read back as class 0, in-memory, staged and fused."""
++    targets = {"surface": TARGETS["surface"], "st": TARGETS["st"]}
++    volume = _volume((32, 32, 32)).numpy()
++    assert (3 * volume > 0.5).any() and (3 * volume < 0.5).any()
++
++    in_memory = _predict(tmp_path, monkeypatch, volume, ClassOneAndLargeTensor(), targets, (16, 16, 16),
++                         "in_memory", in_memory_blend={"finalize_config": FinalizeConfig("multiclass", 0.5)})
++    _, parts = _predict_staged(tmp_path, monkeypatch, volume, ClassOneAndLargeTensor(), targets,
++                               (16, 16, 16), "staged")
++    finalize_logits(str(tmp_path / "staged.zarr"), str(tmp_path / "staged_final.zarr"), mode="multiclass",
++                    threshold=0.5, num_workers=1, verbose=False, delete_intermediates=True)
++    assert not (tmp_path / "staged.zarr").exists()  # removed only after every chunk was written
++    staged = np.asarray(open_zarr(str(tmp_path / "staged_final.zarr"))[:])
++    monkeypatch.setattr(sys, "argv", ["vesuvius.blend_and_finalize", str(parts), str(tmp_path / "fused.zarr"),
++                                      "--mode", "multiclass", "--threshold", "--num_workers", "1", "--quiet"])
++    assert blending.blend_and_finalize_main() == 0
++    fused = np.asarray(open_zarr(str(tmp_path / "fused.zarr"))[:])
++
++    for name, out in (("in-memory", in_memory), ("staged finalize", staged), ("blend_and_finalize", fused)):
++        assert out.shape == (1, 32, 32, 32), name
++        assert np.unique(out).tolist() == [1], f"{name}: classes {np.unique(out).tolist()}"
+-- 
+2.47.3
+
