@@ -1,0 +1,6 @@
+ninja: Entering directory `<work>/build'
+[0/2] Re-checking globbed directories...
+[1/5] Building CXX object core/CMakeFiles/vc_common_pch.dir/vc_common_pch.cpp.o
+[2/5] Linking CXX static library core/libvc_common_pch.a
+[3/5] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/overlays/SurfaceRotationOverlayController.cpp.o
+[4/5] Linking CXX executable bin/VC3D

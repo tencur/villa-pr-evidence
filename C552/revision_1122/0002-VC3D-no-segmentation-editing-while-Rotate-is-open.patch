@@ -1,0 +1,79 @@
+From 74677c44ee600d941d481efbb1afa9615799534a Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 07:42:08 +0000
+Subject: [PATCH 2/2] VC3D: no segmentation editing while Rotate is open
+
+Editing starts from the surface on screen. While Rotate is open that can
+be the tool's unsaved preview, and the edit session's autosave would
+publish the preview's geometry outside Apply. Both directions are
+refused:
+
+- Enabling editing (from the segmentation panel or the agent bridge,
+  both reach CWindow::onSegmentationEditingModeChanged) is refused with
+  a status message until Apply closes the tool.
+- Actions > Transforms > Rotate does not open while segmentation editing
+  is enabled; an information box asks to turn editing off first.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ volume-cartographer/apps/VC3D/CWindow.cpp             | 11 ++++++++---
+ .../apps/VC3D/MenuActionController.cpp                |  7 +++++++
+ .../overlays/SurfaceRotationOverlayController.hpp     |  2 ++
+ 3 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/volume-cartographer/apps/VC3D/CWindow.cpp b/volume-cartographer/apps/VC3D/CWindow.cpp
+index af6772b73..778f020bb 100644
+--- a/volume-cartographer/apps/VC3D/CWindow.cpp
++++ b/volume-cartographer/apps/VC3D/CWindow.cpp
+@@ -5424,9 +5424,14 @@ void CWindow::onSegmentationEditingModeChanged(bool enabled)
+ 
+     if (enabled) {
+         auto activeSurfaceShared = std::dynamic_pointer_cast<QuadSurface>(_state->surface("segmentation"));
+-
+-        if (!_segmentationModule->beginEditingSession(activeSurfaceShared)) {
+-            showStatusBarMessage(tr("Unable to start segmentation editing"), 3000);
++        // While Rotate is open the viewer can show its unsaved preview: edits and their autosave
++        // would publish the preview's geometry outside Apply.
++        const bool rotating = _surfaceRotationOverlay && _surfaceRotationOverlay->isOpen();
++
++        if (rotating || !_segmentationModule->beginEditingSession(activeSurfaceShared)) {
++            showStatusBarMessage(rotating ? tr("Apply the Rotate tool before editing the segment")
++                                          : tr("Unable to start segmentation editing"),
++                                 3000);
+             if (_segmentationWidget && _segmentationWidget->isEditingEnabled()) {
+                 QSignalBlocker blocker(_segmentationWidget);
+                 _segmentationWidget->setEditingEnabled(false);
+diff --git a/volume-cartographer/apps/VC3D/MenuActionController.cpp b/volume-cartographer/apps/VC3D/MenuActionController.cpp
+index 81efefff8..72212d780 100644
+--- a/volume-cartographer/apps/VC3D/MenuActionController.cpp
++++ b/volume-cartographer/apps/VC3D/MenuActionController.cpp
+@@ -1501,6 +1501,13 @@ void MenuActionController::beginRotateSurfaceTransform()
+                                  QObject::tr("Select a segmentation surface before rotating."));
+         return;
+     }
++    // Rotate shows an unsaved preview: an edit session's autosave would publish it outside Apply.
++    if (_window->_segmentationModule && _window->_segmentationModule->editingEnabled()) {
++        QMessageBox::information(_window,
++                                 QObject::tr("Rotate Surface"),
++                                 QObject::tr("Turn off segmentation editing before rotating the segment."));
++        return;
++    }
+     // Rotation saves back to the store the surface was opened from.
+     QString error;
+     if (_window->_surfacePanel && !_window->_surfacePanel->prepareSurfaceEditing(activeSurface->id, &error)) {
+diff --git a/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.hpp b/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.hpp
+index 0808f1f38..cd24fb703 100644
+--- a/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.hpp
++++ b/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.hpp
+@@ -44,6 +44,8 @@ public:
+     void setReopener(std::function<bool(const std::string&)> reopener) { _reopener = std::move(reopener); }
+     void beginRotate();
+     void cancelRotate();
++    // The tool is open: the viewer may show its unsaved preview.
++    bool isOpen() const { return _rotateActive; }
+ 
+ private:
+     struct ViewerEntry {
+-- 
+2.47.3
+

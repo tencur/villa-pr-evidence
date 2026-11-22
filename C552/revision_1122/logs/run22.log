@@ -1,0 +1,136 @@
+start 2026-11-22T07:34:50Z runs: r20:test_ext22
+src synced to c8f3ba453+wiring 2026-11-22T07:34:50Z
+configured 2026-11-22T07:34:53Z
+r20:test_ext22 ninja exit 0 2026-11-22T07:35:13Z
+r20:test_ext22 ctest exit 8 0% tests passed, 1 tests failed out of 1
+wired: saver, stored revision
+case passed: 1 Rotate on A, select B, Apply
+case passed: 2 Apply, Rotate again, clear the selection, Apply
+case passed: 4a Apply pending, A selected again and flipped from the surface panel
+case FAILED: 4b Apply pending, the surface panel's Flip saves first, Rotate again: after the cancelled Apply the surface panel's saved surface is the selected one
+case passed: 5a another client saves during the preview, then Apply
+case passed: 5b the save fails (another client saved first)
+case FAILED: 6a an autosave through the segment's store edit finishes while Apply saves: Apply does not overwrite the autosave that finished while it saved
+case FAILED: 6b the shown preview is edited and autosaved, Apply, Rotate again: after the cancelled Apply the autosaved segment is the selected one
+case FAILED: 7a the stored revision cannot be read at Apply: the segment stays selected (an unreadable revision is not a newer one)
+case FAILED: 7b the revision cannot be read when Rotate opens nor at Apply: Apply does not save when no revision is known (two unknown revisions do not match)
+case passed: 3 Rotate on A, A deleted, Apply with no change
+reopened through the surface panel: 0
+surface rotation apply cases: 6 passed, 5 failed
+The following tests FAILED:
+done 2026-11-22T07:35:18Z
+start 2026-11-22T07:35:49Z runs: r22:test_ext22
+src synced to c8f3ba453+wiring 2026-11-22T07:35:49Z
+configured 2026-11-22T07:35:52Z
+r22:test_ext22 ninja exit 0 2026-11-22T07:41:00Z
+r22:test_ext22 ctest exit 0 100% tests passed, 0 tests failed out of 1
+wired: saver with the transformed revision, source and stored geometry revisions, reopen
+case passed: 1 Rotate on A, select B, Apply
+case passed: 2 Apply, Rotate again, clear the selection, Apply
+case passed: 4a Apply pending, A selected again and flipped from the surface panel
+case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+case passed: 5a another client saves during the preview, then Apply
+case passed: 5b the save fails (another client saved first)
+case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+case passed: 7a the stored revision cannot be read at Apply
+case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+case passed: 3 Rotate on A, A deleted, Apply with no change
+reopened through the surface panel: 4
+surface rotation apply cases: 11 passed, 0 failed
+done 2026-11-22T07:41:05Z
+start 2026-11-22T07:41:38Z runs: r22:test_ext22:repeat10 r22:test_ext18a r22:test_orig18a r22a:test_ext22 main:test_ext22
+src synced to c8f3ba453+wiring 2026-11-22T07:41:39Z
+configured 2026-11-22T07:41:42Z
+r22:test_ext22:repeat10 ninja exit 0 2026-11-22T07:41:42Z
+r22:test_ext22:repeat10 ctest exit 0 100% tests passed, 0 tests failed out of 1
+      1 1/1 Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+     10 case passed: 1 Rotate on A, select B, Apply
+     10 case passed: 2 Apply, Rotate again, clear the selection, Apply
+     10 case passed: 3 Rotate on A, A deleted, Apply with no change
+     10 case passed: 4a Apply pending, A selected again and flipped from the surface panel
+     10 case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+     10 case passed: 5a another client saves during the preview, then Apply
+     10 case passed: 5b the save fails (another client saved first)
+     10 case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+     10 case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+     10 case passed: 7a the stored revision cannot be read at Apply
+     10 case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+     10 reopened through the surface panel: 4
+     10 surface rotation apply cases: 11 passed, 0 failed
+      1     Test #208: surface_rotation_apply ...........   Passed    4.90 sec
+      8     Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+     10 wired: saver with the transformed revision, source and stored geometry revisions, reopen
+r22:test_ext18a ninja exit 0 2026-11-22T07:42:49Z
+r22:test_ext18a ctest exit 0 100% tests passed, 0 tests failed out of 1
+r22:test_orig18a ninja exit 0 2026-11-22T07:43:07Z
+r22:test_orig18a ctest exit 0 100% tests passed, 0 tests failed out of 1
+r22a:test_ext22 ninja exit 0 2026-11-22T07:47:12Z
+r22a:test_ext22 ctest exit 0 100% tests passed, 0 tests failed out of 1
+wired: saver with the transformed revision, source and stored geometry revisions, reopen
+case passed: 1 Rotate on A, select B, Apply
+case passed: 2 Apply, Rotate again, clear the selection, Apply
+case passed: 4a Apply pending, A selected again and flipped from the surface panel
+case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+case passed: 5a another client saves during the preview, then Apply
+case passed: 5b the save fails (another client saved first)
+case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+case passed: 7a the stored revision cannot be read at Apply
+case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+case passed: 3 Rotate on A, A deleted, Apply with no change
+reopened through the surface panel: 4
+surface rotation apply cases: 11 passed, 0 failed
+main:test_ext22 ninja exit 0 2026-11-22T07:47:40Z
+main:test_ext22 ctest exit 8 0% tests passed, 1 tests failed out of 1
+wired: saver
+surface rotation apply test: Actions > Transforms > Rotate opens the tool (Flip and Apply shown)
+The following tests FAILED:
+done 2026-11-22T07:47:40Z
+start 2026-11-22T07:52:11Z runs: r22:test_ext22 r22:test_ext18a r22:test_orig18a
+src synced to c8f3ba453+wiring 2026-11-22T07:52:12Z
+configured 2026-11-22T07:52:15Z
+r22:test_ext22 ninja exit 0 2026-11-22T07:53:01Z
+r22:test_ext22 ctest exit 0 100% tests passed, 0 tests failed out of 1
+wired: saver with the transformed revision, source and stored geometry revisions, reopen
+case passed: 1 Rotate on A, select B, Apply
+case passed: 2 Apply, Rotate again, clear the selection, Apply
+case passed: 4a Apply pending, A selected again and flipped from the surface panel
+case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+case passed: 5a another client saves during the preview, then Apply
+case passed: 5b the save fails (another client saved first)
+case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+case passed: 7a the stored revision cannot be read at Apply
+case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+case passed: 3 Rotate on A, A deleted, Apply with no change
+reopened through the surface panel: 4
+surface rotation apply cases: 11 passed, 0 failed
+r22:test_ext18a ninja exit 0 2026-11-22T07:53:11Z
+r22:test_ext18a ctest exit 0 100% tests passed, 0 tests failed out of 1
+r22:test_orig18a ninja exit 0 2026-11-22T07:53:15Z
+r22:test_orig18a ctest exit 0 100% tests passed, 0 tests failed out of 1
+done 2026-11-22T07:53:16Z
+start 2026-11-22T07:53:22Z runs: r22:test_ext22:repeat10
+src synced to c8f3ba453+wiring 2026-11-22T07:53:22Z
+configured 2026-11-22T07:53:25Z
+r22:test_ext22:repeat10 ninja exit 0 2026-11-22T07:53:29Z
+r22:test_ext22:repeat10 ctest exit 0 100% tests passed, 0 tests failed out of 1
+      1 1/1 Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+     10 case passed: 1 Rotate on A, select B, Apply
+     10 case passed: 2 Apply, Rotate again, clear the selection, Apply
+     10 case passed: 3 Rotate on A, A deleted, Apply with no change
+     10 case passed: 4a Apply pending, A selected again and flipped from the surface panel
+     10 case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+     10 case passed: 5a another client saves during the preview, then Apply
+     10 case passed: 5b the save fails (another client saved first)
+     10 case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+     10 case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+     10 case passed: 7a the stored revision cannot be read at Apply
+     10 case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+     10 reopened through the surface panel: 4
+     10 surface rotation apply cases: 11 passed, 0 failed
+      8     Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+      1     Test #208: surface_rotation_apply ...........   Passed    5.05 sec
+     10 wired: saver with the transformed revision, source and stored geometry revisions, reopen
+done 2026-11-22T07:54:20Z

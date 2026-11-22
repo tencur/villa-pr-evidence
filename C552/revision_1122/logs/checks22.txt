@@ -1,0 +1,24 @@
+# 2026-11-22T07:54:39Z checks for NOTES.md
+# compiler warnings in build22_*.log (grep -ci warning):
+build22_main_test_ext22.log: 0
+build22_r20_test_ext22.log: 0
+build22_r22a_test_ext22.log: 0
+build22_r22_test_ext18a.log: 0
+build22_r22_test_ext22.log: 0
+build22_r22_test_ext22_repeat10.log: 0
+build22_r22_test_orig18a.log: 0
+# MenuActionController.cpp compiled in build22_r22_test_ext22.log: 1
+# callers of the changed APIs in upstream main c8f3ba453 (volume-cartographer, *.cpp *.hpp *.inc):
+./apps/VC3D/CWindow.cpp:2959:    _surfaceRotationOverlay = std::make_unique<SurfaceRotationOverlayController>(_state, this);
+./apps/VC3D/CWindow.cpp:2960:    _surfaceRotationOverlay->setSaver([this](QuadSurface* surface) {
+./apps/VC3D/CWindow.hpp:44:#include "overlays/SurfaceRotationOverlayController.hpp"
+./apps/VC3D/CWindow.hpp:348:    std::unique_ptr<SurfaceRotationOverlayController> _surfaceRotationOverlay;
+# 18 Nov self-tests adapted for r22 (diff test_ext18.inc test_ext18a.inc; diff test_orig18.inc test_orig18a.inc):
+138c138
+<         tool.setSaver([&](QuadSurface* surface) { return module.saveSurface(surface); });
+---
+>         tool.setSaver([&](QuadSurface* surface, const std::optional<std::string>&) { return module.saveSurface(surface); });
+131c131
+<         tool.setSaver([&](QuadSurface* surface) { return module.saveSurface(surface); });
+---
+>         tool.setSaver([&](QuadSurface* surface, const std::optional<std::string>&) { return module.saveSurface(surface); });

@@ -1,0 +1,49 @@
+# git (local branch fix/vc3d-rotate-apply-r22), 2026-11-22T07:54:37Z
+74677c44ee600d941d481efbb1afa9615799534a Ben <60955077+tencur@users.noreply.github.com>
+    VC3D: no segmentation editing while Rotate is open
+3740edc5949ff154fcd8f96ff33301077885646f Ben <60955077+tencur@users.noreply.github.com>
+    VC3D: Rotate/Flip Apply saves only over the geometry it transformed
+b860d5aa0d699532824ec0cbda855c2a4876e0e5 Ben <60955077+tencur@users.noreply.github.com>
+    VC3D: Rotate/Flip Apply respects a newer selection and a newer save
+
+# git diff --stat b860d5aa0..HEAD
+ volume-cartographer/apps/VC3D/CWindow.cpp          | 27 +++++++++----
+ .../apps/VC3D/MenuActionController.cpp             |  7 ++++
+ .../overlays/SurfaceRotationOverlayController.cpp  | 44 +++++++++++++++++-----
+ .../overlays/SurfaceRotationOverlayController.hpp  | 31 +++++++++++----
+ .../apps/VC3D/segmentation/SegmentationModule.cpp  |  5 ++-
+ .../apps/VC3D/segmentation/SegmentationModule.hpp  |  4 +-
+ .../apps/VC3D/segmentation/SurfaceStoreEdit.cpp    |  4 +-
+ .../apps/VC3D/segmentation/SurfaceStoreEdit.hpp    |  6 ++-
+ 8 files changed, 99 insertions(+), 29 deletions(-)
+
+# git show --stat HEAD
+ volume-cartographer/apps/VC3D/CWindow.cpp                     | 11 ++++++++---
+ volume-cartographer/apps/VC3D/MenuActionController.cpp        |  7 +++++++
+ .../apps/VC3D/overlays/SurfaceRotationOverlayController.hpp   |  2 ++
+ 3 files changed, 17 insertions(+), 3 deletions(-)
+
+# blob ids: HEAD / HEAD~1 / b860d5aa0 / c8f3ba453
+overlays/SurfaceRotationOverlayController.cpp
+  943e5d84e9e52e70c9fb966945b8d58268908c93 943e5d84e9e52e70c9fb966945b8d58268908c93 e3f62b8ea108d3a1ea57f9f467a9ab7f1e731ab4 a9cc7558c8a37b279790c52ebdb275b30c856036
+overlays/SurfaceRotationOverlayController.hpp
+  cd24fb7035d1d3fcfc3b31c27501c645209c8cc5 0808f1f38a44f2faac711b9752164c8bbfc38c3d 3b2e3f48ebb1ee39d8f16365a5e75cea36468562 3ffa32e3f11f38c77fd571f16f75e72d225ed099
+CWindow.cpp
+  778f020bb807e915f214745ccdb5c4feada5c9a9 af6772b738ca6b001388ccf7501ff69fafcf6043 d7c011939f4a766f0e79ad58dea89366247f1f5c 0b51a7509f412603f0563ac73f83a164dc024f3c
+MenuActionController.cpp
+  72212d78080f71ef18ecad65c02cd43547e82b55 81efefff86e7087987df01fcbf33daf300146f68 81efefff86e7087987df01fcbf33daf300146f68 81efefff86e7087987df01fcbf33daf300146f68
+segmentation/SegmentationModule.cpp
+  d6f67b543347d8594ad5f8e106f33162249c81ab d6f67b543347d8594ad5f8e106f33162249c81ab 1cf44a78ee72a75e2fa52c369889a58bed09c325 1cf44a78ee72a75e2fa52c369889a58bed09c325
+segmentation/SegmentationModule.hpp
+  f5230ac1f1b27a8fcf14df172d54d2e9e6c1417f f5230ac1f1b27a8fcf14df172d54d2e9e6c1417f bc9318eca1d6246f358443d15e3f350496cd777b bc9318eca1d6246f358443d15e3f350496cd777b
+segmentation/SurfaceStoreEdit.cpp
+  9aa421b91419be22dc27a2a51605aa8251311bdf 9aa421b91419be22dc27a2a51605aa8251311bdf 94b58a2a84670d7f73f2271814c47bdcdfbf5041 94b58a2a84670d7f73f2271814c47bdcdfbf5041
+segmentation/SurfaceStoreEdit.hpp
+  cd80cbf40ebafe0e3ad7daded4496d01e726b814 cd80cbf40ebafe0e3ad7daded4496d01e726b814 4d8327582b9a7fa763a56109a27709371c6ce449 4d8327582b9a7fa763a56109a27709371c6ce449
+# MenuActionController.cpp at merge base 0bddf2757: 81efefff86e7087987df01fcbf33daf300146f68
+
+# merge base with origin/main
+0bddf2757ea1e97572e86d06d448d8e4a7e207b3
+# GitHub (read-only gh api): main head, PR #2466 head/state
+c8f3ba45304f0a317a49a155929e30d294f201eb 2026-11-20T18:23:25Z
+b860d5aa0d699532824ec0cbda855c2a4876e0e5 open

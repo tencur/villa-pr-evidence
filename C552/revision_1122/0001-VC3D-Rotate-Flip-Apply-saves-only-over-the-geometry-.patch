@@ -1,0 +1,303 @@
+From 3740edc5949ff154fcd8f96ff33301077885646f Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 07:42:08 +0000
+Subject: [PATCH 1/2] VC3D: Rotate/Flip Apply saves only over the geometry it
+ transformed
+
+When Rotate opens it records the geometry revision of the surface it
+transforms: the one the segment's store edit holds for it (opened at or
+last saved as), no longer the store head. Apply passes it to
+SegmentationModule::saveSurface, and SurfaceStoreEdit::save refuses the
+write unless the edit still holds that geometry revision. The check runs
+under the edit's lock after a pending save is resolved and after
+saveSurface has waited for a running autosave, so a save that finishes
+during Apply is kept instead of overwritten.
+
+When Apply is cancelled or refused because a newer geometry revision is
+stored while the tool's source is still the active surface, the tool
+reopens the segment through the surface panel (and deselects it only if
+that fails). The next Rotate, the panel and the agent bridge then start
+from the saved geometry: after the panel's Flip saved during a pending
+Apply, Rotate opens again on the flipped segment, and a retry after an
+autosave of the shown preview starts from that autosave.
+
+A revision lookup that returns nothing never matches: Apply saves
+nothing, and the segment stays selected because nothing newer is known.
+CWindow's stored-revision reader returns the head's geometry revision,
+the kind of revision the store edit holds.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ volume-cartographer/apps/VC3D/CWindow.cpp     | 16 +++++--
+ .../SurfaceRotationOverlayController.cpp      | 44 ++++++++++++++-----
+ .../SurfaceRotationOverlayController.hpp      | 29 +++++++++---
+ .../VC3D/segmentation/SegmentationModule.cpp  |  5 ++-
+ .../VC3D/segmentation/SegmentationModule.hpp  |  4 +-
+ .../VC3D/segmentation/SurfaceStoreEdit.cpp    |  4 +-
+ .../VC3D/segmentation/SurfaceStoreEdit.hpp    |  6 ++-
+ 7 files changed, 82 insertions(+), 26 deletions(-)
+
+diff --git a/volume-cartographer/apps/VC3D/CWindow.cpp b/volume-cartographer/apps/VC3D/CWindow.cpp
+index d7c011939..af6772b73 100644
+--- a/volume-cartographer/apps/VC3D/CWindow.cpp
++++ b/volume-cartographer/apps/VC3D/CWindow.cpp
+@@ -2957,20 +2957,28 @@ void CWindow::CreateWidgets(void)
+     _segmentationOverlay = std::make_unique<SegmentationOverlayController>(_state, this);
+     _segmentationOverlay->setViewerManager(_viewerManager.get());
+     _surfaceRotationOverlay = std::make_unique<SurfaceRotationOverlayController>(_state, this);
+-    _surfaceRotationOverlay->setSaver([this](QuadSurface* surface) {
+-        return _segmentationModule && _segmentationModule->saveSurface(surface);
++    _surfaceRotationOverlay->setSaver([this](QuadSurface* surface, const std::optional<std::string>& geometryRevision) {
++        return _segmentationModule && _segmentationModule->saveSurface(surface, true, {}, geometryRevision);
++    });
++    // Apply saves only over the geometry revision Rotate transformed: the one the segment's
++    // edits continue from when Rotate opens, and still the stored one.
++    _surfaceRotationOverlay->setSourceRevisionReader([this](QuadSurface* surface) -> std::optional<std::string> {
++        const auto pin = _segmentationModule ? _segmentationModule->storePin(surface) : std::nullopt;
++        return pin ? pin->geometryRevision : std::nullopt;
+     });
+-    // Apply saves only over the stored revision Rotate was opened on.
+     _surfaceRotationOverlay->setRevisionReader([this](const std::string& id) -> std::optional<std::string> {
+         const auto* row = _surfaceCatalog ? _surfaceCatalog->row(id) : nullptr;
+         if (!row) return std::nullopt;
+         try {
+             const auto head = _surfaceCatalog->session()->currentObject(row->source, id);
+-            return head ? std::optional(head->uuid) : std::nullopt;
++            return head ? head->geometryRevision : std::nullopt;
+         } catch (const std::exception&) {
+             return std::nullopt;
+         }
+     });
++    _surfaceRotationOverlay->setReopener([this](const std::string& id) {
++        return _surfacePanel && _surfacePanel->activateSurfaceById(id);
++    });
+     _surfaceRotationOverlay->setViewerManager(_viewerManager.get());
+ 
+     _segmentationModule = std::make_unique<SegmentationModule>(
+diff --git a/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.cpp b/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.cpp
+index e3f62b8ea..943e5d84e 100644
+--- a/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.cpp
++++ b/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.cpp
+@@ -66,7 +66,8 @@ void warnTransformNotApplied()
+         nullptr,
+         QObject::tr("Surface Transform Cancelled"),
+         QObject::tr("The transform was not applied: the segment was deselected, reopened or saved again "
+-                    "while Rotate was open. Select the segment and open Rotate again."));
++                    "while Rotate was open, or its stored revision could not be read. Open Rotate again "
++                    "on the segment as it is now."));
+ }
+ 
+ class RotationDial final : public QWidget
+@@ -326,7 +327,10 @@ void SurfaceRotationOverlayController::beginRotate()
+     cancelRotate();
+     _sourceSurface = std::move(source);
+     _sourceSurfaceId = sourceSurfaceId;
+-    _sourceRevision = _revisionReader ? _revisionReader(_sourceSurfaceId) : std::nullopt;
++    // The revision of the geometry this tool transforms (Apply saves only over it).
++    _sourceRevision = _sourceRevisionReader ? _sourceRevisionReader(_sourceSurface.get())
++                      : _revisionReader     ? _revisionReader(_sourceSurfaceId)
++                                            : std::nullopt;
+     _shownSurface = _state->surface("segmentation");
+     _angleDeg = 0.0;
+     _horizontalFlip = false;
+@@ -386,21 +390,39 @@ bool SurfaceRotationOverlayController::sourceSelected() const
+ 
+ bool SurfaceRotationOverlayController::sourceCurrent() const
+ {
+-    // E.g. the surface panel's Flip, an edit or another client saved the segment meanwhile.
+-    return !_revisionReader || _revisionReader(_sourceSurfaceId) == _sourceRevision;
++    // E.g. the surface panel's Flip, an autosave or another client saved the segment meanwhile.
++    // A revision that is not known (not stored, or the store did not answer) never matches.
++    if (!_revisionReader) {
++        return true;
++    }
++    const auto stored = _revisionReader(_sourceSurfaceId);
++    return _sourceRevision && stored && *stored == *_sourceRevision;
++}
++
++bool SurfaceRotationOverlayController::newerRevisionStored() const
++{
++    if (!_revisionReader || !_sourceRevision) {
++        return false;
++    }
++    const auto stored = _revisionReader(_sourceSurfaceId);
++    return stored && *stored != *_sourceRevision;
+ }
+ 
+ void SurfaceRotationOverlayController::releaseSource()
+ {
+-    const bool current = sourceCurrent();
+-    if (current && sourceSelected()) {
++    const bool newer = newerRevisionStored();
++    if (!newer && sourceSelected()) {
+         endPreview(_sourceSurface);
+         return;
+     }
+-    // A newer revision was saved: the old one must not stay selected, so that the surface panel
+-    // and the agent bridge open the current one.
+-    if (!current && _state->activeSurfaceId() == _sourceSurfaceId &&
++    // A newer revision was saved (the surface panel's Flip, an autosave, another client): the
++    // geometry the tool started from must not stay selected. Open the saved one, so that the next
++    // Rotate, the surface panel and the agent bridge continue from it; failing that, deselect.
++    if (newer && _state->activeSurfaceId() == _sourceSurfaceId &&
+         _state->activeSurface().lock() == _sourceSurface) {
++        if (_reopener && _reopener(_sourceSurfaceId)) {
++            return;
++        }
+         _state->clearActiveSurface();
+     }
+     // Take the preview down where it is still shown; another selection stays as it is.
+@@ -755,7 +777,9 @@ void SurfaceRotationOverlayController::applyRotation()
+                     return;
+                 }
+ 
+-                if (!self->_saver || !self->_saver(result.surface.get())) {
++                // The store edit refuses the save unless it still holds the geometry revision the
++                // transform started from (a save that finished or was resolved meanwhile wins).
++                if (!self->_saver || !self->_saver(result.surface.get(), self->_sourceRevision)) {
+                     self->releaseSource();
+                     // Apply can be tried again only on the selected, current segment.
+                     if (!self->sourceSelected()) {
+diff --git a/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.hpp b/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.hpp
+index 3b2e3f48e..0808f1f38 100644
+--- a/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.hpp
++++ b/volume-cartographer/apps/VC3D/overlays/SurfaceRotationOverlayController.hpp
+@@ -24,14 +24,24 @@ public:
+     ~SurfaceRotationOverlayController() override;
+ 
+     void setViewerManager(ViewerManager* manager);
+-    // Publishes the transformed surface to the object store.
+-    void setSaver(std::function<bool(QuadSurface*)> saver) { _saver = std::move(saver); }
+-    // The stored segment's current revision (none when it is not stored). Apply saves only over
+-    // the revision the tool was opened on.
++    // Publishes the transformed surface to the object store, only over the stored geometry
++    // revision it was transformed from (the second argument).
++    using Saver = std::function<bool(QuadSurface*, const std::optional<std::string>&)>;
++    void setSaver(Saver saver) { _saver = std::move(saver); }
++    // The geometry revision a surface holds: the one it was opened at or last saved as (none
++    // when unknown). Read when Rotate opens, for the geometry it transforms.
++    void setSourceRevisionReader(std::function<std::optional<std::string>(QuadSurface*)> reader)
++    {
++        _sourceRevisionReader = std::move(reader);
++    }
++    // The stored segment's current geometry revision (none when it is not stored or the store
++    // did not answer). Apply saves only while it is the revision Rotate transforms.
+     void setRevisionReader(std::function<std::optional<std::string>(const std::string&)> reader)
+     {
+         _revisionReader = std::move(reader);
+     }
++    // Opens the segment's stored revision again (selects it as the surface panel does).
++    void setReopener(std::function<bool(const std::string&)> reopener) { _reopener = std::move(reopener); }
+     void beginRotate();
+     void cancelRotate();
+ 
+@@ -61,16 +71,20 @@ private:
+     void endPreview(const std::shared_ptr<QuadSurface>& surface);
+     // The segment the tool was opened on is still selected and shown as the tool left it.
+     bool sourceSelected() const;
+-    // No newer revision of the segment was saved since the tool was opened.
++    // The stored geometry is known to be the one the tool transforms (an unknown revision never is).
+     bool sourceCurrent() const;
+-    // End the preview without saving, leaving a newer selection or revision alone.
++    // A newer geometry revision of the segment is known to be stored.
++    bool newerRevisionStored() const;
++    // End the preview without saving, leaving a newer selection alone; a newer revision is reopened.
+     void releaseSource();
+     void closeRotate();
+     static std::shared_ptr<QuadSurface> cloneSurface(const std::shared_ptr<QuadSurface>& surface);
+ 
+     CState* _state{nullptr};
+-    std::function<bool(QuadSurface*)> _saver;
++    Saver _saver;
++    std::function<std::optional<std::string>(QuadSurface*)> _sourceRevisionReader;
+     std::function<std::optional<std::string>(const std::string&)> _revisionReader;
++    std::function<bool(const std::string&)> _reopener;
+     ViewerManager* _viewerManager{nullptr};
+     QMetaObject::Connection _viewerCreatedConn;
+     QMetaObject::Connection _viewerClosingConn;
+@@ -82,6 +96,7 @@ private:
+     bool _horizontalFlip{false};
+     std::shared_ptr<QuadSurface> _sourceSurface;
+     std::string _sourceSurfaceId;
++    // The geometry revision of _sourceSurface when the tool opened.
+     std::optional<std::string> _sourceRevision;
+     std::shared_ptr<QuadSurface> _previewSurface;
+     // What the tool put in the viewer last (the source or a preview).
+diff --git a/volume-cartographer/apps/VC3D/segmentation/SegmentationModule.cpp b/volume-cartographer/apps/VC3D/segmentation/SegmentationModule.cpp
+index 1cf44a78e..d6f67b543 100644
+--- a/volume-cartographer/apps/VC3D/segmentation/SegmentationModule.cpp
++++ b/volume-cartographer/apps/VC3D/segmentation/SegmentationModule.cpp
+@@ -2880,7 +2880,8 @@ std::shared_ptr<SurfaceStoreEdit> SegmentationModule::storeEditFor(QuadSurface*
+     return _storeEdit;
+ }
+ 
+-bool SegmentationModule::saveSurface(QuadSurface* surface, bool vertices, const std::vector<std::string>& channels)
++bool SegmentationModule::saveSurface(QuadSurface* surface, bool vertices, const std::vector<std::string>& channels,
++                                     const std::optional<std::string>& geometryRevision)
+ {
+     const auto storeEdit = surface ? storeEditFor(surface) : nullptr;
+     if (!storeEdit) {
+@@ -2898,7 +2899,7 @@ bool SegmentationModule::saveSurface(QuadSurface* surface, bool vertices, const
+         }
+         const auto* points = surface->rawPointsPtr();
+         storeEdit->save(*surface, vertices && points ? cv::Rect(0, 0, points->cols, points->rows) : cv::Rect(), loaded,
+-                        _state->objectStoreSession()->draftRevision(surface->id));
++                        _state->objectStoreSession()->draftRevision(surface->id), geometryRevision);
+         return true;
+     } catch (const std::exception& error) {
+         qCWarning(lcSegModule) << "Saving surface channels failed:" << error.what();
+diff --git a/volume-cartographer/apps/VC3D/segmentation/SegmentationModule.hpp b/volume-cartographer/apps/VC3D/segmentation/SegmentationModule.hpp
+index bc9318eca..f5230ac1f 100644
+--- a/volume-cartographer/apps/VC3D/segmentation/SegmentationModule.hpp
++++ b/volume-cartographer/apps/VC3D/segmentation/SegmentationModule.hpp
+@@ -123,7 +123,9 @@ public:
+     void setStorePinResolver(StorePinResolver resolver) { _storePinResolver = std::move(resolver); }
+     // Synchronously publish `surface` to its store object: its changed vertices
+     // (with `vertices`) and its loaded `channels` (every channel when empty).
+-    bool saveSurface(QuadSurface* surface, bool vertices = true, const std::vector<std::string>& channels = {});
++    // With `geometryRevision`, only over that stored geometry (SurfaceStoreEdit::save).
++    bool saveSurface(QuadSurface* surface, bool vertices = true, const std::vector<std::string>& channels = {},
++                     const std::optional<std::string>& geometryRevision = std::nullopt);
+     // The store revisions the surface's edits continue from.
+     std::optional<vc::objects::PinnedObject> storePin(QuadSurface* surface);
+     void endEditingSession();
+diff --git a/volume-cartographer/apps/VC3D/segmentation/SurfaceStoreEdit.cpp b/volume-cartographer/apps/VC3D/segmentation/SurfaceStoreEdit.cpp
+index 94b58a2a8..9aa421b91 100644
+--- a/volume-cartographer/apps/VC3D/segmentation/SurfaceStoreEdit.cpp
++++ b/volume-cartographer/apps/VC3D/segmentation/SurfaceStoreEdit.cpp
+@@ -100,11 +100,13 @@ void SurfaceStoreEdit::settlePending()
+ }
+ 
+ void SurfaceStoreEdit::save(QuadSurface& surface, const cv::Rect& rect, const std::vector<std::string>& channels,
+-                            std::optional<uint64_t> draftRevision)
++                            std::optional<uint64_t> draftRevision, const std::optional<std::string>& geometryRevision)
+ {
+     // One save at a time: each starts from the version the previous one committed.
+     std::lock_guard lock(_mutex);
+     settlePending();
++    if (geometryRevision && _pin.geometryRevision != geometryRevision)
++        throw std::runtime_error("The surface was saved again since this copy was made; reopen it before saving");
+     const auto& points = *surface.rawPointsPtr();
+     auto request = _session->newRequest(_pin.attachment);
+     request.generation = _pin.writeGeneration;
+diff --git a/volume-cartographer/apps/VC3D/segmentation/SurfaceStoreEdit.hpp b/volume-cartographer/apps/VC3D/segmentation/SurfaceStoreEdit.hpp
+index 4d8327582..cd80cbf40 100644
+--- a/volume-cartographer/apps/VC3D/segmentation/SurfaceStoreEdit.hpp
++++ b/volume-cartographer/apps/VC3D/segmentation/SurfaceStoreEdit.hpp
+@@ -33,8 +33,12 @@ public:
+     // not change since. When a hosted store does not answer, the save stays
+     // pending and the next save first resolves it (its receipt, or the
+     // identical request again), so saves never skip one another.
++    // With `geometryRevision` (the geometry `surface` was derived from), the
++    // save is refused unless this edit is still at that geometry, also when a
++    // previous save committed or was resolved meanwhile.
+     void save(QuadSurface& surface, const cv::Rect& rect, const std::vector<std::string>& channels = {},
+-              std::optional<uint64_t> draftRevision = std::nullopt);
++              std::optional<uint64_t> draftRevision = std::nullopt,
++              const std::optional<std::string>& geometryRevision = std::nullopt);
+ 
+     vc::objects::PinnedObject pin() const;
+     // The pin the edit started from (the opened surface's).
+-- 
+2.47.3
+

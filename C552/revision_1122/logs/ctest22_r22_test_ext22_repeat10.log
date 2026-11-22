@@ -1,0 +1,640 @@
+UpdateCTestConfiguration  from :<work>/build/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<work>/build/DartConfiguration.tcl
+Test project <work>/build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 208
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object 4c72cdbe-deb9-4850-868d-c744bfa71826
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+    Test #208: surface_rotation_apply ...........   Passed    5.05 sec
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object 893e1818-e650-4a8c-9d45-62bf5b72983e
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+    Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object 214442fa-2cad-4547-b259-c1abb693613e
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+    Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object 96c846c1-5817-4e27-b80a-0fc65fa3b5ce
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+    Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object 6afe22fd-bd7a-4653-afa8-2a1126ca0864
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+    Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object aa6cb622-3703-4834-a113-bcf693952882
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+    Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object c6640be6-ef4a-4dc3-a0c8-f5f8e1e6e3eb
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+    Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object 6bb91e77-6759-4f66-bfe6-6a5cf8e95b22
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+    Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object 43a650dd-d03f-47c9-82f3-7fdc276fe6b5
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+    Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+    Start 208: surface_rotation_apply
+
+208: Test command: <work>/build/bin/VC3D "--test-surface-rotation"
+208: Working Directory: <work>/build/apps/VC3D/test
+208: Environment variables: 
+208:  QT_QPA_PLATFORM=offscreen
+208: Environment variable modifications: 
+208:  VC3D_CONFIG_DIR=set:<work>/build/Testing/isolated/surface_rotation_apply/config
+208:  HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/home
+208:  XDG_CONFIG_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/config
+208:  XDG_DATA_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/data
+208:  XDG_CACHE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/cache
+208:  XDG_STATE_HOME=set:<work>/build/Testing/isolated/surface_rotation_apply/xdg/state
+208: Test timeout computed to be: 120
+208: wired: saver with the transformed revision, source and stored geometry revisions, reopen
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 1 Rotate on A, select B, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 2 Apply, Rotate again, clear the selection, Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4a Apply pending, A selected again and flipped from the surface panel
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 4b Apply pending, the surface panel's Flip saves first, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5a another client saves during the preview, then Apply
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: object history: expected version conflict for object 732b123f-4cab-41c5-9b83-1f6705a6de1a
+208: This plugin does not support propagateSizeHints()
+208: case passed: 5b the save fails (another client saved first)
+208: This plugin does not support propagateSizeHints()
+208: vc.segmentation.module: Saving surface channels failed: The surface was saved again since this copy was made; reopen it before saving
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6a an autosave through the segment's store edit finishes while Apply saves
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 6b the shown preview is edited and autosaved, Apply, Rotate again
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7a the stored revision cannot be read at Apply
+208: This plugin does not support propagateSizeHints()
+208: This plugin does not support propagateSizeHints()
+208: case passed: 7b the revision cannot be read when Rotate opens nor at Apply
+208: This plugin does not support propagateSizeHints()
+208: case passed: 3 Rotate on A, A deleted, Apply with no change
+208: reopened through the surface panel: 4
+208: surface rotation apply cases: 11 passed, 0 failed
+208: surface rotation apply tests passed
+1/1 Test #208: surface_rotation_apply ...........   Passed    5.00 sec
+
+The following tests passed:
+	surface_rotation_apply
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+vc-core    =   5.00 sec*proc (1 test)
+
+Total Test time (real) =  50.05 sec

@@ -1,0 +1,41 @@
+ninja: Entering directory `<work>/build'
+[0/2] Re-checking globbed directories...
+[1/40] Building CXX object core/CMakeFiles/vc_common_pch.dir/vc_common_pch.cpp.o
+[2/40] Linking CXX static library core/libvc_common_pch.a
+[3/40] Automatic MOC and UIC for target vc3d_app
+[4/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/CWindowContextMenu.cpp.o
+[5/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/vc3d_app_autogen/mocs_compilation.cpp.o
+[6/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/CWindow.cpp.o
+[7/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/tools/SurfaceMaskBrushTool.cpp.o
+[8/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/growth/SegmentationGrower.cpp.o
+[9/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/tools/SegmentationPushPullTool.cpp.o
+[10/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/SegmentationModule_Falloff.cpp.o
+[11/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/SegmentationModule_Input.cpp.o
+[12/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/SegmentationModule_Session.cpp.o
+[13/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/overlays/SurfaceRotationOverlayController.cpp.o
+[14/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/SurfacePanelController.cpp.o
+[15/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/StoreImportController.cpp.o
+[16/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/VolumeAttachmentController.cpp.o
+[17/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/SegmentationModule.cpp.o
+[18/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/SurfaceStoreEdit.cpp.o
+[19/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/growth/SegmentationCorrections.cpp.o
+[20/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/segmentation/SurfaceCorrections.cpp.o
+[21/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/ViewerManager.cpp.o
+[22/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeServer.cpp.o
+[23/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeJobs.cpp.o
+[24/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_catalog.cpp.o
+[25/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_session.cpp.o
+[26/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_stores.cpp.o
+[27/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_editing.cpp.o
+[28/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_wrap.cpp.o
+[29/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_fiber.cpp.o
+[30/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_seeding.cpp.o
+[31/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_lasagna.cpp.o
+[32/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_flatten.cpp.o
+[33/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_points.cpp.o
+[34/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_review.cpp.o
+[35/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_surfaceops.cpp.o
+[36/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/agent_bridge/AgentBridgeHandlers_viewer.cpp.o
+[37/40] Building CXX object apps/VC3D/CMakeFiles/vc3d_app.dir/MenuActionController.cpp.o
+[38/40] Building CXX object apps/VC3D/CMakeFiles/VC3D.dir/VCAppMain.cpp.o
+[39/40] Linking CXX executable bin/VC3D
