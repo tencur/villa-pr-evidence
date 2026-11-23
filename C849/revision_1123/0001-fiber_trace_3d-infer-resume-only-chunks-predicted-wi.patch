@@ -1,0 +1,319 @@
+From a6d3c568d8c2996a9d6aa2a0b020ae7cf64848c3 Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Mon, 23 Nov 2026 04:28:06 +0000
+Subject: [PATCH] fiber_trace_3d infer: resume only chunks predicted with the
+ same tiling
+
+Resume treats every stored chunk as complete, so rerunning over an
+output written with another overlap (for example the old default 16)
+kept its gaps, mixed tile grids and replaced inference.json with the new
+settings. inference.json cannot tell which tiling produced a store: it
+is shared by every output in the directory and is first written after
+setup.
+
+Each output store now records its tiling (tile size, overlap, border,
+input and output scale, chunk size) as the `fiber_inference_tiling`
+attribute, written at setup before any chunk: on the root of a compact
+store, and on every channel store of a legacy output. Before setup, a
+store that already holds chunks is refused when its recorded tiling
+differs or is missing, so neither the output nor inference.json changes.
+Stores without chunks are adopted, so a retry after an interruption
+during setup works. Crops of the same tiling still extend each other,
+and a second output in the same directory does not affect the first.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../neural_tracing/fiber_trace_3d/infer.py    |  60 +++++-
+ .../neural_tracing/test_fiber_trace_3d.py     | 171 ++++++++++++++++++
+ 2 files changed, 230 insertions(+), 1 deletion(-)
+
+diff --git a/vesuvius/src/vesuvius/neural_tracing/fiber_trace_3d/infer.py b/vesuvius/src/vesuvius/neural_tracing/fiber_trace_3d/infer.py
+index a8b1081b2..9f40f89aa 100644
+--- a/vesuvius/src/vesuvius/neural_tracing/fiber_trace_3d/infer.py
++++ b/vesuvius/src/vesuvius/neural_tracing/fiber_trace_3d/infer.py
+@@ -4,6 +4,7 @@ import argparse
+ import hashlib
+ import json
+ import math
++import os
+ from pathlib import Path
+ import platform
+ import subprocess
+@@ -380,6 +381,46 @@ def _select_and_expand_crop(
+     )
+ 
+ 
++# Each output store records the tiling its chunks were predicted with, because
++# resume reuses every stored chunk and inference.json is shared by the directory.
++TILING_ATTR = "fiber_inference_tiling"
++
++
++def _store_has_chunks(store: Path) -> bool:
++    """Whether a local Zarr v2 store holds any chunk (metadata files start with '.')."""
++    return any(
++        not name.startswith(".") for _dirpath, _dirs, files in os.walk(store) for name in files
++    )
++
++
++def _refuse_other_tiling(stores: list[Path], tiling: dict[str, int]) -> None:
++    """Refuse stores holding chunks predicted with another or an unrecorded tiling.
++
++    Stores without chunks (such as after an interruption during setup) are adopted.
++    """
++    def describe(value: object) -> str:
++        return " ".join(f"{k}={v}" for k, v in value.items()) if isinstance(value, dict) else repr(value)
++
++    for store in stores:
++        try:
++            recorded = json.loads((store / ".zattrs").read_text()).get(TILING_ATTR)
++        except (OSError, ValueError, AttributeError):
++            recorded = None
++        if recorded == tiling or not _store_has_chunks(store):
++            continue
++        if recorded is None:
++            raise ValueError(
++                f"{store} holds prediction chunks but records no tiling (written before tilings "
++                "were recorded), so they cannot be reused safely; use a new output path or "
++                "remove the store."
++            )
++        raise ValueError(
++            f"{store} holds prediction chunks from tiling {describe(recorded)}, but this run "
++            f"uses {describe(tiling)}; rerun with the recorded tiling to resume, or use a new "
++            "output path or remove the store."
++        )
++
++
+ def run_fiber_trace_3d_inference(
+     *,
+     config_path: str | Path | None = None,
+@@ -537,27 +578,44 @@ def run_fiber_trace_3d_inference(
+         emit_width="width" in annotation_heads,
+         emit_normals="normal" in annotation_heads,
+     )
++    # Stored chunks are reused as complete, so a store's chunks must come from this tiling.
++    tiling = {
++        "tile_size": int(tile_size_i), "overlap": int(overlap), "border": int(border),
++        "input_scaledown": int(input_sd), "output_scaledown": int(output_sd_input),
++        "ome_chunk": int(ome_chunk),
++    }
++    if output_format == "compact":
++        tiled_stores = [output_manifest]
++    else:
++        tiled_stores = sorted({Path(OmeZarrOutputAdapter.channel_path(channel))
++                               for product in predict_adapter.output_products
++                               for channel in product.channels})
++    _refuse_other_tiling(tiled_stores, tiling)
+     if output_format == "compact":
+         from lasagna.lasagna_volume import VALIDITY_BY_CHUNKS
++        from vc_reader.reader import create_group
+         products = predict_adapter.output_products
+         output_adapter = CompactOutputAdapter(root=output_manifest, products=products, n_levels=n_levels,
+             validity_channel=VALIDITY_BY_CHUNKS, blank_invalid=blank_invalid)
+         output_adapter.prepare(base_shape_zyx=base_shape_zyx, ome_chunk=int(ome_chunk),
+             ome_compressor=ome_compressor, crop=crop_xyzwhd,
+             provenance="../inference.json", extra_fields={"width_encoding": "uint8-base-voxels" if width_uint8_base else "float32-input-voxels"})
++        create_group(output_manifest).attrs[TILING_ATTR] = tiling
+     else:
+         output_adapter = OmeZarrOutputAdapter(
+             products=predict_adapter.output_products,
+             n_levels=n_levels,
+         )
+         output_adapter.blank_invalid = blank_invalid
+-        create_product_omezarr_groups(
++        channel_groups = create_product_omezarr_groups(
+             products=predict_adapter.output_products,
+             base_shape_zyx=base_shape_zyx,
+             n_levels=n_levels,
+             ome_chunk=int(ome_chunk),
+             ome_compressor=ome_compressor,
+         )
++        for group in channel_groups.values():
++            group.attrs[TILING_ATTR] = tiling
+         write_lasagna_product_manifest(
+             output_path=output_manifest,
+             products=predict_adapter.output_products,
+diff --git a/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py b/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py
+index cc9767e1a..bd8cad13d 100644
+--- a/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py
++++ b/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py
+@@ -1008,6 +1008,177 @@ def test_fiber_inference_rejects_overlap_below_both_tile_borders(tmp_path: Path)
+         )
+ 
+ 
++def _constant_fiber_cli(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
++    """Direct Fiber CLI on a 96^3 volume (8 output chunks) with a presence-1 stand-in model."""
++    input_path = tmp_path / "input.zarr"
++    create_v2_array(input_path, shape=(96, 96, 96), chunks=(32, 32, 32), dtype=np.uint8)[:] = 100
++    checkpoint = tmp_path / "model.pt"
++    torch.save({"config": {
++        "patch_shape_zyx": [64, 64, 64],
++        "image_normalization": "none",
++        "model_3d": {"output_stride": 1},
++        "training": {"mixed_precision": "off"},
++    }}, checkpoint)
++    monkeypatch.setattr(
++        "vesuvius.neural_tracing.fiber_trace_3d.inference_adapter.build_fiber_trace_3d_model",
++        lambda config: _ConstantPresenceFiberModel(),
++    )
++    monkeypatch.setattr(
++        "vesuvius.neural_tracing.fiber_trace_3d.train._load_snapshot",
++        lambda *args, **kwargs: None,
++    )
++
++    def run(output: Path, *extra: str) -> int:
++        return fiber_infer_module.main([
++            "--input", str(input_path), "--output", str(output),
++            "--output-format", "legacy" if output.name.endswith(".lasagna.json") else "compact",
++            "--checkpoint", str(checkpoint), "--base-ref", str(input_path), "--base-scale", "0",
++            "--device", "cpu", "--levels", "1", "--flush-workers", "0", "--accumulator-workers", "0",
++            *extra,
++        ])
++    return run
++
++
++def _presence(output: Path) -> np.ndarray:
++    if output.name.endswith(".lasagna.json"):
++        return np.asarray(open_zarr(output.parent / "fiber_presence.ome.zarr" / "0")[:])
++    group = next(g for g in json.loads((output / ".zattrs").read_text())["lasagna"]["groups"].values()
++                 if "presence" in g["channels"])
++    return np.asarray(open_zarr(output / group["zarr"])[:])[group["channels"].index("presence")]
++
++
++def _finest_chunks(output: Path) -> dict[str, tuple[int, int]]:
++    root = output.parent / "fiber_presence.ome.zarr" / "0" if output.name.endswith(".lasagna.json") else output / "sd0" / "0"
++    return {p.relative_to(root).as_posix(): (p.stat().st_ino, p.stat().st_mtime_ns)
++            for p in sorted(root.rglob("*")) if p.is_file() and not p.name.startswith(".")}
++
++
++def _files(directory: Path) -> dict[str, bytes]:
++    return {p.relative_to(directory).as_posix(): p.read_bytes()
++            for p in sorted(directory.rglob("*")) if p.is_file()}
++
++
++def _drop_tiling_records(directory: Path) -> None:
++    """Make stores look like ones written before tilings were recorded."""
++    for attrs in directory.rglob(".zattrs"):
++        values = json.loads(attrs.read_text())
++        if values.pop("fiber_inference_tiling", None) is not None:
++            attrs.write_text(json.dumps(values))
++
++
++def test_fiber_inference_refuses_resume_of_store_without_tiling(
++    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    run = _constant_fiber_cli(tmp_path, monkeypatch)
++    output = tmp_path / "out" / "fiber.zarr"
++    assert run(output, "--overlap", "16", "--border", "8") == 0
++    _drop_tiling_records(output.parent)
++    removed = output / "sd0" / "0" / "0" / "1" / "1" / "1"
++    removed.unlink()
++    before = _files(output.parent)
++
++    with pytest.raises(ValueError, match="holds prediction chunks but records no tiling"):
++        run(output)
++
++    assert _files(output.parent) == before
++    assert json.loads((output.parent / "inference.json").read_text())["inference"]["overlap"] == 16
++
++
++@pytest.mark.parametrize("keep_manifest", [True, False])
++def test_fiber_inference_refuses_legacy_resume_with_other_tiling(
++    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, keep_manifest: bool,
++) -> None:
++    run = _constant_fiber_cli(tmp_path, monkeypatch)
++    output = tmp_path / "out" / "fiber.lasagna.json"
++    assert run(output) == 0
++    if not keep_manifest:
++        output.unlink()
++    before = _files(output.parent)
++
++    with pytest.raises(ValueError, match="from tiling .*overlap=32.* uses .*overlap=48"):
++        run(output, "--overlap", "48")
++
++    assert _files(output.parent) == before
++
++
++def test_fiber_inference_same_tiling_retry_rebuilds_only_missing_chunk(
++    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    run = _constant_fiber_cli(tmp_path, monkeypatch)
++    output = tmp_path / "out" / "fiber.zarr"
++    assert run(output, "--overlap", "48") == 0
++    chunks = _finest_chunks(output)
++    assert len(chunks) == 8
++    (output / "sd0" / "0" / "0" / "1" / "1" / "1").unlink()
++
++    assert run(output, "--overlap", "48") == 0
++
++    after = _finest_chunks(output)
++    assert set(after) == set(chunks)
++    assert [key for key in chunks if after[key] != chunks[key]] == ["0/1/1/1"]
++    assert int((_presence(output) == 0).sum()) == 0
++
++
++def test_fiber_inference_extends_crop_after_other_output_in_same_directory(
++    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
++) -> None:
++    run = _constant_fiber_cli(tmp_path, monkeypatch)
++    a, b = tmp_path / "out" / "a.zarr", tmp_path / "out" / "b.zarr"
++    assert run(a, "--crop", "0", "0", "0", "32", "32", "32") == 0
++    crop_chunks = _finest_chunks(a)
++    assert list(crop_chunks) == ["0/0/0/0"]
++    assert run(b, "--overlap", "48") == 0
++
++    assert run(a) == 0
++
++    after = _finest_chunks(a)
++    assert len(after) == 8 and after["0/0/0/0"] == crop_chunks["0/0/0/0"]
++    assert int((_presence(a) == 0).sum()) == 0
++    before = _files(tmp_path / "out")
++    with pytest.raises(ValueError, match="from tiling .*overlap=32.* uses .*overlap=48"):
++        run(a, "--overlap", "48")
++    assert _files(tmp_path / "out") == before
++
++
++class _Interrupted(Exception):
++    pass
++
++
++@pytest.mark.parametrize("record_written", [True, False])
++@pytest.mark.parametrize("name", ["fiber.zarr", "fiber.lasagna.json"])
++def test_fiber_inference_retries_after_interrupted_setup(
++    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, name: str, record_written: bool,
++) -> None:
++    run = _constant_fiber_cli(tmp_path, monkeypatch)
++    output = tmp_path / "out" / name
++    armed = [True]
++    for module_name in ("inference_provenance", "lasagna.inference_provenance"):
++        try:
++            module = __import__(module_name, fromlist=["atomic_write"])
++        except ImportError:
++            continue
++
++        def interrupt(path, value, *args, _write=module.atomic_write, **kwargs):
++            if armed[0] and Path(path).name == "inference.json":
++                armed[0] = False
++                raise _Interrupted
++            return _write(path, value, *args, **kwargs)
++        monkeypatch.setattr(module, "atomic_write", interrupt)
++
++    with pytest.raises(_Interrupted):
++        run(output)
++    assert not (output.parent / "inference.json").exists()
++    assert not _finest_chunks(output)
++    if not record_written:
++        _drop_tiling_records(output.parent)
++
++    assert run(output) == 0
++
++    assert len(_finest_chunks(output)) == 8
++    assert int((_presence(output) == 0).sum()) == 0
++    assert json.loads((output.parent / "inference.json").read_text())["status"] == "completed"
++
++
+ def test_checkpoint_config_is_authoritative_with_legacy_fallback(tmp_path: Path) -> None:
+     checkpoint = tmp_path / "model.pt"
+     legacy = tmp_path / "legacy.json"
+-- 
+2.47.3
+

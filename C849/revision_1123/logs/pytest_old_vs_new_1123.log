@@ -1,0 +1,53 @@
+# CPU, torch venv, vc_reader built from upstream source; git archive of each revision, PYTHONPATH=<villa>/vesuvius/src:<villa>:<villa>/lasagna:<vcr>
+# file: vesuvius/tests/neural_tracing/test_fiber_trace_3d.py; -k selects the 9 new and 2 previous PR tests
+# the same 5 whole-file failures on both heads are environmental (no `vc` native module, a subprocess import without vc_reader, no git checkout for inference.code_commit)
+
+### old head 58bff76ae code + the revised test file: new and previous PR tests
+E       Failed: DID NOT RAISE ValueError
+E       Failed: DID NOT RAISE ValueError
+E       Failed: DID NOT RAISE ValueError
+E       Failed: DID NOT RAISE ValueError
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_cli_defaults_predict_every_voxel
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_rejects_overlap_below_both_tile_borders
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_same_tiling_retry_rebuilds_only_missing_chunk
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.zarr-True]
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.zarr-False]
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.lasagna.json-True]
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.lasagna.json-False]
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_refuses_resume_of_store_without_tiling
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_refuses_legacy_resume_with_other_tiling[True]
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_refuses_legacy_resume_with_other_tiling[False]
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_extends_crop_after_other_output_in_same_directory
+4 failed, 7 passed, 280 deselected in 99.82s (0:01:39)
+
+### new head a6d3c568d: new and previous PR tests
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_cli_defaults_predict_every_voxel
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_rejects_overlap_below_both_tile_borders
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_refuses_resume_of_store_without_tiling
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_refuses_legacy_resume_with_other_tiling[True]
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_refuses_legacy_resume_with_other_tiling[False]
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_same_tiling_retry_rebuilds_only_missing_chunk
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_extends_crop_after_other_output_in_same_directory
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.zarr-True]
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.zarr-False]
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.lasagna.json-True]
+PASSED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.lasagna.json-False]
+11 passed, 280 deselected in 77.35s (0:01:17)
+
+### whole file, old head 58bff76ae (its own tests)
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_trace_3d_imports_with_package_style_lasagna_path
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_native_geometry_rejects_stale_binding
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_geometry_auto_prefers_native_and_falls_back_for_stale_binding
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_value_augmentation_backend_selection
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_3d_fiber_infer_writes_lasagna_presence_normal_products[legacy]
+5 failed, 259 passed, 16 skipped, 2 xfailed, 1 warning in 27.80s
+
+### whole file, new head a6d3c568d
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_trace_3d_imports_with_package_style_lasagna_path
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_native_geometry_rejects_stale_binding
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_geometry_auto_prefers_native_and_falls_back_for_stale_binding
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_value_augmentation_backend_selection
+FAILED vesuvius/tests/neural_tracing/test_fiber_trace_3d.py::test_3d_fiber_infer_writes_lasagna_presence_normal_products[legacy]
+5 failed, 268 passed, 16 skipped, 2 xfailed, 1 warning in 49.03s
+
+# a first old-head whole-file run made concurrently with the coverage oracle also failed the two timing-based training watchdog tests (7 failed, 257 passed); rerun unloaded above

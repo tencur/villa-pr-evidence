@@ -1,0 +1,13 @@
+infer argv: --input <wd>/volume160.zarr/0 --output <wd>/new_out/fiber.zarr --checkpoint <wd>/model.pt --device cpu
+
+[fiber_trace_3d:infer] done output=<work>/new_out/fiber.zarr elapsed=20.2s
+result: completed
+finest chunks: 27 stored, 27 rebuilt, 0 untouched
+inference.json: overlap 32, border 16, status 'completed'
+store tiling record: {'border': 16, 'input_scaledown': 1, 'ome_chunk': 64, 'output_scaledown': 1, 'overlap': 32, 'tile_size': 64}
+presence shape (160, 160, 160), values [255]
+voxels with presence 0: 0 of 4096000 (fraction 0.000); expected 0
+x-planes entirely presence 0: 0 (none)
+y-planes entirely presence 0: 0 (none)
+z-planes entirely presence 0: 0 (none)
+validity_channel 'chunks', blank_invalid False: 27 of 27 chunks stored; 0 of 0 chunks with presence-0 voxels are stored

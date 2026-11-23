@@ -1,0 +1,24 @@
+infer argv: --input <wd>/volume160.zarr/0 --output <wd>/main_default160/fiber.zarr --checkpoint <wd>/model.pt --device cpu
+[input] level=0 location=<work>/volume160.zarr/0 shape=(160, 160, 160) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[predict3d] base shape from level 0 array: (160, 160, 160)
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] ring sd=1 zyx=(192,192,192) logical_z=192 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.09GiB weight_backing=0.03GiB backing=0.12GiB
+[predict3d] flush processes=4 ipc_window=8 native_threads_per_worker=1 blosc_threads_per_worker=1
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] flush sd=1 z=[0,64) dirty_chunks=9
+[predict3d] flush complete sd=1 z=64 dirty_chunks=9 products_written=9 unsupported=0 resume=0 touched=121.50MiB cleared=28.12MiB elapsed=5.99s
+[predict3d] flush sd=1 z=[64,160) dirty_chunks=18
+[predict3d] input stats reads=64 bytes=16777216 read_sum=0.17s ready_highwater=3
+[predict3d] flush complete sd=1 z=160 dirty_chunks=18 products_written=18 unsupported=0 resume=0 touched=121.50MiB cleared=70.31MiB elapsed=4.57s
+[predict3d] flush stats workers=4 chunks=27 work_sum=29.15s wait=7.93s wall=12.53s rate=2.15chunks/s
+[predict3d] inference done in 15.0s (64 processed, 0 skipped)
+[fiber_trace_3d:infer] done output=<work>/main_default160/fiber.zarr elapsed=22.3s
+presence shape (160, 160, 160), values [0, 255]
+voxels with presence 0: 1998848 of 4096000 (fraction 0.488); expected 0
+x-planes entirely presence 0: 32 (32-47, 80-95)
+y-planes entirely presence 0: 32 (32-47, 80-95)
+z-planes entirely presence 0: 32 (32-47, 80-95)
+validity_channel 'chunks', blank_invalid False: 27 of 27 chunks stored; 26 of 26 chunks with presence-0 voxels are stored
+  presence at the presence-0 voxels: [0]; elsewhere: [255]
+  nx at the presence-0 voxels: [148]; elsewhere: [255]
+  ny at the presence-0 voxels: [156]; elsewhere: [128]

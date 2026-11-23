@@ -1,0 +1,27 @@
+infer argv: --input <wd>/volume256.zarr/0 --output <wd>/main_default256/fiber.zarr --checkpoint <wd>/model.pt --device cpu
+[input] level=0 location=<work>/volume256.zarr/0 shape=(256, 256, 256) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[predict3d] base shape from level 0 array: (256, 256, 256)
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] ring sd=1 zyx=(176,288,288) logical_z=288 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.26GiB weight_backing=0.07GiB backing=0.33GiB
+[predict3d] flush processes=4 ipc_window=8 native_threads_per_worker=1 blosc_threads_per_worker=1
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] flush sd=1 z=[0,64) dirty_chunks=16
+[predict3d] flush complete sd=1 z=64 dirty_chunks=16 products_written=16 unsupported=0 resume=0 touched=281.25MiB cleared=72.00MiB elapsed=11.67s
+[predict3d] flush sd=1 z=[64,128) dirty_chunks=16
+[predict3d] flush sd=1 z=[128,192) dirty_chunks=16
+[predict3d] flush complete sd=1 z=192 dirty_chunks=16 products_written=16 unsupported=0 resume=0 touched=562.50MiB cleared=216.00MiB elapsed=12.91s
+[predict3d] flush sd=1 z=[192,256) dirty_chunks=16
+[predict3d] input stats reads=216 bytes=56623104 read_sum=1.17s ready_highwater=3
+[predict3d] flush complete sd=1 z=256 dirty_chunks=16 products_written=16 unsupported=0 resume=0 touched=562.50MiB cleared=288.00MiB elapsed=11.08s
+[predict3d] flush stats workers=4 chunks=64 work_sum=180.61s wait=17.96s wall=52.15s rate=1.23chunks/s
+[predict3d] inference done in 62.0s (216 processed, 0 skipped)
+[fiber_trace_3d:infer] done output=<work>/main_default256/fiber.zarr elapsed=75.9s
+presence shape (256, 256, 256), values [0, 255]
+voxels with presence 0: 9699328 of 16777216 (fraction 0.578); expected 0
+x-planes entirely presence 0: 64 (32-47, 80-95, 128-143, 176-191)
+y-planes entirely presence 0: 64 (32-47, 80-95, 128-143, 176-191)
+z-planes entirely presence 0: 64 (32-47, 80-95, 128-143, 176-191)
+validity_channel 'chunks', blank_invalid False: 64 of 64 chunks stored; 63 of 63 chunks with presence-0 voxels are stored
+  presence at the presence-0 voxels: [0]; elsewhere: [255]
+  nx at the presence-0 voxels: [148]; elsewhere: [255]
+  ny at the presence-0 voxels: [156]; elsewhere: [128]

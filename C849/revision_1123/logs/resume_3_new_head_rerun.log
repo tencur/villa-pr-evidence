@@ -1,0 +1,16 @@
+removed finest chunk sd0/0/0/1/1/1
+infer argv: --input <wd>/volume160.zarr/0 --output <wd>/new_retry/fiber.zarr --checkpoint <wd>/model.pt --device cpu
+result: ValueError: <wd>/new_retry/fiber.zarr holds prediction chunks but records no tiling (written before tilings were recorded), so they cannot be reused safely; use a new output path or remove the store.
+finest chunks: 26 stored, 0 rebuilt, 26 untouched
+store files unchanged: True; inference.json unchanged: True
+inference.json: overlap 16, border 16, status 'completed'
+store tiling record: None
+presence shape (160, 160, 160), values [0, 255]
+voxels with presence 0: 2109440 of 4096000 (fraction 0.515); expected 0
+x-planes entirely presence 0: 32 (32-47, 80-95)
+y-planes entirely presence 0: 32 (32-47, 80-95)
+z-planes entirely presence 0: 32 (32-47, 80-95)
+validity_channel 'chunks', blank_invalid False: 26 of 27 chunks stored; 25 of 26 chunks with presence-0 voxels are stored
+  presence at the presence-0 voxels: [0]; elsewhere: [255]
+  nx at the presence-0 voxels: [0, 148]; elsewhere: [255]
+  ny at the presence-0 voxels: [0, 156]; elsewhere: [128]
