@@ -1,0 +1,21 @@
+infer argv: --input <wd>/volume160.zarr/0 --output <wd>/fix_overlap16_160/fiber.zarr --checkpoint <wd>/model.pt --device cpu --overlap 16 --border 16
+Traceback (most recent call last):
+  File "scripts/default_coverage.py", line 119, in <module>
+    main()
+    ~~~~^^
+  File "scripts/default_coverage.py", line 114, in main
+    infer.main(argv)
+    ~~~~~~~~~~^^^^^^
+  File "<villa>/vesuvius/src/vesuvius/neural_tracing/fiber_trace_3d/infer.py", line 931, in main
+    run_fiber_trace_3d_inference(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        config_path=args.config,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<36 lines>...
+        provenance_context_path=args.provenance_context,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<villa>/vesuvius/src/vesuvius/neural_tracing/fiber_trace_3d/infer.py", line 441, in run_fiber_trace_3d_inference
+    raise ValueError(f"overlap={overlap} must be >= 2 * border={border}")
+ValueError: overlap=16 must be >= 2 * border=16

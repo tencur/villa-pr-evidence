@@ -1,0 +1,24 @@
+== main 3521e7c97 + the 2 new tests: tests/neural_tracing/test_fiber_trace_3d.py -k new tests
+E       assert 372736 == 0
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'overlap=16 must be >= 2 \\* border=16'
+E         Actual message: 'checkpoint does not contain an embedded config; pass a legacy config JSON as the positional argument'
+2 failed, 280 deselected in 12.52s
+== fix (main 3521e7c97 + this PR): tests/neural_tracing/test_fiber_trace_3d.py -k new tests
+2 passed, 280 deselected in 11.65s
+== main 3521e7c97 + the 2 new tests: tests/neural_tracing/test_fiber_trace_3d.py (whole file)
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_cli_defaults_predict_every_voxel
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_rejects_overlap_below_both_tile_borders
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_trace_3d_imports_with_package_style_lasagna_path
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_native_geometry_rejects_stale_binding
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_geometry_auto_prefers_native_and_falls_back_for_stale_binding
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_value_augmentation_backend_selection
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_3d_fiber_infer_writes_lasagna_presence_normal_products[legacy]
+7 failed, 257 passed, 16 skipped, 2 xfailed, 1 warning in 32.94s
+== fix: tests/neural_tracing/test_fiber_trace_3d.py (whole file)
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_trace_3d_imports_with_package_style_lasagna_path
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_native_geometry_rejects_stale_binding
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_geometry_auto_prefers_native_and_falls_back_for_stale_binding
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_value_augmentation_backend_selection
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_3d_fiber_infer_writes_lasagna_presence_normal_products[legacy]
+5 failed, 259 passed, 16 skipped, 2 xfailed, 1 warning in 32.41s

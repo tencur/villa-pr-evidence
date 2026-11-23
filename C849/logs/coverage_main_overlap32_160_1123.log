@@ -1,0 +1,21 @@
+infer argv: --input <wd>/volume160.zarr/0 --output <wd>/main_overlap32_160/fiber.zarr --checkpoint <wd>/model.pt --device cpu --overlap 32 --border 16
+[input] level=0 location=<work>/volume160.zarr/0 shape=(160, 160, 160) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[predict3d] base shape from level 0 array: (160, 160, 160)
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] ring sd=1 zyx=(192,192,192) logical_z=192 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.09GiB weight_backing=0.03GiB backing=0.12GiB
+[predict3d] flush processes=4 ipc_window=8 native_threads_per_worker=1 blosc_threads_per_worker=1
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] flush sd=1 z=[0,64) dirty_chunks=9
+[predict3d] flush complete sd=1 z=64 dirty_chunks=9 products_written=9 unsupported=0 resume=0 touched=192.94MiB cleared=28.12MiB elapsed=5.95s
+[predict3d] flush sd=1 z=[64,160) dirty_chunks=18
+[predict3d] input stats reads=125 bytes=32768000 read_sum=0.23s ready_highwater=4
+[predict3d] flush complete sd=1 z=160 dirty_chunks=18 products_written=18 unsupported=0 resume=0 touched=192.94MiB cleared=70.31MiB elapsed=3.71s
+[predict3d] flush stats workers=4 chunks=27 work_sum=20.45s wait=5.09s wall=11.22s rate=2.41chunks/s
+[predict3d] inference done in 14.4s (125 processed, 0 skipped)
+[fiber_trace_3d:infer] done output=<work>/main_overlap32_160/fiber.zarr elapsed=19.6s
+presence shape (160, 160, 160), values [255]
+voxels with presence 0: 0 of 4096000 (fraction 0.000); expected 0
+x-planes entirely presence 0: 0 (none)
+y-planes entirely presence 0: 0 (none)
+z-planes entirely presence 0: 0 (none)
+validity_channel 'chunks', blank_invalid False: 27 of 27 chunks stored; 0 of 0 chunks with presence-0 voxels are stored
