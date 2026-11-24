@@ -1,0 +1,6 @@
+# 2026-11-24 villa main e87544118, aarch64 CPU, Python 3.13.5
+E       AssertionError: Lists differ: ['device_utils'] != []
+FAILED tests/test_gpu_image_modules.py::GpuImageModulesTests::test_gpu_image_copies_every_local_module_it_imports
+1 failed, 18 passed, 6 warnings, 12 subtests passed in 1.73s
+# 2026-11-24 villa fix 0944952fa on e87544118, aarch64 CPU, Python 3.13.5
+19 passed, 6 warnings, 12 subtests passed in 1.75s

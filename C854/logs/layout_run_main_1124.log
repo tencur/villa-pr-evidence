@@ -1,0 +1,10 @@
+gpu stage COPY into /app: requirements.txt entrypoint.py processing.py inference.py profiling.py model_timesformer.py model_resnet3d.py model_resnet3d_3d_decoder.py k8s.py runtime_contracts.py models
+local .py files not in the image: __init__.py device_utils.py sync_hf_to_s3.py
+STEP=inference exit status 1
+    File "<work>/app/entrypoint.py", line 1019, in main
+      run_inference_step(inputs, profiler=profiler)
+      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "<work>/app/entrypoint.py", line 671, in run_inference_step
+      from device_utils import select_device, amp_device_type
+  ModuleNotFoundError: No module named 'device_utils'
+RESULT: stops at import: No module named 'device_utils'

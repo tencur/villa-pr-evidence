@@ -1,0 +1,32 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ GpuImageModulesTests.test_gpu_image_copies_every_local_module_it_imports ___
+
+self = <optimized_inference.tests.test_gpu_image_modules.GpuImageModulesTests testMethod=test_gpu_image_copies_every_local_module_it_imports>
+
+    def test_gpu_image_copies_every_local_module_it_imports(self):
+        copied = _stage_app_copies("gpu")
+        self.assertIn("entrypoint.py", copied)
+        self.assertIn("inference.py", copied)
+        local = {p.stem for p in ROOT.glob("*.py")}
+        wanted = set()
+        for name in copied:
+            path = ROOT / name
+            files = [path] if path.suffix == ".py" else sorted(path.rglob("*.py")) if path.is_dir() else []
+            for py in files:
+                wanted |= _imported_top_level(py)
+        missing = sorted((wanted & local) - {Path(n).stem for n in copied})
+>       self.assertEqual(missing, [], "the gpu image imports local modules it does not COPY into /app")
+E       AssertionError: Lists differ: ['device_utils'] != []
+E       
+E       First list contains 1 additional elements.
+E       First extra element 0:
+E       'device_utils'
+E       
+E       - ['device_utils']
+E       + [] : the gpu image imports local modules it does not COPY into /app
+
+tests/test_gpu_image_modules.py:44: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_gpu_image_modules.py::GpuImageModulesTests::test_gpu_image_copies_every_local_module_it_imports
+1 failed in 0.12s
