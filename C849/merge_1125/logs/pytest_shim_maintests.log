@@ -1,0 +1,577 @@
+.....................................FFFFFFF.FFFFF...............F...... [ 24%]
+..............................................ssssFFss........s.sssssssF [ 49%]
+...........ss.......................F...xx.............................. [ 73%]
+........................................................................ [ 98%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+E   assert 372736 == 0
+     +  where 372736 = int(np.int64(372736))
+     +    where np.int64(372736) = <built-in method sum of numpy.ndarray object at 0x7fff39397810>()
+     +      where <built-in method sum of numpy.ndarray object at 0x7fff39397810> = array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) == 0.sum
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_cli_defau0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] creating new fiber_presence.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_nx.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_ny.ome.zarr (levels 0-1)
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_cli_defau0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_cli_defau0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] flush processes=4 ipc_window=8 native_threads_per_worker=1 blosc_threads_per_worker=1
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [###################-----------] 17/27 tiles (63.0%) eta 00:00 avg=59ms/tile | overall eta 00:00 final_z=0/96  
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=58ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=8
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.07s ready_highwater=3
+[predict3d] flush complete sd=1 z=96 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=51.26MiB cleared=15.19MiB elapsed=2.45s
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=58ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=4 chunks=8 work_sum=3.32s wait=2.43s wall=3.59s rate=2.23chunks/s
+[predict3d] inference done in 5.2s (27 processed, 0 skipped)
+[pyramid presence L1] workers=4
+[pyramid fiber_option_000 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid fiber_option_000 L1] workers=1
+[pyramid fiber_option_000 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_cli_defau0/fiber.lasagna.json elapsed=5.3s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:997: assert 372736 == 0
+E   AssertionError: Regex pattern did not match.
+      Expected regex: 'overlap=16 must be >= 2 \\* border=16'
+      Actual message: 'checkpoint does not contain an embedded config; pass a legacy config JSON as the positional argument'
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1001: AssertionError: Regex pattern did not match.
+E   Failed: DID NOT RAISE ValueError
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_refuses_r0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_refuses_r0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_refuses_r0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(112,112,112) logical_z=112 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/8 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 8/8 tiles (100.0%) eta 00:00 avg=26ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=8
+[predict3d] flush complete sd=1 z=96 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=24.12MiB cleared=15.19MiB elapsed=0.62s
+[predict3d] input stats reads=8 bytes=2097152 read_sum=0.01s ready_highwater=3
+[predict3d] [##############################] 8/8 tiles (100.0%) eta 00:00 avg=26ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=8 work_sum=0.62s wait=0.62s wall=0.62s rate=12.91chunks/s
+[predict3d] inference done in 0.8s (8 processed, 0 skipped)
+[pyramid sd0 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid sd0 L1] workers=1
+[pyramid sd0 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_refuses_r0/out/fiber.zarr elapsed=0.9s
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_refuses_r0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_refuses_r0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_refuses_r0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(48,48,48) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=1
+[predict3d] flush complete sd=1 z=96 dirty_chunks=1 products_written=1 unsupported=0 resume=7 touched=4.50MiB cleared=0.56MiB elapsed=0.03s
+[predict3d] input stats reads=8 bytes=2097152 read_sum=0.01s ready_highwater=2
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=1 work_sum=0.03s wait=0.03s wall=0.03s rate=36.15chunks/s
+[predict3d] inference done in 0.2s (8 processed, 19 skipped)
+[pyramid sd0 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid sd0 L1] workers=1
+[pyramid sd0 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_refuses_r0/out/fiber.zarr elapsed=0.2s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1080: Failed: DID NOT RAISE ValueError
+E   SystemExit: 2
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_adopts_st0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_adopts_st0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,64,0,64,0,64) output_region_zyx=(0,0,0,64,64,64) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_adopts_st0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(96,96,96) logical_z=96 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/64
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=14ms/tile | overall eta 00:00 final_z=0/64
+[predict3d] flush sd=1 z=[0,64) dirty_chunks=1
+[predict3d] flush complete sd=1 z=64 dirty_chunks=1 products_written=1 unsupported=0 resume=0 touched=8.79MiB cleared=4.50MiB elapsed=0.19s
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.03s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=14ms/tile | overall eta 00:00 final_z=64/64
+[predict3d] flush stats workers=0 chunks=1 work_sum=0.19s wait=0.19s wall=0.19s rate=5.23chunks/s
+[predict3d] inference done in 0.6s (27 processed, 0 skipped)
+[pyramid sd0 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid sd0 L1] workers=1
+[pyramid sd0 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_adopts_st0/out/fiber.zarr elapsed=0.6s
+----------------------------- Captured stderr call -----------------------------
+usage: __main__.py [-h] --input INPUT --output OUTPUT
+                   [--output-format {compact,legacy}]
+                   [--blank-invalid | --no-blank-invalid]
+                   [--width-uint8-base | --no-width-uint8-base]
+                   --checkpoint CHECKPOINT [--tile-size TILE_SIZE]
+                   [--overlap OVERLAP] [--border BORDER]
+                   [--inference-scaledown-power INFERENCE_SCALEDOWN_POWER]
+                   [--crop X Y Z W H D] [--device DEVICE] [--devices DEVICES]
+                   [--prefetch-workers PREFETCH_WORKERS]
+                   [--slots-per-gpu SLOTS_PER_GPU]
+                   [--flush-workers FLUSH_WORKERS]
+                   [--prefetch-tiles-per-gpu PREFETCH_TILES_PER_GPU]
+                   [--input-cache-gib INPUT_CACHE_GIB]
+                   [--input-io-threads INPUT_IO_THREADS] [--profile-pipeline]
+                   [--inference-precision {auto,fp32,fp16,bf16}]
+                   [--product-accumulator-dtype {float16,float32}]
+                   [--accumulator-workers ACCUMULATOR_WORKERS]
+                   [--input-disk-cache-dir INPUT_DISK_CACHE_DIR]
+                   [--input-disk-cache-gib INPUT_DISK_CACHE_GIB]
+                   [--input-connections INPUT_CONNECTIONS]
+                   [--read-ahead-tiles READ_AHEAD_TILES] [--base-ref BASE_REF]
+                   [--base-scale BASE_SCALE] [--levels LEVELS]
+                   [--ome-chunk OME_CHUNK]
+                   [--ome-compressor {vc-delta3d,blosc-zstd,none}]
+                   [--pyramid-workers PYRAMID_WORKERS]
+                   [--recurrent-steps RECURRENT_STEPS]
+                   [--provenance-context PROVENANCE_CONTEXT]
+                   [config]
+__main__.py: error: unrecognized arguments: --adopt-unrecorded-tiling
+/usr/lib/python3.13/argparse.py:2659: SystemExit: 2
+E   SystemExit: 2
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_adopts_st1/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] creating new fiber_presence.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_nx.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_ny.ome.zarr (levels 0-1)
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_adopts_st1/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,64,0,64,0,64) output_region_zyx=(0,0,0,64,64,64) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_adopts_st1/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(96,96,96) logical_z=96 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/64
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=14ms/tile | overall eta 00:00 final_z=0/64
+[predict3d] flush sd=1 z=[0,64) dirty_chunks=1
+[predict3d] flush complete sd=1 z=64 dirty_chunks=1 products_written=1 unsupported=0 resume=0 touched=8.79MiB cleared=4.50MiB elapsed=0.19s
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.03s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=14ms/tile | overall eta 00:00 final_z=64/64
+[predict3d] flush stats workers=0 chunks=1 work_sum=0.19s wait=0.19s wall=0.19s rate=5.22chunks/s
+[predict3d] inference done in 0.6s (27 processed, 0 skipped)
+[pyramid presence L1] workers=4
+[pyramid fiber_option_000 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid fiber_option_000 L1] workers=1
+[pyramid fiber_option_000 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_adopts_st1/out/fiber.lasagna.json elapsed=0.6s
+----------------------------- Captured stderr call -----------------------------
+usage: __main__.py [-h] --input INPUT --output OUTPUT
+                   [--output-format {compact,legacy}]
+                   [--blank-invalid | --no-blank-invalid]
+                   [--width-uint8-base | --no-width-uint8-base]
+                   --checkpoint CHECKPOINT [--tile-size TILE_SIZE]
+                   [--overlap OVERLAP] [--border BORDER]
+                   [--inference-scaledown-power INFERENCE_SCALEDOWN_POWER]
+                   [--crop X Y Z W H D] [--device DEVICE] [--devices DEVICES]
+                   [--prefetch-workers PREFETCH_WORKERS]
+                   [--slots-per-gpu SLOTS_PER_GPU]
+                   [--flush-workers FLUSH_WORKERS]
+                   [--prefetch-tiles-per-gpu PREFETCH_TILES_PER_GPU]
+                   [--input-cache-gib INPUT_CACHE_GIB]
+                   [--input-io-threads INPUT_IO_THREADS] [--profile-pipeline]
+                   [--inference-precision {auto,fp32,fp16,bf16}]
+                   [--product-accumulator-dtype {float16,float32}]
+                   [--accumulator-workers ACCUMULATOR_WORKERS]
+                   [--input-disk-cache-dir INPUT_DISK_CACHE_DIR]
+                   [--input-disk-cache-gib INPUT_DISK_CACHE_GIB]
+                   [--input-connections INPUT_CONNECTIONS]
+                   [--read-ahead-tiles READ_AHEAD_TILES] [--base-ref BASE_REF]
+                   [--base-scale BASE_SCALE] [--levels LEVELS]
+                   [--ome-chunk OME_CHUNK]
+                   [--ome-compressor {vc-delta3d,blosc-zstd,none}]
+                   [--pyramid-workers PYRAMID_WORKERS]
+                   [--recurrent-steps RECURRENT_STEPS]
+                   [--provenance-context PROVENANCE_CONTEXT]
+                   [config]
+__main__.py: error: unrecognized arguments: --adopt-unrecorded-tiling
+/usr/lib/python3.13/argparse.py:2659: SystemExit: 2
+E   Failed: DID NOT RAISE ValueError
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_refuses_l0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] creating new fiber_presence.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_nx.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_ny.ome.zarr (levels 0-1)
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_refuses_l0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_refuses_l0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=8
+[predict3d] flush complete sd=1 z=96 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=51.26MiB cleared=15.19MiB elapsed=0.62s
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.04s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=8 work_sum=0.62s wait=0.62s wall=0.62s rate=12.85chunks/s
+[predict3d] inference done in 1.1s (27 processed, 0 skipped)
+[pyramid presence L1] workers=4
+[pyramid fiber_option_000 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid fiber_option_000 L1] workers=1
+[pyramid fiber_option_000 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_refuses_l0/out/fiber.lasagna.json elapsed=1.2s
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_refuses_l0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] reusing existing fiber_presence.ome.zarr (level 0 shape=(96, 96, 96))
+[predict3d] reusing existing fiber_nx.ome.zarr (level 0 shape=(96, 96, 96))
+[predict3d] reusing existing fiber_ny.ome.zarr (level 0 shape=(96, 96, 96))
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_refuses_l0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_refuses_l0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/125 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] [##############################] 125/125 tiles (100.0%) eta --:-- final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=0
+[predict3d] flush complete sd=1 z=96 dirty_chunks=0 products_written=0 unsupported=0 resume=8 touched=0.00MiB cleared=0.00MiB elapsed=0.00s
+[predict3d] input stats reads=0 bytes=0 read_sum=0.00s ready_highwater=0
+[predict3d] [##############################] 125/125 tiles (100.0%) eta --:-- final_z=96/96
+[predict3d] flush stats workers=0 chunks=0 work_sum=0.00s wait=0.00s wall=0.00s rate=0.00chunks/s
+[predict3d] inference done in 0.0s (0 processed, 125 skipped)
+[pyramid presence L1] workers=4
+[pyramid fiber_option_000 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid fiber_option_000 L1] workers=1
+[pyramid fiber_option_000 L1] [##############################] 1/1 (100.0%) eta 00:00 skip_existing=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_refuses_l0/out/fiber.lasagna.json elapsed=0.0s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1117: Failed: DID NOT RAISE ValueError
+E   Failed: DID NOT RAISE ValueError
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_refuses_l1/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] creating new fiber_presence.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_nx.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_ny.ome.zarr (levels 0-1)
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_refuses_l1/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_refuses_l1/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=8
+[predict3d] flush complete sd=1 z=96 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=51.26MiB cleared=15.19MiB elapsed=0.62s
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.03s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=8 work_sum=0.61s wait=0.61s wall=0.62s rate=13.01chunks/s
+[predict3d] inference done in 1.1s (27 processed, 0 skipped)
+[pyramid presence L1] workers=4
+[pyramid fiber_option_000 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid fiber_option_000 L1] workers=1
+[pyramid fiber_option_000 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_refuses_l1/out/fiber.lasagna.json elapsed=1.1s
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_refuses_l1/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] reusing existing fiber_presence.ome.zarr (level 0 shape=(96, 96, 96))
+[predict3d] reusing existing fiber_nx.ome.zarr (level 0 shape=(96, 96, 96))
+[predict3d] reusing existing fiber_ny.ome.zarr (level 0 shape=(96, 96, 96))
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_refuses_l1/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_refuses_l1/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/125 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] [##############################] 125/125 tiles (100.0%) eta --:-- final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=0
+[predict3d] flush complete sd=1 z=96 dirty_chunks=0 products_written=0 unsupported=0 resume=8 touched=0.00MiB cleared=0.00MiB elapsed=0.00s
+[predict3d] input stats reads=0 bytes=0 read_sum=0.00s ready_highwater=0
+[predict3d] [##############################] 125/125 tiles (100.0%) eta --:-- final_z=96/96
+[predict3d] flush stats workers=0 chunks=0 work_sum=0.00s wait=0.00s wall=0.00s rate=0.00chunks/s
+[predict3d] inference done in 0.0s (0 processed, 125 skipped)
+[pyramid presence L1] workers=4
+[pyramid fiber_option_000 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid fiber_option_000 L1] workers=1
+[pyramid fiber_option_000 L1] [##############################] 1/1 (100.0%) eta 00:00 skip_existing=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_refuses_l1/out/fiber.lasagna.json elapsed=0.0s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1117: Failed: DID NOT RAISE ValueError
+E   AssertionError: assert 372736 == 0
+     +  where 372736 = int(np.int64(372736))
+     +    where np.int64(372736) = <built-in method sum of numpy.ndarray object at 0x7fff393d8570>()
+     +      where <built-in method sum of numpy.ndarray object at 0x7fff393d8570> = array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) == 0.sum
+     +        where array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) = _presence(PosixPath('<tmp>/pytest-45/test_fiber_inference_extends_c0/out/a.zarr'))
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_extends_c0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_extends_c0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,64,0,64,0,64) output_region_zyx=(0,0,0,64,64,64) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_extends_c0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(96,96,96) logical_z=96 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/64
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=14ms/tile | overall eta 00:00 final_z=0/64
+[predict3d] flush sd=1 z=[0,64) dirty_chunks=1
+[predict3d] flush complete sd=1 z=64 dirty_chunks=1 products_written=1 unsupported=0 resume=0 touched=8.79MiB cleared=4.50MiB elapsed=0.19s
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.04s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=14ms/tile | overall eta 00:00 final_z=64/64
+[predict3d] flush stats workers=0 chunks=1 work_sum=0.19s wait=0.19s wall=0.19s rate=5.28chunks/s
+[predict3d] inference done in 0.6s (27 processed, 0 skipped)
+[pyramid sd0 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid sd0 L1] workers=1
+[pyramid sd0 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_extends_c0/out/a.zarr elapsed=0.6s
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_extends_c0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_extends_c0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_extends_c0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/125 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [#############-----------------] 54/125 tiles (43.2%) eta 00:01 avg=18ms/tile | overall eta 00:01 final_z=0/96  
+[predict3d] [#########################-----] 105/125 tiles (84.0%) eta 00:00 avg=19ms/tile | overall eta 00:00 final_z=0/96  [predict3d] [##############################] 125/125 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=8
+[predict3d] flush complete sd=1 z=96 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=288.00MiB cleared=15.19MiB elapsed=0.66s
+[predict3d] input stats reads=125 bytes=32768000 read_sum=0.11s ready_highwater=3
+[predict3d] [##############################] 125/125 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=8 work_sum=0.66s wait=0.66s wall=0.66s rate=12.04chunks/s
+[predict3d] inference done in 3.0s (125 processed, 0 skipped)
+[pyramid sd0 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid sd0 L1] workers=1
+[pyramid sd0 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_extends_c0/out/b.zarr elapsed=3.1s
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_extends_c0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_extends_c0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_extends_c0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(0,0,48) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=17ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=7
+[predict3d] flush complete sd=1 z=96 dirty_chunks=7 products_written=7 unsupported=0 resume=1 touched=42.47MiB cleared=10.69MiB elapsed=0.46s
+[predict3d] input stats reads=26 bytes=6815744 read_sum=0.02s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=17ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=7 work_sum=0.46s wait=0.46s wall=0.46s rate=15.27chunks/s
+[predict3d] inference done in 0.9s (26 processed, 1 skipped)
+[pyramid sd0 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid sd0 L1] workers=1
+[pyramid sd0 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_extends_c0/out/a.zarr elapsed=0.9s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1155: AssertionError: assert 372736 == 0
+E   AssertionError: assert 372736 == 0
+     +  where 372736 = int(np.int64(372736))
+     +    where np.int64(372736) = <built-in method sum of numpy.ndarray object at 0x7fff38115770>()
+     +      where <built-in method sum of numpy.ndarray object at 0x7fff38115770> = array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) == 0.sum
+     +        where array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) = _presence(PosixPath('<tmp>/pytest-45/test_fiber_inference_retries_a0/out/fiber.zarr'))
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_retries_a0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_retries_a0/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_retries_a0/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_retries_a0/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=8
+[predict3d] flush complete sd=1 z=96 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=51.26MiB cleared=15.19MiB elapsed=0.65s
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.02s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=8 work_sum=0.65s wait=0.65s wall=0.65s rate=12.24chunks/s
+[predict3d] inference done in 1.1s (27 processed, 0 skipped)
+[pyramid sd0 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid sd0 L1] workers=1
+[pyramid sd0 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_retries_a0/out/fiber.zarr elapsed=1.2s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1197: AssertionError: assert 372736 == 0
+E   AssertionError: assert 372736 == 0
+     +  where 372736 = int(np.int64(372736))
+     +    where np.int64(372736) = <built-in method sum of numpy.ndarray object at 0x7fff3815f630>()
+     +      where <built-in method sum of numpy.ndarray object at 0x7fff3815f630> = array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) == 0.sum
+     +        where array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) = _presence(PosixPath('<tmp>/pytest-45/test_fiber_inference_retries_a1/out/fiber.zarr'))
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_retries_a1/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_retries_a1/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_retries_a1/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_retries_a1/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=8
+[predict3d] flush complete sd=1 z=96 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=51.26MiB cleared=15.19MiB elapsed=0.66s
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.02s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=8 work_sum=0.66s wait=0.66s wall=0.66s rate=12.08chunks/s
+[predict3d] inference done in 1.2s (27 processed, 0 skipped)
+[pyramid sd0 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid sd0 L1] workers=1
+[pyramid sd0 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_retries_a1/out/fiber.zarr elapsed=1.2s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1197: AssertionError: assert 372736 == 0
+E   AssertionError: assert 372736 == 0
+     +  where 372736 = int(np.int64(372736))
+     +    where np.int64(372736) = <built-in method sum of numpy.ndarray object at 0x7fff393dac10>()
+     +      where <built-in method sum of numpy.ndarray object at 0x7fff393dac10> = array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) == 0.sum
+     +        where array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) = _presence(PosixPath('<tmp>/pytest-45/test_fiber_inference_retries_a2/out/fiber.lasagna.json'))
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_retries_a2/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] creating new fiber_presence.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_nx.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_ny.ome.zarr (levels 0-1)
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_retries_a2/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] reusing existing fiber_presence.ome.zarr (level 0 shape=(96, 96, 96))
+[predict3d] reusing existing fiber_nx.ome.zarr (level 0 shape=(96, 96, 96))
+[predict3d] reusing existing fiber_ny.ome.zarr (level 0 shape=(96, 96, 96))
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_retries_a2/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_retries_a2/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=8
+[predict3d] flush complete sd=1 z=96 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=51.26MiB cleared=15.19MiB elapsed=0.66s
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.02s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=8 work_sum=0.66s wait=0.66s wall=0.66s rate=12.16chunks/s
+[predict3d] inference done in 1.2s (27 processed, 0 skipped)
+[pyramid presence L1] workers=4
+[pyramid fiber_option_000 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid fiber_option_000 L1] workers=1
+[pyramid fiber_option_000 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_retries_a2/out/fiber.lasagna.json elapsed=1.2s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1197: AssertionError: assert 372736 == 0
+E   AssertionError: assert 372736 == 0
+     +  where 372736 = int(np.int64(372736))
+     +    where np.int64(372736) = <built-in method sum of numpy.ndarray object at 0x7fff38117a50>()
+     +      where <built-in method sum of numpy.ndarray object at 0x7fff38117a50> = array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) == 0.sum
+     +        where array([[[255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ...,...5, 255, 255, ..., 255, 255, 255],\n        [255, 255, 255, ..., 255, 255, 255]]],\n      shape=(96, 96, 96), dtype=uint8) = _presence(PosixPath('<tmp>/pytest-45/test_fiber_inference_retries_a3/out/fiber.lasagna.json'))
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_retries_a3/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] creating new fiber_presence.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_nx.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_ny.ome.zarr (levels 0-1)
+[input] level=None location=<tmp>/pytest-45/test_fiber_inference_retries_a3/input.zarr shape=(96, 96, 96) chunks=(32, 32, 32) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint
+[predict3d] reusing existing fiber_presence.ome.zarr (level 0 shape=(96, 96, 96))
+[predict3d] reusing existing fiber_nx.ome.zarr (level 0 shape=(96, 96, 96))
+[predict3d] reusing existing fiber_ny.ome.zarr (level 0 shape=(96, 96, 96))
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_fiber_inference_retries_a3/input.zarr shape=(96, 96, 96) input_sd=1 base_shape=(96, 96, 96)
+[fiber_trace_3d:infer] crop_zyx=(0,96,0,96,0,96) output_region_zyx=(0,0,0,96,96,96) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=<tmp>/pytest-45/test_fiber_inference_retries_a3/model.pt device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(128,128,128) logical_z=128 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.03GiB weight_backing=0.01GiB backing=0.04GiB
+[predict3d] [------------------------------] 0/27 tiles (0.0%) eta --:-- final_z=0/96
+[predict3d] tile pos=(0,0,0) input=(0.3922,0.3922) raw=(0.5000,1.0000) nan=0/1835008 dtype=torch.float32
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=0/96
+[predict3d] flush sd=1 z=[0,96) dirty_chunks=8
+[predict3d] flush complete sd=1 z=96 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=51.26MiB cleared=15.19MiB elapsed=0.64s
+[predict3d] input stats reads=27 bytes=7077888 read_sum=0.02s ready_highwater=3
+[predict3d] [##############################] 27/27 tiles (100.0%) eta 00:00 avg=18ms/tile | overall eta 00:00 final_z=96/96
+[predict3d] flush stats workers=0 chunks=8 work_sum=0.64s wait=0.64s wall=0.64s rate=12.49chunks/s
+[predict3d] inference done in 1.1s (27 processed, 0 skipped)
+[pyramid presence L1] workers=4
+[pyramid fiber_option_000 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid fiber_option_000 L1] workers=1
+[pyramid fiber_option_000 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_fiber_inference_retries_a3/out/fiber.lasagna.json elapsed=1.2s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1197: AssertionError: assert 372736 == 0
+E   AssertionError: Traceback (most recent call last):
+        File "<string>", line 1, in <module>
+          import vesuvius.neural_tracing.fiber_trace_3d
+        File "<D>/vesuvius/src/vesuvius/neural_tracing/fiber_trace_3d/__init__.py", line 9, in <module>
+          from .model import (
+          ...<6 lines>...
+          )
+        File "<D>/vesuvius/src/vesuvius/neural_tracing/fiber_trace_3d/model.py", line 13, in <module>
+          from vesuvius.neural_tracing.fiber_trace.model import (
+          ...<2 lines>...
+          )
+        File "<D>/vesuvius/src/vesuvius/neural_tracing/fiber_trace/__init__.py", line 3, in <module>
+          from vesuvius.neural_tracing.fiber_trace.dataset import (
+          ...<2 lines>...
+          )
+        File "<D>/vesuvius/src/vesuvius/neural_tracing/fiber_trace/dataset.py", line 26, in <module>
+          from vesuvius.neural_tracing.datasets.common import (
+          ...<2 lines>...
+          )
+        File "<D>/vesuvius/src/vesuvius/neural_tracing/datasets/common.py", line 8, in <module>
+          from vc_reader import tifxyz
+      ModuleNotFoundError: No module named 'vc_reader'
+      
+    assert 1 == 0
+     +  where 1 = CompletedProcess(args=['<work>/fixwork/venv/bin/python', '-c', 'import vesuvius.neural_tracing.fiber_trace_3d\nimpor...mmon.py", line 8, in <module>\n    from vc_reader import tifxyz\nModuleNotFoundError: No module named \'vc_reader\'\n').returncode
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:1806: AssertionError: Traceback (most recent call last):
+E   ModuleNotFoundError: No module named 'vc'
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:2679: ModuleNotFoundError: No module named 'vc'
+E   ModuleNotFoundError: No module named 'vc'
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:2697: ModuleNotFoundError: No module named 'vc'
+E   ModuleNotFoundError: No module named 'vc'
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:3142: ModuleNotFoundError: No module named 'vc'
+E   TypeError: object of type 'NoneType' has no len()
+----------------------------- Captured stdout call -----------------------------
+[input] level=None location=<tmp>/pytest-45/test_3d_fiber_infer_writes_las0/input.zarr shape=(8, 8, 8) chunks=(4, 4, 4) remote=False cache_dir=None cache_max_bytes=None read_ahead_tiles=10000 connections=64
+[fiber_trace_3d:infer] inference_precision=fp32 source=checkpoint-missing
+[predict3d] creating new fiber_out_presence.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_out_nx.ome.zarr (levels 0-1)
+[predict3d] creating new fiber_out_ny.ome.zarr (levels 0-1)
+[fiber_trace_3d:infer] input=<tmp>/pytest-45/test_3d_fiber_infer_writes_las0/input.zarr shape=(8, 8, 8) input_sd=1 base_shape=(8, 8, 8)
+[fiber_trace_3d:infer] crop_zyx=(0,8,0,8,0,8) output_region_zyx=(0,0,0,8,8,8) inference_scaledown_power=0 inference_factor=1 effective_base_factor=1 level=0 products=1 devices=cpu
+[fiber_trace_3d:infer] loading checkpoint=None device=cpu
+[fiber_trace_3d:infer] model loaded; starting tiled inference
+[predict3d] ring sd=1 zyx=(8,8,8) logical_z=8 products=1 product_dtype=float16 weight_dtype=float32 product_backing=0.00GiB weight_backing=0.00GiB backing=0.00GiB
+[predict3d] [------------------------------] 0/1 tiles (0.0%) eta --:-- final_z=0/8
+[predict3d] tile pos=(0,0,0) input=(0.0000,0.9804) raw=(0.3317,0.6653) nan=0/3584 dtype=torch.float32
+[predict3d] [##############################] 1/1 tiles (100.0%) eta 00:00 avg=6ms/tile | overall eta 00:00 final_z=0/8
+[predict3d] flush sd=1 z=[0,8) dirty_chunks=8
+[predict3d] flush complete sd=1 z=8 dirty_chunks=8 products_written=8 unsupported=0 resume=0 touched=0.01MiB cleared=0.01MiB elapsed=0.02s
+[predict3d] input stats reads=1 bytes=512 read_sum=0.00s ready_highwater=0
+[predict3d] [##############################] 1/1 tiles (100.0%) eta 00:00 avg=6ms/tile | overall eta 00:00 final_z=8/8
+[predict3d] flush stats workers=0 chunks=8 work_sum=0.02s wait=0.02s wall=0.02s rate=449.46chunks/s
+[predict3d] inference done in 0.0s (1 processed, 0 skipped)
+[pyramid presence L1] workers=1
+[pyramid fiber_out_option_000 L1] [------------------------------] 0/1 (0.0%) eta 00:00
+[pyramid fiber_out_option_000 L1] workers=1
+[pyramid fiber_out_option_000 L1] [##############################] 1/1 (100.0%) eta 00:00 write=1
+[fiber_trace_3d:infer] done output=<tmp>/pytest-45/test_3d_fiber_infer_writes_las0/fiber_out.lasagna.json elapsed=0.0s
+<D>/vesuvius/tests/neural_tracing/test_fiber_trace_3d.py:4418: TypeError: object of type 'NoneType' has no len()
+=============================== warnings summary ===============================
+tests/neural_tracing/test_fiber_trace_3d.py::test_bounded_gradients_match_actual_conditioned_loss
+  <work>/fixwork/venv/lib/python3.13/site-packages/torch/backends/mkldnn/__init__.py:96: UserWarning: TF32 acceleration on top of oneDNN is available for Intel GPUs. The current Torch version does not have Intel GPU Support. (Triggered internally at /__w/pytorch/pytorch/aten/src/ATen/Context.cpp:265.)
+    torch._C._set_onednn_allow_tf32(_allow_tf32)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_cli_defaults_predict_every_voxel
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_rejects_overlap_below_both_tile_borders
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_refuses_resume_of_store_without_tiling
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_adopts_store_without_tiling_on_request[fiber.zarr]
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_adopts_store_without_tiling_on_request[fiber.lasagna.json]
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_refuses_legacy_resume_with_other_tiling[True]
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_refuses_legacy_resume_with_other_tiling[False]
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_extends_crop_after_other_output_in_same_directory
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.zarr-True]
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.zarr-False]
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.lasagna.json-True]
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_inference_retries_after_interrupted_setup[fiber.lasagna.json-False]
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_fiber_trace_3d_imports_with_package_style_lasagna_path
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_native_geometry_rejects_stale_binding
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_geometry_auto_prefers_native_and_falls_back_for_stale_binding
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_value_augmentation_backend_selection
+FAILED tests/neural_tracing/test_fiber_trace_3d.py::test_3d_fiber_infer_writes_lasagna_presence_normal_products[legacy]
+17 failed, 258 passed, 16 skipped, 2 xfailed, 1 warning in 41.60s
