@@ -1,0 +1,8 @@
+.....                                                                    [100%]
+=============================== warnings summary ===============================
+../../../..<venv>/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:300: 24 warnings
+  <venv>/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:300: PydanticDeprecatedSince20: `json_encoders` is deprecated. See https://pydantic.dev/docs/validation/2.14/concepts/serialization/#custom-serializers for alternatives. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 passed, 24 warnings in 5.62s

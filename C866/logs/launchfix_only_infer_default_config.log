@@ -1,0 +1,82 @@
+WARNING: QOpenGLWidget is not supported on this platform.
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+Traceback (most recent call last):
+  File "launchfix/vesuvius/src/vesuvius/napari_trainer/inference_widget.py", line 52, in inference_widget
+    results = run_inference(
+        viewer=viewer,
+    ...<5 lines>...
+        activation_type=activation_type.value
+    )
+  File "launchfix/vesuvius/src/vesuvius/napari_trainer/inference.py", line 197, in run_inference
+    model, model_config = loader.load()
+                          ~~~~~~~~~~~^^
+  File "scripts/napari_session.py", line 97, in load
+    model, cfg = real_load(self)
+                 ~~~~~~~~~^^^^^^
+  File "launchfix/vesuvius/src/vesuvius/napari_trainer/inference.py", line 65, in load
+    model = NetworkFromConfig(mgr)
+  File "launchfix/vesuvius/src/vesuvius/models/build/build_network_from_config.py", line 370, in __init__
+    self._init_primus(mgr, model_config)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "launchfix/vesuvius/src/vesuvius/models/build/build_network_from_config.py", line 1428, in _init_primus
+    self.shared_encoder = PrimusEncoder(
+                          ~~~~~~~~~~~~~^
+        input_channels=self.in_channels,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        **primus_kwargs
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "launchfix/vesuvius/src/vesuvius/models/build/primus_wrapper.py", line 86, in __init__
+    self.eva = Eva(
+               ~~~^
+        embed_dim=self.embed_dim,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<15 lines>...
+        scale_attn_inner=scale_attn_inner,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "launchfix/vesuvius/src/vesuvius/models/build/transformers/eva.py", line 136, in __init__
+    self.rope = rope_impl(
+                ~~~~~~~~~^
+        rope_dim, in_pixels=False, feat_shape=ref_feat_shape, ref_feat_shape=ref_feat_shape, **rope_kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<venv>/lib/python3.13/site-packages/timm/layers/pos_embed_sincos.py", line 597, in __init__
+    self.reset_parameters()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "<venv>/lib/python3.13/site-packages/timm/layers/pos_embed_sincos.py", line 601, in reset_parameters
+    self._init_buffers()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<venv>/lib/python3.13/site-packages/timm/layers/pos_embed_sincos.py", line 608, in _init_buffers
+    self.pos_embed.copy_(self._get_pos_embed_values(self.feat_shape))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: The size of tensor a (96) must match the size of tensor b (144) at non-singleton dimension 1
+Traceback (most recent call last):
+  File "scripts/napari_session.py", line 145, in <module>
+    main()
+    ~~~~^^
+  File "launchfix/vesuvius/src/vesuvius/napari_trainer/main_window.py", line 217, in main
+    napari.run()
+    ~~~~~~~~~~^^
+  File "scripts/napari_session.py", line 114, in session_infer
+    state = built["model"].state_dict()
+            ~~~~~^^^^^^^^^
+KeyError: 'model'
+Detected 3D patch size (128, 128, 128), setting 3D operations
+Default config loaded from launchfix/vesuvius/src/vesuvius/models/configuration/single_task/ps128_dicece.yaml
+Using global config manager from main_window
+Using dimensionality (3D) from ConfigManager
+--- Initializing Primus architecture ---
+Using Primus-M configuration
+Using decoder normalization: LayerNormNd
+Using decoder activation: GELU
+inference error: The size of tensor a (96) must match the size of tensor b (144) at non-singleton dimension 1
+RESULT {"main": "KeyError: 'model'"}

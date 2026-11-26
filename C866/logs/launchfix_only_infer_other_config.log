@@ -1,0 +1,174 @@
+WARNING: QOpenGLWidget is not supported on this platform.
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+Detected 3D patch size (128, 128, 128), setting 3D operations
+Default config loaded from launchfix/vesuvius/src/vesuvius/models/configuration/single_task/ps128_dicece.yaml
+selected config :  (PosixPath('scripts/configs/tiny_unet_wide_ink.yaml'),)
+Detected 3D patch size (32, 32, 32), setting 3D operations
+Config loaded from scripts/configs/tiny_unet_wide_ink.yaml
+Using global config manager from main_window
+Using dimensionality (3D) from ConfigManager
+Using 3D convolutions (nn.Conv3d)
+Using 3D normalization (nn.InstanceNorm3d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [16, 32, 64]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32, 32) to (32, 32, 32) to ensure divisibility by pooling factors [8 8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: napari_tiny_unet_wide
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [16, 32, 64]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3, 3], [3, 3, 3], [3, 3, 3]]
+  pool_op_kernel_sizes: [[1, 1, 1], [2, 2, 2], [2, 2, 2]]
+  conv_op: Conv3d
+  conv_bias: True
+  norm_op: InstanceNorm3d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1, 1], [2, 2, 2], [2, 2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 16
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 3
+  patch_size: (32, 32, 32)
+  batch_size: 2
+  in_channels: 1
+  autoconfigure: True
+  targets: {'ink': {'activation': 'none', 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0}], 'out_channels': 2}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3, 3]
+  must_be_divisible_by: [8 8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Warning: Error loading state dict: Error(s) in loading state_dict for NetworkFromConfig:
+	size mismatch for shared_encoder.stem.convs.0.conv.weight: copying a param with shape torch.Size([8, 1, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([16, 1, 3, 3, 3]).
+	size mismatch for shared_encoder.stem.convs.0.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stem.convs.0.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stem.convs.0.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.0.weight: copying a param with shape torch.Size([8, 1, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([16, 1, 3, 3, 3]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.conv.weight: copying a param with shape torch.Size([8, 8, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([16, 16, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.0.weight: copying a param with shape torch.Size([8, 8, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([16, 16, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.conv.weight: copying a param with shape torch.Size([8, 8, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([16, 16, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.0.weight: copying a param with shape torch.Size([8, 8, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([16, 16, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.conv.weight: copying a param with shape torch.Size([16, 8, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 16, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.conv.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.0.weight: copying a param with shape torch.Size([16, 8, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 16, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.conv.weight: copying a param with shape torch.Size([16, 16, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.conv.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.0.weight: copying a param with shape torch.Size([16, 16, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.skip.1.conv.weight: copying a param with shape torch.Size([16, 8, 1, 1, 1]) from checkpoint, the shape in current model is torch.Size([32, 16, 1, 1, 1]).
+	size mismatch for shared_encoder.stages.1.blocks.0.skip.1.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.skip.1.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.skip.1.all_modules.0.weight: copying a param with shape torch.Size([16, 8, 1, 1, 1]) from checkpoint, the shape in current model is torch.Size([32, 16, 1, 1, 1]).
+	size mismatch for shared_encoder.stages.1.blocks.0.skip.1.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.skip.1.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.conv.weight: copying a param with shape torch.Size([32, 16, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 32, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.conv.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.norm.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.norm.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.0.weight: copying a param with shape torch.Size([32, 16, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 32, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.0.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.1.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.1.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.conv.weight: copying a param with shape torch.Size([32, 32, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 64, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.conv.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.norm.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.norm.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.0.weight: copying a param with shape torch.Size([32, 32, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 64, 3, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.0.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.1.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.1.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.skip.1.conv.weight: copying a param with shape torch.Size([32, 16, 1, 1, 1]) from checkpoint, the shape in current model is torch.Size([64, 32, 1, 1, 1]).
+	size mismatch for shared_encoder.stages.2.blocks.0.skip.1.norm.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.skip.1.norm.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.skip.1.all_modules.0.weight: copying a param with shape torch.Size([32, 16, 1, 1, 1]) from checkpoint, the shape in current model is torch.Size([64, 32, 1, 1, 1]).
+	size mismatch for shared_encoder.stages.2.blocks.0.skip.1.all_modules.1.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.skip.1.all_modules.1.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for task_heads.ink.weight: copying a param with shape torch.Size([2, 8, 1, 1, 1]) from checkpoint, the shape in current model is torch.Size([2, 16, 1, 1, 1]).
+	size mismatch for shared_decoder.stages.0.convs.0.conv.weight: copying a param with shape torch.Size([16, 32, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 64, 3, 3, 3]).
+	size mismatch for shared_decoder.stages.0.convs.0.conv.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_decoder.stages.0.convs.0.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_decoder.stages.0.convs.0.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.0.weight: copying a param with shape torch.Size([16, 32, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 64, 3, 3, 3]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_decoder.stages.1.convs.0.conv.weight: copying a param with shape torch.Size([8, 16, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([16, 32, 3, 3, 3]).
+	size mismatch for shared_decoder.stages.1.convs.0.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_decoder.stages.1.convs.0.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_decoder.stages.1.convs.0.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.0.weight: copying a param with shape torch.Size([8, 16, 3, 3, 3]) from checkpoint, the shape in current model is torch.Size([16, 32, 3, 3, 3]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+	size mismatch for shared_decoder.transpconvs.0.weight: copying a param with shape torch.Size([32, 16, 2, 2, 2]) from checkpoint, the shape in current model is torch.Size([64, 32, 2, 2, 2]).
+	size mismatch for shared_decoder.transpconvs.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_decoder.transpconvs.1.weight: copying a param with shape torch.Size([16, 8, 2, 2, 2]) from checkpoint, the shape in current model is torch.Size([32, 16, 2, 2, 2]).
+	size mismatch for shared_decoder.transpconvs.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([16]).
+Attempting to continue with partially loaded weights
+Using patch_size from model_config: (32, 32, 32)
+Final roi_size for inference: (32, 32, 32)
+Data shape: (64, 128, 128), Using 3D inference
+Generated Gaussian map with shape (1, 32, 32, 32), min: 0.0000, max: 1.0000
+Sliding window:   0%|          | 0/38 [00:00<?, ?it/s]Sliding window:   3%|▎         | 1/38 [00:01<00:42,  1.14s/it]Sliding window:   5%|▌         | 2/38 [00:02<00:40,  1.14s/it]Sliding window:   8%|▊         | 3/38 [00:03<00:39,  1.13s/it]Sliding window:  11%|█         | 4/38 [00:04<00:38,  1.13s/it]Sliding window:  13%|█▎        | 5/38 [00:05<00:37,  1.14s/it]Sliding window:  16%|█▌        | 6/38 [00:06<00:36,  1.14s/it]Sliding window:  18%|█▊        | 7/38 [00:07<00:35,  1.13s/it]Sliding window:  21%|██        | 8/38 [00:09<00:33,  1.13s/it]Sliding window:  24%|██▎       | 9/38 [00:10<00:32,  1.14s/it]Sliding window:  26%|██▋       | 10/38 [00:11<00:31,  1.14s/it]Sliding window:  29%|██▉       | 11/38 [00:12<00:30,  1.14s/it]Sliding window:  32%|███▏      | 12/38 [00:13<00:29,  1.13s/it]Sliding window:  34%|███▍      | 13/38 [00:14<00:28,  1.14s/it]Sliding window:  37%|███▋      | 14/38 [00:15<00:27,  1.14s/it]Sliding window:  39%|███▉      | 15/38 [00:17<00:26,  1.14s/it]Sliding window:  42%|████▏     | 16/38 [00:18<00:25,  1.14s/it]Sliding window:  45%|████▍     | 17/38 [00:19<00:23,  1.13s/it]Sliding window:  47%|████▋     | 18/38 [00:20<00:22,  1.14s/it]Sliding window:  50%|█████     | 19/38 [00:21<00:21,  1.13s/it]Sliding window:  53%|█████▎    | 20/38 [00:22<00:20,  1.14s/it]Sliding window:  55%|█████▌    | 21/38 [00:23<00:19,  1.14s/it]Sliding window:  58%|█████▊    | 22/38 [00:25<00:18,  1.14s/it]Sliding window:  61%|██████    | 23/38 [00:26<00:17,  1.14s/it]Sliding window:  63%|██████▎   | 24/38 [00:27<00:16,  1.15s/it]Sliding window:  66%|██████▌   | 25/38 [00:28<00:14,  1.15s/it]Sliding window:  68%|██████▊   | 26/38 [00:29<00:13,  1.15s/it]Sliding window:  71%|███████   | 27/38 [00:30<00:12,  1.16s/it]Sliding window:  74%|███████▎  | 28/38 [00:31<00:11,  1.16s/it]Sliding window:  76%|███████▋  | 29/38 [00:33<00:11,  1.23s/it]Sliding window:  79%|███████▉  | 30/38 [00:34<00:09,  1.21s/it]Sliding window:  82%|████████▏ | 31/38 [00:35<00:08,  1.19s/it]Sliding window:  84%|████████▍ | 32/38 [00:36<00:07,  1.17s/it]Sliding window:  87%|████████▋ | 33/38 [00:37<00:05,  1.17s/it]Sliding window:  89%|████████▉ | 34/38 [00:39<00:04,  1.17s/it]Sliding window:  92%|█████████▏| 35/38 [00:40<00:03,  1.16s/it]Sliding window:  95%|█████████▍| 36/38 [00:41<00:02,  1.16s/it]Sliding window:  97%|█████████▋| 37/38 [00:42<00:01,  1.18s/it]Sliding window: 100%|██████████| 38/38 [00:43<00:00,  1.05it/s]Sliding window: 100%|██████████| 38/38 [00:43<00:00,  1.13s/it]
+WARNING: QOpenGLWidget: Failed to create context
+Inference completed. Added 1 new layers to the viewer.
+RESULT {"config": "scripts/configs/tiny_unet_wide_ink.yaml", "checkpoint_tensors": 90, "tensors_not_loaded_from_checkpoint": 89, "output_layers": {"vol01_napari_tiny_unet_final_ink": [1, 2, 64, 128, 128]}, "ink_iou_vs_label": 0.3734, "main": "returned"}

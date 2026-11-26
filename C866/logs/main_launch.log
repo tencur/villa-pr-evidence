@@ -1,0 +1,16 @@
+WARNING: QOpenGLWidget is not supported on this platform.
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: QOpenGLWidget: Failed to create context
+Traceback (most recent call last):
+  File "scripts/napari_session.py", line 145, in <module>
+    main()
+    ~~~~^^
+  File "main/vesuvius/src/vesuvius/napari_trainer/main_window.py", line 173, in main
+    _config_manager.load_config(default_config_path)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "main/vesuvius/src/vesuvius/models/configuration/config_manager.py", line 30, in load_config
+    with open(config_path, "r", encoding="utf-8-sig") as f:
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'main/vesuvius/src/models/configuration/single_task/ps128_dicece.yaml'
+RESULT {"main": "FileNotFoundError: [Errno 2] No such file or directory: 'main/vesuvius/src/models/configuration/single_task/ps128_dicece.yaml'"}
