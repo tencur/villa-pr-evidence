@@ -1,0 +1,4 @@
+56b28fcb8efb9f31fce9805ed2a6b48c84a7effd napari_trainer: infer with the checkpoint's preprocessing and on the source layer's grid
+6198b3dc5a857a83242398b97d1f55f7dc308bd5 napari_trainer: keep configured losses and refuse losses that cannot take the labels
+3c209902f37a0bc416c1fe4528f7df659b458359 napari_trainer: select patches without ignored voxels and train on exactly those
+524f0ed1491c323d1b11059c3ff1d220f75dbd4a napari_trainer: stop before saving when the split leaves no training patch

@@ -1,0 +1,80 @@
+== unit_napari_trainer_56b28fcb8.log: 42 passed, 25 warnings in 9.49s
+== unit_napari_trainer_6198b3dc5.log: 3 failed, 39 passed, 25 warnings in 9.34s
+test_zscore_checkpoint_sees_zscored_windows: assert (np.float32(0.55132973) < 0.0001)
+test_ct_checkpoint_sees_its_saved_intensity_properties: AssertionError:
+test_prediction_layers_keep_the_source_layers_transform: AssertionError:
+== unit_napari_trainer_3c209902f.log: 7 failed, 35 passed, 25 warnings in 9.32s
+test_zscore_checkpoint_sees_zscored_windows: assert (np.float32(0.55132973) < 0.0001)
+test_ct_checkpoint_sees_its_saved_intensity_properties: AssertionError:
+test_prediction_layers_keep_the_source_layers_transform: AssertionError:
+test_configured_losses_are_kept_and_train: IndexError: Target 1 is out of bounds.
+test_losses_that_cannot_take_the_labels_are_rejected[widget-loss-on-one-channel]: Failed: DID NOT RAISE ValueError
+test_losses_that_cannot_take_the_labels_are_rejected[class-out-of-range]: Failed: DID NOT RAISE ValueError
+test_losses_that_cannot_take_the_labels_are_rejected[bce-non-binary]: Failed: DID NOT RAISE ValueError
+== unit_napari_trainer_524f0ed14.log: 13 failed, 29 passed, 25 warnings in 9.97s
+test_zscore_checkpoint_sees_zscored_windows: assert (np.float32(0.55132973) < 0.0001)
+test_ct_checkpoint_sees_its_saved_intensity_properties: AssertionError:
+test_prediction_layers_keep_the_source_layers_transform: AssertionError:
+test_ignored_voxels_do_not_count_toward_the_labeled_percentage: Failed: DID NOT RAISE ValueError
+test_targets_with_different_valid_patch_values_are_rejected: Failed: DID NOT RAISE ValueError
+test_images_without_a_label_for_every_target_are_rejected[True]: Failed: DID NOT RAISE ValueError
+test_images_without_a_label_for_every_target_are_rejected[False]: FileNotFoundError: Label not found: <work>/fixwork/c866rev/bt_524f0ed14/test_images_without_a_label_fo1/napari_trainer_crgy9hjz/data/labels/image0_surface.zarr (set allow_unlabeled_data=True to allo
+test_unlabeled_foreground_configs_are_rejected: Failed: DID NOT RAISE ValueError
+test_the_trainer_stops_if_its_dataset_is_not_the_selection: Failed: DID NOT RAISE RuntimeError
+test_configured_losses_are_kept_and_train: IndexError: Target 1 is out of bounds.
+test_losses_that_cannot_take_the_labels_are_rejected[widget-loss-on-one-channel]: Failed: DID NOT RAISE ValueError
+test_losses_that_cannot_take_the_labels_are_rejected[class-out-of-range]: Failed: DID NOT RAISE ValueError
+test_losses_that_cannot_take_the_labels_are_rejected[bce-non-binary]: Failed: DID NOT RAISE ValueError
+== unit_napari_trainer_9ee250e0d.log: 14 failed, 28 passed, 25 warnings in 10.23s
+test_zscore_checkpoint_sees_zscored_windows: assert (np.float32(0.55132973) < 0.0001)
+test_ct_checkpoint_sees_its_saved_intensity_properties: AssertionError:
+test_prediction_layers_keep_the_source_layers_transform: AssertionError:
+test_a_split_without_training_patches_stops_before_saving: Failed: DID NOT RAISE ValueError
+test_ignored_voxels_do_not_count_toward_the_labeled_percentage: Failed: DID NOT RAISE ValueError
+test_targets_with_different_valid_patch_values_are_rejected: Failed: DID NOT RAISE ValueError
+test_images_without_a_label_for_every_target_are_rejected[True]: Failed: DID NOT RAISE ValueError
+test_images_without_a_label_for_every_target_are_rejected[False]: FileNotFoundError: Label not found: <work>/fixwork/c866rev/bt_new/test_images_without_a_label_fo1/napari_trainer_qvdtyk5m/data/labels/image0_surface.zarr (set allow_unlabeled_data=True to allow)
+test_unlabeled_foreground_configs_are_rejected: Failed: DID NOT RAISE ValueError
+test_the_trainer_stops_if_its_dataset_is_not_the_selection: Failed: DID NOT RAISE RuntimeError
+test_configured_losses_are_kept_and_train: IndexError: Target 1 is out of bounds.
+test_losses_that_cannot_take_the_labels_are_rejected[widget-loss-on-one-channel]: Failed: DID NOT RAISE ValueError
+test_losses_that_cannot_take_the_labels_are_rejected[class-out-of-range]: Failed: DID NOT RAISE ValueError
+test_losses_that_cannot_take_the_labels_are_rejected[bce-non-binary]: Failed: DID NOT RAISE ValueError
+== unit_napari_trainer_main.log: 37 failed, 5 passed, 25 warnings in 11.33s
+test_checkpoint_config_wins_over_the_gui_config: AssertionError: assert ['shared_enco....0.bias', ...] == []
+test_per_target_decoder_layout_is_restored: AssertionError: assert ['task_heads....rm.bias', ...] == []
+test_nested_legacy_config_is_unwrapped: AssertionError: assert ['shared_enco....0.bias', ...] == []
+test_primus_checkpoint_infers_with_its_input_shape: ValueError: No patch_size or train_patch_size found in model config. Cannot proceed with inference.
+test_missing_weights_stop_before_a_prediction: Failed: DID NOT RAISE RuntimeError
+test_zscore_checkpoint_sees_zscored_windows: assert (np.float32(0.55132973) < 0.0001)
+test_ct_checkpoint_sees_its_saved_intensity_properties: AssertionError:
+test_prediction_layers_keep_the_source_layers_transform: AssertionError:
+test_main_loads_the_default_config: FileNotFoundError: [Errno 2] No such file or directory: '<work>/fixwork/c866rev/tree_main/vesuvius/src/models/configuration/single_task/ps128_dicece.yaml'
+test_run_training_trains_on_the_viewer_layers: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_loss_choices_are_losses_the_trainer_knows: RuntimeError: Unsupported loss function: 'BCEDiceLoss'
+test_training_uses_a_copy_of_the_selected_config: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_label_layer_pairs_with_the_longest_matching_image_name: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_label_layer_on_another_grid_is_rejected[<lambda>-translate]: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_label_layer_on_another_grid_is_rejected[<lambda>-scale]: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_label_layer_on_another_grid_is_rejected[<lambda>-shape]: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_configs_that_read_other_data_are_rejected[dataset_config0-dataset_config.volumes]: FileNotFoundError: Explicit image volume not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/elsewhere.zarr
+test_configs_that_read_other_data_are_rejected[dataset_config1-cross_frame]: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_exports_stay_in_a_run_directory_removed_after_the_run: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_min_labeled_percentage_selects_the_patches: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_3d_layers_with_patch_size_z_0_are_rejected: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_offered_losses_fit_the_default_target_and_keep_its_ignore_label: RuntimeError: Unsupported loss function: 'BCELoss'
+test_default_config_is_package_data: AttributeError: module 'vesuvius.napari_trainer.main_window' has no attribute 'DEFAULT_CONFIG_PATH'
+test_a_split_without_training_patches_stops_before_saving: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/bt_main/test_a_split_without_training_0/images
+test_ignored_voxels_do_not_count_toward_the_labeled_percentage: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_training_reads_exactly_the_selected_patches: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_targets_with_different_valid_patch_values_are_rejected: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_images_without_a_label_for_every_target_are_rejected[True]: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_images_without_a_label_for_every_target_are_rejected[False]: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_unlabeled_foreground_configs_are_rejected: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_the_trainer_stops_if_its_dataset_is_not_the_selection: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/bt_main/test_the_trainer_stops_if_its_0/images
+test_configured_losses_are_kept_and_train: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/bt_main/test_configured_losses_are_kep0/images
+test_losses_that_cannot_take_the_labels_are_rejected[widget-loss-on-one-channel]: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_losses_that_cannot_take_the_labels_are_rejected[class-out-of-range]: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_losses_that_cannot_take_the_labels_are_rejected[bce-non-binary]: FileNotFoundError: Images directory not found: <work>/fixwork/c866rev/tree_main/vesuvius/src/vesuvius/models/configuration/single_task/images
+test_validation_metrics_accept_2d_patches: AssertionError
+test_2d_voi_equals_voi_of_the_same_patch_as_a_one_slice_volume: AssertionError

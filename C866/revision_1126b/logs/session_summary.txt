@@ -1,0 +1,9 @@
+new=56b28fcb8 base=9ee250e0d 2026-11-26T07:34:28Z
+new_train3d exit 0 (714s)
+checkpoint3d work_r2_train3d/checkpoints/napari_tiny_unet/napari_tiny_unet_final.pth
+new_infer_default exit 0 (21s)
+new_infer_other exit 0 (22s)
+base_infer_default exit 0 (22s)
+new_train2d exit 0 (14s)
+checkpoint2d work_r2_train2d/checkpoints/napari_tiny_unet_2d/napari_tiny_unet_2d_final.pth
+done

@@ -1,0 +1,1070 @@
+From 524f0ed1491c323d1b11059c3ff1d220f75dbd4a Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 07:26:05 +0000
+Subject: [PATCH 1/4] napari_trainer: stop before saving when the split leaves
+ no training patch
+
+When the default train/validation split sends every selected patch to
+validation (e.g. a single qualifying patch), the run now raises before the
+trainer creates its checkpoint directories, instead of taking no optimizer
+step and writing a final checkpoint over an earlier one. The check sits on
+the trainer's own split (_configure_dataloaders), in a subclass used only by
+the napari widget.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../vesuvius/napari_trainer/main_window.py    | 23 ++++++-
+ .../tests/napari_trainer/test_main_window.py  | 68 +++++++++++++++++++
+ 2 files changed, 90 insertions(+), 1 deletion(-)
+
+diff --git a/vesuvius/src/vesuvius/napari_trainer/main_window.py b/vesuvius/src/vesuvius/napari_trainer/main_window.py
+index 1d2edd536..e8dda8720 100644
+--- a/vesuvius/src/vesuvius/napari_trainer/main_window.py
++++ b/vesuvius/src/vesuvius/napari_trainer/main_window.py
+@@ -146,7 +146,7 @@ def run_training(patch_size_z: int = 0, patch_size_x: int = 128, patch_size_y: i
+ 
+         from vesuvius.models.training.train import BaseTrainer
+ 
+-        trainer = BaseTrainer(mgr=mgr, verbose=True)
++        trainer = _viewer_layer_trainer(BaseTrainer)(mgr=mgr, verbose=True)
+         print("\nStarting training...")
+         trainer.train()
+ 
+@@ -160,6 +160,27 @@ def run_training(patch_size_z: int = 0, patch_size_x: int = 128, patch_size_y: i
+         print(f"Removed the exported layers ({run_dir})")
+ 
+ 
++def _viewer_layer_trainer(base):
++    """The trainer class for a run on the viewer's layers: `base` (BaseTrainer), stopping
++    before the model directory or any checkpoint is written when the train/validation
++    split leaves no training patch (a run without an optimizer step would still save a
++    final checkpoint and could overwrite an earlier one)."""
++
++    class ViewerLayerTrainer(base):
++        def _configure_dataloaders(self, train_dataset, val_dataset=None):
++            loaders = super()._configure_dataloaders(train_dataset, val_dataset)
++            train_indices, val_indices = loaders[2], loaders[3]
++            if len(train_indices) == 0:
++                raise ValueError(
++                    f"The train/validation split (tr_val_split {self.mgr.tr_val_split}) puts all "
++                    f"{len(val_indices)} selected patches into validation, so there is nothing to train on; "
++                    "nothing was saved. Label more, or lower Min Labeled Percentage or the patch size, "
++                    "so that more patches qualify.")
++            return loaders
++
++    return ViewerLayerTrainer
++
++
+ def _pair_layers(image_layers, label_layers):
+     """Pair each '<image>_<target>' label layer with its image layer. A label whose name
+     starts with several image names ('vol_crop_ink' with images 'vol' and 'vol_crop')
+diff --git a/vesuvius/tests/napari_trainer/test_main_window.py b/vesuvius/tests/napari_trainer/test_main_window.py
+index c987f5c38..43845e952 100644
+--- a/vesuvius/tests/napari_trainer/test_main_window.py
++++ b/vesuvius/tests/napari_trainer/test_main_window.py
+@@ -337,3 +337,71 @@ def test_default_config_is_package_data(main_window):
+     relative = main_window.DEFAULT_CONFIG_PATH.relative_to(package_dir).as_posix()
+ 
+     assert any(fnmatch(relative, pattern) for pattern in patterns)
++
++
++_TINY_2D_UNET = """
++tr_setup:
++  model_name: "tiny2d"
++tr_config:
++  patch_size: [32, 32]
++  batch_size: 2
++  max_steps_per_epoch: 2
++  max_val_steps_per_epoch: 1
++  num_dataloader_workers: 0
++  enable_deep_supervision: false
++model_config:
++  basic_encoder_block: "BasicBlockD"
++  basic_decoder_block: "ConvBlock"
++  bottleneck_block: "BasicBlockD"
++  features_per_stage: [4, 8]
++  n_stages: 2
++  n_blocks_per_stage: [1, 1]
++  n_conv_per_stage_decoder: [1]
++  kernel_sizes: [[3, 3], [3, 3]]
++  strides: [[1, 1], [2, 2]]
++  separate_decoders: false
++  autoconfigure: false
++dataset_config:
++  normalization_scheme: "zscore"
++  targets:
++    ink:
++      out_channels: 2
++      activation: "none"
++      ignore_label: 2
++      losses:
++        - name: "nnUNet_DC_and_CE_loss"
++          weight: 1.0
++"""
++
++
++def _tiny_manager(tmp_path, extra_targets=""):
++    """A config with a small 2D U-Net, for runs of the real trainer."""
++    from vesuvius.models.configuration.config_manager import ConfigManager
++
++    path = tmp_path / "tiny2d.yaml"
++    path.write_text(_TINY_2D_UNET + extra_targets)
++    mgr = ConfigManager(verbose=False)
++    mgr.load_config(path)
++    return mgr
++
++
++def _files(root):
++    return sorted(p.relative_to(root).as_posix() for p in root.rglob("*"))
++
++
++def test_a_split_without_training_patches_stops_before_saving(main_window, tmp_path):
++    main_window._config_manager = _tiny_manager(tmp_path)
++    image, label = _pair()
++    label.data = np.zeros_like(label.data)
++    label.data[4:8, 4:8] = 1  # one patch qualifies at 1%; the default split sends it to validation
++    _viewer(image, label)
++    final = tmp_path / "checkpoints" / "tiny2d" / "tiny2d_final.pth"
++    final.parent.mkdir(parents=True, exist_ok=True)
++    final.write_bytes(b"an earlier run's checkpoint")
++    before = _files(tmp_path / "checkpoints")
++
++    with pytest.raises(ValueError, match="nothing to train on"):
++        _train(main_window, percent=1.0)
++
++    assert final.read_bytes() == b"an earlier run's checkpoint"
++    assert _files(tmp_path / "checkpoints") == before
+-- 
+2.47.3
+
+
+From 3c209902f37a0bc416c1fe4528f7df659b458359 Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 07:28:14 +0000
+Subject: [PATCH 2/4] napari_trainer: select patches without ignored voxels and
+ train on exactly those
+
+The widget now selects the training patches itself with find_valid_patches,
+passing the first target's ignore label, so ignored voxels never count
+toward Min Labeled Percentage and labels made only of the ignore value give
+no patch. It writes the selection as the patch cache under the parameters
+ZarrDataset looks it up with, and the trainer stops before saving anything
+if its datasets do not read exactly the selected patches (e.g. after a cache
+miss, which would enumerate every patch).
+
+Rejected before anything is exported:
+- targets with different valid_patch_value (the cache has one value; a null
+  on one target and 2 on another made the dataset miss the cache);
+- an image without a label layer for every target of the run (with
+  allow_unlabeled_data the missing label became an all-zero target in the
+  loss; without it the dataset raised FileNotFoundError mid-run);
+- unlabeled_foreground_enabled, which adds patches nobody selected.
+
+generate_patch_caches is restored to main's version: the napari trainer no
+longer uses the generate_patch_caches_for_config split.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../models/preprocessing/patches/generate.py  |  10 --
+ .../vesuvius/napari_trainer/main_window.py    | 150 +++++++++++++++---
+ .../tests/napari_trainer/test_main_window.py  | 106 ++++++++++++-
+ 3 files changed, 231 insertions(+), 35 deletions(-)
+
+diff --git a/vesuvius/src/vesuvius/models/preprocessing/patches/generate.py b/vesuvius/src/vesuvius/models/preprocessing/patches/generate.py
+index 3f44d5eaa..2ef25ebd5 100644
+--- a/vesuvius/src/vesuvius/models/preprocessing/patches/generate.py
++++ b/vesuvius/src/vesuvius/models/preprocessing/patches/generate.py
+@@ -79,17 +79,7 @@ def generate_patch_caches(
+     # Load config
+     mgr = ConfigManager(verbose=True)
+     mgr.load_config(config_path)
+-    return generate_patch_caches_for_config(mgr, input_path=input_path, cache_dir=cache_dir, force=force)
+ 
+-
+-def generate_patch_caches_for_config(
+-    mgr: ConfigManager,
+-    *,
+-    input_path: Optional[Path] = None,
+-    cache_dir: Optional[Path] = None,
+-    force: bool = False,
+-) -> PatchCacheResult:
+-    """generate_patch_caches for a config that is already loaded (e.g. one changed in memory)."""
+     if input_path is not None:
+         mgr.data_path = Path(input_path)
+ 
+diff --git a/vesuvius/src/vesuvius/napari_trainer/main_window.py b/vesuvius/src/vesuvius/napari_trainer/main_window.py
+index e8dda8720..84af0156b 100644
+--- a/vesuvius/src/vesuvius/napari_trainer/main_window.py
++++ b/vesuvius/src/vesuvius/napari_trainer/main_window.py
+@@ -136,17 +136,20 @@ def run_training(patch_size_z: int = 0, patch_size_x: int = 128, patch_size_y: i
+         min_bbox_percent=0.0
+     )
+ 
++    targets = _run_targets(mgr, pairs)
++    _check_patch_selection_rule(targets)
++
+     run_dir = Path(tempfile.mkdtemp(prefix="napari_trainer_"))
+     try:
+-        _export_viewer_layers(mgr, pairs, run_dir / "data")
++        _export_viewer_layers(mgr, pairs, run_dir / "data", targets)
+         for target_name in mgr.targets:
+             mgr.targets[target_name]['losses'] = [{"name": loss_function, "weight": 1.0, "kwargs": {}}]
+             print(f"  - Set loss function for target '{target_name}' to {loss_function}")
+-        _write_patch_cache(mgr, min_labeled_percentage)
++        selected = _write_patch_cache(mgr, min_labeled_percentage)
+ 
+         from vesuvius.models.training.train import BaseTrainer
+ 
+-        trainer = _viewer_layer_trainer(BaseTrainer)(mgr=mgr, verbose=True)
++        trainer = _viewer_layer_trainer(BaseTrainer, selected)(mgr=mgr, verbose=True)
+         print("\nStarting training...")
+         trainer.train()
+ 
+@@ -160,13 +163,24 @@ def run_training(patch_size_z: int = 0, patch_size_x: int = 128, patch_size_y: i
+         print(f"Removed the exported layers ({run_dir})")
+ 
+ 
+-def _viewer_layer_trainer(base):
++def _viewer_layer_trainer(base, selected):
+     """The trainer class for a run on the viewer's layers: `base` (BaseTrainer), stopping
+-    before the model directory or any checkpoint is written when the train/validation
+-    split leaves no training patch (a run without an optimizer step would still save a
+-    final checkpoint and could overwrite an earlier one)."""
++    before the model directory or any checkpoint is written when its datasets would not
++    read exactly the `selected` patches [(volume id, position), ...], or when the
++    train/validation split leaves no training patch (a run without an optimizer step
++    would still save a final checkpoint and could overwrite an earlier one)."""
+ 
+     class ViewerLayerTrainer(base):
++        def _build_dataset_for_mgr(self, mgr, *, is_training):
++            dataset = super()._build_dataset_for_mgr(mgr, is_training=is_training)
++            patches = [(p.volume_name, tuple(p.position)) for p in dataset.valid_patches]
++            if patches != selected:
++                raise RuntimeError(
++                    f"The trainer's {'training' if is_training else 'validation'} dataset has "
++                    f"{len(patches)} patches, not the {len(selected)} selected ones; not training on "
++                    "patches the labeled-percentage check did not select.")
++            return dataset
++
+         def _configure_dataloaders(self, train_dataset, val_dataset=None):
+             loaders = super()._configure_dataloaders(train_dataset, val_dataset)
+             train_indices, val_indices = loaders[2], loaders[3]
+@@ -199,8 +213,9 @@ def _pair_layers(image_layers, label_layers):
+ 
+ 
+ def _check_trains_on_viewer_layers(mgr, pairs):
+-    """Refuse configs that would train on other data, targets that are not plain names,
+-    and labels that do not cover their image voxel for voxel."""
++    """Refuse configs that would train on other data or on unlabeled patches, images without
++    a label for every target, targets that are not plain names, and labels that do not
++    cover their image voxel for voxel."""
+     dataset_config = getattr(mgr, 'dataset_config', None) or {}
+     if dataset_config.get("volumes"):
+         raise ValueError(
+@@ -212,6 +227,20 @@ def _check_trains_on_viewer_layers(mgr, pairs):
+             f"The selected config uses dataset_type '{dataset_type}', which reads its own image and "
+             "label data instead of the viewer's layers. Choose a config with the default 'zarr' dataset.")
+ 
++    if getattr(mgr, 'unlabeled_foreground_enabled', False):
++        raise ValueError(
++            "The selected config sets unlabeled_foreground_enabled; the napari trainer trains only on "
++            "labeled patches of the viewer's layers. Choose a config without it.")
++    all_targets = list(dict.fromkeys(target for _, labels in pairs for target, _ in labels))
++    for img_layer, labels in pairs:
++        missing = [t for t in all_targets if t not in {target for target, _ in labels}]
++        if missing:
++            raise ValueError(
++                f"Image layer '{img_layer.name}' has no label layer for target(s) {', '.join(missing)} "
++                f"(e.g. '{img_layer.name}_{missing[0]}'). Every paired image needs a label layer for each "
++                "target, since a missing label would be trained as background; add the label layers or "
++                "train the targets separately.")
++
+     for img_layer, labels in pairs:
+         for target, lbl_layer in labels:
+             if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", target):
+@@ -245,18 +274,47 @@ def _write_layer_zarr(path, data):
+     ZarrWriter.create(path, shape=data.shape, chunks=chunks, dtype=data.dtype, overwrite=True)[...] = data
+ 
+ 
+-def _export_viewer_layers(mgr, pairs, data_path):
++def _run_targets(mgr, pairs):
++    """The run's targets, one per label-layer suffix. A target the loaded config defines
++    keeps its settings (losses, ignore label, ...)."""
++    targets = {}
++    for _, labels in pairs:
++        for target, _ in labels:
++            targets.setdefault(target, deepcopy(mgr.targets.get(target) or {}))
++    return targets
++
++
++def _ignore_value(target_info):
++    """The target's ignore label, under any of the names the trainer reads."""
++    for alias in ("ignore_index", "ignore_label", "ignore_value"):
++        if target_info.get(alias) is not None:
++            return target_info[alias]
++    return None
++
++
++def _check_patch_selection_rule(targets):
++    """Patches are selected, and the patch cache is keyed, with one valid_patch_value; the
++    trainer's dataset would look the cache up with another value than the one it was written
++    with if the targets set different ones, and would then train on every patch."""
++    values = {name: info.get("valid_patch_value") for name, info in targets.items()
++              if not info.get("auxiliary_task", False)}
++    if len(set(values.values())) > 1:
++        raise ValueError(
++            "The targets set different valid_patch_value ("
++            + ", ".join(f"{name}: {value}" for name, value in values.items())
++            + "); patches are selected with one value for all targets. Give every target the same "
++            "valid_patch_value (or none), or train the targets separately.")
++
++
++def _export_viewer_layers(mgr, pairs, data_path, targets):
+     """Write the paired layers to data_path in the images/ + labels/ layout the trainer's
+     ZarrDataset reads (file names are indexes, not layer names), and set the run's
+     data_path and targets to them."""
+-    targets = {}
+     for index, (img_layer, labels) in enumerate(pairs):
+         volume_id = f"image{index}"
+         _write_layer_zarr(data_path / "images" / f"{volume_id}.zarr", img_layer.data)
+         for target, lbl_layer in labels:
+             _write_layer_zarr(data_path / "labels" / f"{volume_id}_{target}.zarr", lbl_layer.data)
+-            # A target the loaded config defines keeps its settings (losses, ignore label, ...).
+-            targets.setdefault(target, deepcopy(mgr.targets.get(target, {})))
+             print(f"Exported '{img_layer.name}' + '{lbl_layer.name}' as {volume_id}, target '{target}'")
+ 
+     mgr.data_path = data_path
+@@ -265,16 +323,64 @@ def _export_viewer_layers(mgr, pairs, data_path):
+ 
+ 
+ def _write_patch_cache(mgr, min_labeled_percentage):
+-    """Select the training patches with at least the widget's labeled percentage, with
+-    vesuvius.find_patches' generator; ZarrDataset reads the cache it writes to data_path."""
+-    from vesuvius.models.preprocessing.patches.generate import generate_patch_caches_for_config
+-
+-    result = generate_patch_caches_for_config(mgr, force=True)
+-    if result.total_fg_patches == 0:
++    """Select the training patches and write them as the patch cache ZarrDataset loads.
++
++    As in vesuvius.find_patches, the first target's labels decide: a patch qualifies when at
++    least the widget's percentage of its voxels equal valid_patch_value (any non-zero value
++    when none is set). Voxels with the target's ignore label never count. The cache key uses
++    the parameters ZarrDataset looks the cache up with. Returns the selected patches as
++    [(volume id, position), ...] in the order the dataset reads them."""
++    from vc_reader.reader import open_node
++    from vesuvius.models.datasets.find_valid_patches import find_valid_patches
++    from vesuvius.models.preprocessing.patches.cache import (
++        PatchCacheData, PatchEntry, build_cache_params, save_patch_cache)
++
++    data_path = Path(mgr.data_path)
++    patch_size = tuple(int(v) for v in mgr.train_patch_size)
++    target = next(name for name, info in mgr.targets.items() if not info.get("auxiliary_task", False))
++    info = mgr.targets[target]
++    valid_patch_value = info.get("valid_patch_value")  # the same on every target (_check_patch_selection_rule)
++    if valid_patch_value is None:
++        valid_patch_value = (getattr(mgr, "dataset_config", None) or {}).get("valid_patch_value")
++    ignore = _ignore_value(info)
++    volume_ids = sorted(p.stem for p in (data_path / "images").iterdir() if p.suffix == ".zarr")
++
++    params = build_cache_params(
++        data_path=data_path,
++        volume_ids=volume_ids,
++        patch_size=patch_size,
++        min_labeled_ratio=float(getattr(mgr, "min_labeled_ratio", 0.10)),
++        bbox_threshold=float(getattr(mgr, "min_bbox_percent", 0.95)),
++        valid_patch_find_resolution=int(getattr(mgr, "valid_patch_find_resolution", 1)),
++        valid_patch_value=valid_patch_value,
++        unlabeled_fg_enabled=bool(getattr(mgr, "unlabeled_foreground_enabled", False)),
++        unlabeled_fg_threshold=float(getattr(mgr, "unlabeled_foreground_threshold", 0.05)),
++        unlabeled_fg_bbox_threshold=float(getattr(mgr, "unlabeled_foreground_bbox_threshold", 0.15)),
++    )
++    found = find_valid_patches(
++        label_arrays=[open_node(data_path / "labels" / f"{v}_{target}.zarr") for v in volume_ids],
++        label_names=volume_ids,
++        patch_size=patch_size,
++        bbox_threshold=params.bbox_threshold,
++        label_threshold=params.min_labeled_ratio,
++        valid_patch_find_resolution=params.valid_patch_find_resolution,
++        ignore_labels=[ignore] * len(volume_ids),
++        valid_patch_values=[valid_patch_value] * len(volume_ids) if valid_patch_value is not None else None,
++        collect_unlabeled_fg=False,
++    )
++    fg = [PatchEntry(volume_idx=p["volume_idx"], volume_name=p["volume_name"], position=tuple(p["start_pos"]))
++          for p in found["fg_patches"]]
++    if not fg:
+         raise ValueError(
+-            f"No {'x'.join(map(str, mgr.train_patch_size))} patch of the paired layers has at least "
+-            f"{min_labeled_percentage}% labeled voxels; lower Min Labeled Percentage, the patch size, or label more.")
+-    print(f"{result.total_fg_patches} patches have at least {min_labeled_percentage}% labeled voxels")
++            f"No {'x'.join(map(str, patch_size))} patch of the paired layers has at least "
++            f"{min_labeled_percentage}% voxels labeled for target '{target}'"
++            + (f" (ignore label {ignore} not counted)" if ignore is not None else "")
++            + "; lower Min Labeled Percentage, the patch size, or label more.")
++    save_patch_cache(data_path / ".patches_cache", params, PatchCacheData(fg_patches=fg, bg_patches=[],
++                                                                           unlabeled_fg_patches=[]))
++    print(f"{len(fg)} patches have at least {min_labeled_percentage}% voxels labeled for target '{target}'"
++          + (f" (ignore label {ignore} not counted)" if ignore is not None else ""))
++    return [(entry.volume_name, entry.position) for entry in fg]
+ 
+ 
+ def main():
+diff --git a/vesuvius/tests/napari_trainer/test_main_window.py b/vesuvius/tests/napari_trainer/test_main_window.py
+index 43845e952..c04874a02 100644
+--- a/vesuvius/tests/napari_trainer/test_main_window.py
++++ b/vesuvius/tests/napari_trainer/test_main_window.py
+@@ -5,6 +5,7 @@ config manager, the layer export and the trainer's ZarrDataset are the real ones
+ """
+ import importlib
+ import inspect
++import json
+ import sys
+ import tomllib
+ import tempfile
+@@ -135,12 +136,12 @@ def test_loss_choices_are_losses_the_trainer_knows(main_window):
+         _create_loss(name, {}, None, -100, None)
+ 
+ 
+-def _default_manager():
++def _default_manager(name="ps128_dicece.yaml"):
+     import vesuvius
+     from vesuvius.models.configuration.config_manager import ConfigManager
+ 
+     mgr = ConfigManager(verbose=False)
+-    mgr.load_config(Path(vesuvius.__file__).parent / "models/configuration/single_task/ps128_dicece.yaml")
++    mgr.load_config(Path(vesuvius.__file__).parent / "models/configuration/single_task" / name)
+     return mgr
+ 
+ 
+@@ -161,8 +162,11 @@ def recorded(main_window, monkeypatch):
+             arrays = [(np.asarray(v.image_array[:]),
+                        {t: np.asarray(a[:]) for t, a in v.label_arrays.items() if a is not None})
+                       for v in dataset._volumes]  # read now: the export is removed when the run ends
++            caches = list((Path(self.mgr.data_path) / ".patches_cache").glob("*.json"))
++            selected = [[(p["vol_name"], tuple(p["pos"])) for p in json.loads(c.read_text())["fg_patches"]]
++                        for c in caches]
+             runs.append(SimpleNamespace(mgr=self.mgr, data_path=Path(self.mgr.data_path), dataset=dataset,
+-                                        arrays=arrays, targets=deepcopy(self.mgr.targets)))
++                                        arrays=arrays, targets=deepcopy(self.mgr.targets), selected=selected))
+ 
+     monkeypatch.setattr(train, "BaseTrainer", RecordingTrainer)
+     main_window._config_manager = _default_manager()
+@@ -405,3 +409,99 @@ def test_a_split_without_training_patches_stops_before_saving(main_window, tmp_p
+ 
+     assert final.read_bytes() == b"an earlier run's checkpoint"
+     assert _files(tmp_path / "checkpoints") == before
++
++
++def _patches(run):
++    return [(p.volume_name, tuple(p.position)) for p in run.dataset._patches]
++
++
++def test_ignored_voxels_do_not_count_toward_the_labeled_percentage(main_window, recorded):
++    # the guided ink preset: ignore_label 2 and no valid_patch_value
++    main_window._config_manager = _default_manager("ps128_guided_dinovol_ink.yaml")
++    image, label = _pair()
++    label.data = np.full_like(label.data, 2)  # nothing but the ignore label
++    _viewer(image, label)
++
++    with pytest.raises(ValueError, match="Min Labeled Percentage"):
++        _train(main_window, percent=1.0)
++    assert recorded == []
++
++    label.data[4:8, 4:8] = 1  # 16 labeled pixels in patch (0, 0), everything else ignored
++    _train(main_window, percent=1.0)
++    assert _patches(recorded[0]) == [("image0", (0, 0))]
++
++
++def test_training_reads_exactly_the_selected_patches(main_window, recorded):
++    image1, ink1 = _pair("vol01")
++    image2, ink2 = _pair("vol02")
++    ink2.data = np.zeros_like(ink2.data)
++    ink2.data[0:32, 0:32] = 1
++    surface1 = _Labels(np.ones_like(ink1.data), "vol01_surface")
++    surface2 = _Labels(np.ones_like(ink2.data), "vol02_surface")
++
++    _viewer(image1, ink1, surface1, image2, ink2, surface2)
++    _train(main_window)
++
++    run = recorded[0]
++    assert list(run.targets) == ["ink", "surface"]
++    assert len(run.selected) == 1
++    assert _patches(run) == run.selected[0] == [("image0", (0, 0)), ("image0", (0, 32)), ("image0", (32, 0)),
++                                                ("image0", (32, 32)), ("image1", (0, 0))]
++
++
++def test_targets_with_different_valid_patch_values_are_rejected(main_window, recorded):
++    mgr = main_window._config_manager
++    mgr.targets["ink"]["valid_patch_value"] = None
++    mgr.targets["surface"] = {"out_channels": 2, "valid_patch_value": 2,
++                              "losses": [{"name": "nnUNet_DC_and_CE_loss", "weight": 1.0}]}
++    image, ink = _pair()
++    surface = _Labels(ink.data.copy(), "vol01_surface")
++    ink.data[0:4] = 2
++
++    _viewer(image, ink, surface)
++    with pytest.raises(ValueError, match="valid_patch_value"):
++        _train(main_window)
++    assert recorded == []
++
++
++@pytest.mark.parametrize("allow_unlabeled_data", [True, False])
++def test_images_without_a_label_for_every_target_are_rejected(main_window, recorded, allow_unlabeled_data):
++    mgr = main_window._config_manager
++    mgr.allow_unlabeled_data = allow_unlabeled_data
++    mgr.dataset_config["allow_unlabeled_data"] = allow_unlabeled_data
++    image1, ink1 = _pair("vol01", "ink")
++    image2, surface2 = _pair("vol02", "surface")
++
++    _viewer(image1, ink1, image2, surface2)
++    with pytest.raises(ValueError, match="no label layer for target"):
++        _train(main_window)
++    assert recorded == []
++
++
++def test_unlabeled_foreground_configs_are_rejected(main_window, recorded):
++    mgr = main_window._config_manager
++    mgr.unlabeled_foreground_enabled = True
++    mgr.dataset_config["unlabeled_foreground_enabled"] = True
++
++    _viewer(*_pair())
++    with pytest.raises(ValueError, match="unlabeled_foreground_enabled"):
++        _train(main_window)
++    assert recorded == []
++
++
++def test_the_trainer_stops_if_its_dataset_is_not_the_selection(main_window, tmp_path, monkeypatch):
++    from vesuvius.models.datasets.zarr_dataset import ZarrDataset
++
++    main_window._config_manager = _tiny_manager(tmp_path)
++    image, label = _pair()
++    label.data = np.zeros_like(label.data)
++    label.data[4:8, 4:8] = 1  # at 1% only patch (0, 0) is selected
++    label.data[40:44, 40:44] = 1  # and (32, 32), so the split keeps one for training
++    _viewer(image, label)
++    # a dataset that misses the patch cache enumerates every patch
++    monkeypatch.setattr(ZarrDataset, "_try_load_cache", lambda self: None)
++    before = _files(tmp_path / "checkpoints")
++
++    with pytest.raises(RuntimeError, match="not the 2 selected"):
++        _train(main_window, percent=1.0)
++    assert _files(tmp_path / "checkpoints") == before
+-- 
+2.47.3
+
+
+From 6198b3dc5a857a83242398b97d1f55f7dc308bd5 Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 07:29:22 +0000
+Subject: [PATCH 3/4] napari_trainer: keep configured losses and refuse losses
+ that cannot take the labels
+
+A target the selected config gives losses keeps them; the widget's loss now
+only fills targets without configured losses. With the documented ink
+(Dice + CE, two channels) and damage (BCEWithLogits, one channel) targets,
+the widget no longer puts Dice + CE on damage, which failed on the first
+batch with "IndexError: Target 1 is out of bounds".
+
+Before anything is exported, a target is refused when its Dice + CE loss has
+fewer than two output channels or label values outside 0..out_channels-1, or
+its BCEWithLogits loss has more than one output channel or labels other than
+0/1 (the ignore label excepted). Other configured losses are kept unchecked.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../vesuvius/napari_trainer/main_window.py    | 66 +++++++++++++++++--
+ .../tests/napari_trainer/test_main_window.py  | 56 ++++++++++++++++
+ 2 files changed, 115 insertions(+), 7 deletions(-)
+
+diff --git a/vesuvius/src/vesuvius/napari_trainer/main_window.py b/vesuvius/src/vesuvius/napari_trainer/main_window.py
+index 84af0156b..e64379635 100644
+--- a/vesuvius/src/vesuvius/napari_trainer/main_window.py
++++ b/vesuvius/src/vesuvius/napari_trainer/main_window.py
+@@ -44,7 +44,7 @@ def filespicker(filenames: Sequence[Path] = str(DEFAULT_CONFIG_PATH)) -> Sequenc
+     patch_size_y={'widget_type': 'SpinBox', 'label': 'Patch Size Y', 'min': 0, 'max': 4096, 'value': 128},
+     min_labeled_percentage={'widget_type': 'FloatSpinBox', 'label': 'Min Labeled Percentage', 'min': 0.0, 'max': 100.0, 'step': 1.0, 'value': 10.0},
+     max_epochs={'widget_type': 'SpinBox', 'label': 'Max Epochs', 'min': 1, 'max': 1000, 'value': 5},
+-    # Losses for the default target: two output channels, one label channel, ignore label kept.
++    # The loss for targets the config gives no loss: two output channels, one label channel, ignore label kept.
+     loss_function={'widget_type': 'ComboBox', 'choices': ["nnUNet_DC_and_CE_loss"], 'value': "nnUNet_DC_and_CE_loss"}
+ )
+ def run_training(patch_size_z: int = 0, patch_size_x: int = 128, patch_size_y: int = 128,
+@@ -136,15 +136,13 @@ def run_training(patch_size_z: int = 0, patch_size_x: int = 128, patch_size_y: i
+         min_bbox_percent=0.0
+     )
+ 
+-    targets = _run_targets(mgr, pairs)
++    targets = _run_targets(mgr, pairs, loss_function)
+     _check_patch_selection_rule(targets)
++    _check_losses_fit_the_labels(targets, pairs)
+ 
+     run_dir = Path(tempfile.mkdtemp(prefix="napari_trainer_"))
+     try:
+         _export_viewer_layers(mgr, pairs, run_dir / "data", targets)
+-        for target_name in mgr.targets:
+-            mgr.targets[target_name]['losses'] = [{"name": loss_function, "weight": 1.0, "kwargs": {}}]
+-            print(f"  - Set loss function for target '{target_name}' to {loss_function}")
+         selected = _write_patch_cache(mgr, min_labeled_percentage)
+ 
+         from vesuvius.models.training.train import BaseTrainer
+@@ -274,16 +272,70 @@ def _write_layer_zarr(path, data):
+     ZarrWriter.create(path, shape=data.shape, chunks=chunks, dtype=data.dtype, overwrite=True)[...] = data
+ 
+ 
+-def _run_targets(mgr, pairs):
++def _run_targets(mgr, pairs, loss_function):
+     """The run's targets, one per label-layer suffix. A target the loaded config defines
+-    keeps its settings (losses, ignore label, ...)."""
++    keeps its settings (losses, ignore label, ...); the widget's loss is used only for
++    targets without configured losses."""
+     targets = {}
+     for _, labels in pairs:
+         for target, _ in labels:
+             targets.setdefault(target, deepcopy(mgr.targets.get(target) or {}))
++    for name, info in targets.items():
++        if info.get("losses"):
++            print(f"  - Target '{name}' keeps its configured losses: "
++                  f"{', '.join(str(loss.get('name')) for loss in info['losses'])}")
++        else:
++            info["losses"] = [{"name": loss_function, "weight": 1.0, "kwargs": {}}]
++            print(f"  - Target '{name}' has no configured loss; using {loss_function}")
+     return targets
+ 
+ 
++# Losses whose label requirements are checked before training: a class-index label for
++# cross-entropy over out_channels >= 2 channels, a 0/1 label for one-channel BCE. Other
++# configured losses are kept as configured, without a check.
++_CLASS_INDEX_LOSSES = {"nnUNet_DC_and_CE_loss"}
++_ONE_CHANNEL_BINARY_LOSSES = {"BCEWithLogitsLoss"}
++
++
++def _check_losses_fit_the_labels(targets, pairs):
++    """Refuse a target whose losses cannot take its labels (e.g. cross-entropy on one output
++    channel, or label values a loss cannot index), which would otherwise fail on the first batch."""
++    layers = {}
++    for _, labels in pairs:
++        for target, lbl_layer in labels:
++            layers.setdefault(target, []).append(lbl_layer)
++    for name, info in targets.items():
++        if name not in layers:
++            continue
++        out_channels = info.get("out_channels") or info.get("channels") or 2  # set_targets_and_data's default
++        ignore = _ignore_value(info)
++        values = set()
++        for lbl_layer in layers[name]:
++            values.update(np.unique(np.asarray(lbl_layer.data)).tolist())
++        values.discard(ignore)
++        for loss in info["losses"]:
++            loss_name = loss.get("name")
++            if loss_name in _CLASS_INDEX_LOSSES:
++                allowed, need = set(range(int(out_channels))), "out_channels of at least 2"
++                fits = int(out_channels) >= 2
++            elif loss_name in _ONE_CHANNEL_BINARY_LOSSES:
++                allowed, need = {0, 1}, "out_channels 1"
++                fits = int(out_channels) == 1
++            else:
++                continue
++            if not fits:
++                raise ValueError(
++                    f"Target '{name}' has out_channels {out_channels}, but its loss {loss_name} needs {need}. "
++                    "Fix the target's out_channels or losses in the config.")
++            bad = sorted(v for v in values if v not in allowed)
++            if bad:
++                raise ValueError(
++                    f"The label layers of target '{name}' contain the values {bad}, but its loss {loss_name} "
++                    f"with out_channels {out_channels} accepts only {sorted(allowed)}"
++                    + (f" and the ignore label {ignore}" if ignore is not None else "")
++                    + ". Repaint those voxels or change the target's settings.")
++
++
+ def _ignore_value(target_info):
+     """The target's ignore label, under any of the names the trainer reads."""
+     for alias in ("ignore_index", "ignore_label", "ignore_value"):
+diff --git a/vesuvius/tests/napari_trainer/test_main_window.py b/vesuvius/tests/napari_trainer/test_main_window.py
+index c04874a02..a81054212 100644
+--- a/vesuvius/tests/napari_trainer/test_main_window.py
++++ b/vesuvius/tests/napari_trainer/test_main_window.py
+@@ -505,3 +505,59 @@ def test_the_trainer_stops_if_its_dataset_is_not_the_selection(main_window, tmp_
+     with pytest.raises(RuntimeError, match="not the 2 selected"):
+         _train(main_window, percent=1.0)
+     assert _files(tmp_path / "checkpoints") == before
++
++
++_DAMAGE_TARGET = """
++    damage:
++      out_channels: 1
++      activation: "sigmoid"
++      losses:
++        - name: "BCEWithLogitsLoss"
++          weight: 1.0
++"""
++
++
++def test_configured_losses_are_kept_and_train(main_window, tmp_path, monkeypatch):
++    # the documented multi-task config (docs/data_formatting.md): two-channel ink + one-channel BCE damage
++    import torch
++    import vesuvius.models.training.train as train
++
++    main_window._config_manager = _tiny_manager(tmp_path, _DAMAGE_TARGET)
++    image, ink = _pair()
++    damage = _Labels(ink.data.copy(), "vol01_damage")
++    damage_maxima = []
++    real_step = train.BaseTrainer._train_step
++
++    def train_step(self, model, data_dict, *args, **kwargs):
++        damage_maxima.append(float(data_dict["damage"].max()))
++        return real_step(self, model, data_dict, *args, **kwargs)
++
++    monkeypatch.setattr(train.BaseTrainer, "_train_step", train_step)
++    _viewer(image, ink, damage)
++    _train(main_window)
++
++    assert damage_maxima and max(damage_maxima) == 1.0  # trained on batches with damage foreground
++    saved = torch.load(tmp_path / "checkpoints" / "tiny2d" / "tiny2d_final.pth", weights_only=False)
++    targets = saved["model_config"]["targets"]
++    assert [loss["name"] for loss in targets["ink"]["losses"]] == ["nnUNet_DC_and_CE_loss"]
++    assert [loss["name"] for loss in targets["damage"]["losses"]] == ["BCEWithLogitsLoss"]
++    assert targets["damage"]["out_channels"] == 1
++
++
++@pytest.mark.parametrize("target, value, message", [
++    ({"out_channels": 1}, 1, "needs out_channels of at least 2"),  # gets the widget's loss
++    (None, 3, r"contain the values \[3\]"),  # the default ink target: classes 0 and 1, ignore label 2
++    ({"out_channels": 1, "losses": [{"name": "BCEWithLogitsLoss", "weight": 1.0}]}, 2, r"contain the values \[2\]"),
++], ids=["widget-loss-on-one-channel", "class-out-of-range", "bce-non-binary"])
++def test_losses_that_cannot_take_the_labels_are_rejected(main_window, recorded, target, value, message):
++    name = "ink"
++    if target is not None:
++        name = "damage"
++        main_window._config_manager.targets[name] = target
++    image, label = _pair(target=name)
++    label.data[8:12, 8:12] = value
++
++    _viewer(image, label)
++    with pytest.raises(ValueError, match=message):
++        _train(main_window)
++    assert recorded == []
+-- 
+2.47.3
+
+
+From 56b28fcb8efb9f31fce9805ed2a6b48c84a7effd Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 07:31:36 +0000
+Subject: [PATCH 4/4] napari_trainer: infer with the checkpoint's preprocessing
+ and on the source layer's grid
+
+Normalization: a checkpoint that saved normalization_scheme and
+intensity_properties (save_checkpoint stores the training dataset's) is now
+normalized as the trainer's ZarrDataset normalized each patch: the
+normalizer is built by ZarrDataset's own _initialize_normalization and
+applied to each window's part inside the image, which is then zero-padded,
+as ZarrDataset pads a patch. A zscore checkpoint now sees windows with mean
+0 and standard deviation 1 instead of min-max values around 0.5. A
+checkpoint without a saved scheme keeps the whole-image min-max scaling
+unchanged.
+
+Placement: each prediction layer gets the source layer's scale, translate,
+rotate, shear and affine on its spatial axes (identity on the leading
+batch and channel axes), so it overlays a rotated, scaled or translated
+source.
+
+The batch passed to the network is made contiguous.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../src/vesuvius/napari_trainer/inference.py  |  93 ++++++++++++++-
+ .../test_inference_checkpoint_config.py       | 110 ++++++++++++++++++
+ 2 files changed, 197 insertions(+), 6 deletions(-)
+
+diff --git a/vesuvius/src/vesuvius/napari_trainer/inference.py b/vesuvius/src/vesuvius/napari_trainer/inference.py
+index c334542c9..3d21bf024 100644
+--- a/vesuvius/src/vesuvius/napari_trainer/inference.py
++++ b/vesuvius/src/vesuvius/napari_trainer/inference.py
+@@ -10,6 +10,7 @@ import contextlib
+ from typing import Optional, List, Tuple, Dict, Any, Union, Callable
+ import itertools
+ from copy import deepcopy
++from types import SimpleNamespace
+ 
+ from vesuvius.models.run.blending import generate_gaussian_map
+ from vesuvius.utils.models.helpers import compute_steps_for_sliding_window
+@@ -44,6 +45,50 @@ def _apply_saved_decoder_layout(model_config, state_dict):
+             info['separate_decoder'] = False
+ 
+ 
++def _training_normalizer(scheme, intensity_properties):
++    """The intensity normalization the trainer's ZarrDataset applied to every training patch
++    for a checkpoint saved with `scheme` and `intensity_properties` (save_checkpoint stores
++    both), built by ZarrDataset's own code. Returns a function of one window."""
++    from vesuvius.models.datasets.zarr_dataset import ZarrDataset
++
++    dataset = ZarrDataset.__new__(ZarrDataset)  # only its normalization setup is used
++    dataset.mgr = SimpleNamespace(skip_intensity_sampling=True)
++    dataset.normalization_scheme = scheme
++    dataset.intensity_properties = dict(intensity_properties or {})
++    dataset._initialize_normalization()
++    normalizer = dataset.normalizer
++
++    def normalize(window: np.ndarray) -> np.ndarray:
++        # as ZarrDataset.__getitem__ normalizes a patch before padding it
++        window = np.asarray(window, dtype=np.float32)
++        if normalizer is None or window.size == 0:
++            return window
++        normalized = normalizer({"image": window.reshape(1, 1, -1)}, seed=0)["image"]
++        return np.asarray(normalized, dtype=np.float32).reshape(window.shape)
++
++    return normalize
++
++
++def _source_transform(layer, ndim: int) -> Dict[str, Any]:
++    """scale, translate, rotate, shear and affine that put an ndim-D prediction on the grid of
++    the napari layer it was computed from: the source's transform on the trailing (spatial)
++    axes, identity on the leading (batch, channel) axes."""
++    if not hasattr(layer, "affine"):  # not a napari layer
++        return {}
++    from napari.utils.transforms import CompositeAffine
++
++    extra = ndim - layer.ndim
++    if extra < 0:
++        raise ValueError(f"A {ndim}D prediction cannot carry the transform of the {layer.ndim}D layer '{layer.name}'")
++    physical = CompositeAffine(scale=layer.scale, translate=layer.translate, rotate=layer.rotate,
++                               shear=layer.shear, ndim=layer.ndim)
++    affine = layer.affine
++    if extra:
++        physical, affine = physical.expand_dims(list(range(extra))), affine.expand_dims(list(range(extra)))
++    return {"scale": physical.scale, "translate": physical.translate, "rotate": physical.rotate,
++            "shear": physical.shear, "affine": affine.affine_matrix}
++
++
+ def _strip_wrapper_prefixes(state_dict):
+     """Drop DDP ('module.') and torch.compile ('_orig_mod.') key prefixes."""
+     def strip(key):
+@@ -66,12 +111,18 @@ class ModelLoader:
+     def __init__(self, checkpoint_path, config_manager=None):
+         self.checkpoint_path = Path(checkpoint_path)
+         self.config_manager = config_manager
++        # The training preprocessing saved with the checkpoint (None: not saved).
++        self.normalization_scheme = None
++        self.intensity_properties = None
+         
+     def load(self):
+         if not self.checkpoint_path.exists():
+             raise FileNotFoundError(f"Checkpoint not found: {self.checkpoint_path}")
+             
+         checkpoint_data = torch.load(self.checkpoint_path, map_location='cpu', weights_only=False)
++        if isinstance(checkpoint_data, dict) and checkpoint_data.get('normalization_scheme') is not None:
++            self.normalization_scheme = checkpoint_data['normalization_scheme']
++            self.intensity_properties = checkpoint_data.get('intensity_properties') or {}
+ 
+         if 'model' in checkpoint_data:
+             print("Loading weights from 'model' key in checkpoint")
+@@ -154,7 +205,9 @@ def sliding_window_inference(model: nn.Module,
+                              overlap: float = 0.25,
+                              batch_size: int = 2,
+                              sigma_scale: float = 8.0,
+-                             post_transform: Optional[Callable] = None) -> Dict[str, np.ndarray]:
++                             post_transform: Optional[Callable] = None,
++                             normalize_window: Optional[Callable[[np.ndarray], np.ndarray]] = None
++                             ) -> Dict[str, np.ndarray]:
+     """Gaussian-blended sliding-window prediction of an in-memory image.
+ 
+     Patch positions and blend weights are those of ``vesuvius.predict`` /
+@@ -163,7 +216,9 @@ def sliding_window_inference(model: nn.Module,
+     weights from ``generate_gaussian_map`` (sigma = patch / sigma_scale).
+     ``image`` is spatial ``(Y, X)`` / ``(Z, Y, X)`` or channel-first
+     ``(C, ...)``; spatial axes smaller than the patch are zero-padded.
+-    Returns ``(1, C_out, ...)`` arrays per model output.
++    ``normalize_window`` (the checkpoint's training normalization) is applied to
++    each window before padding, as the trainer did to each patch; without it the
++    whole image is min-max scaled. Returns ``(1, C_out, ...)`` arrays per model output.
+     """
+     patch_size = tuple(int(p) for p in patch_size)
+     dims = len(patch_size)
+@@ -174,7 +229,11 @@ def sliding_window_inference(model: nn.Module,
+ 
+     device = next(model.parameters()).device
+     model.eval()
+-    inputs = A.Normalize("minmax", eps=1e-5)(torch.as_tensor(np.asarray(image), dtype=torch.float32, device=device))[None]
++    if normalize_window is None:
++        inputs = A.Normalize("minmax", eps=1e-5)(torch.as_tensor(np.asarray(image), dtype=torch.float32, device=device))[None]
++    else:
++        raw = np.asarray(image, dtype=np.float32)  # each window is normalized on its own below
++        inputs = torch.as_tensor(raw)[None]
+ 
+     spatial = tuple(inputs.shape[2:])
+     padded = tuple(max(s, p) for s, p in zip(spatial, patch_size))
+@@ -195,7 +254,11 @@ def sliding_window_inference(model: nn.Module,
+         for start in tqdm(range(0, len(positions), batch_size), desc="Sliding window"):
+             batch_pos = positions[start:start + batch_size]
+             windows = [tuple(slice(o, o + p) for o, p in zip(pos, patch_size)) for pos in batch_pos]
+-            batch = torch.cat([inputs[(slice(None), slice(None)) + w] for w in windows])
++            if normalize_window is None:
++                batch = torch.cat([inputs[(slice(None), slice(None)) + w] for w in windows])
++            else:
++                batch = torch.cat([_normalized_window(raw, w, spatial, normalize_window) for w in windows]).to(device)
++            batch = batch.contiguous()
+             for name, pred in _as_outputs(model(batch)).items():
+                 acc = sums.get(name)
+                 if acc is None:
+@@ -217,6 +280,16 @@ def sliding_window_inference(model: nn.Module,
+     return result
+ 
+ 
++def _normalized_window(raw, window, spatial, normalize_window):
++    """The window of the (C, ...) image: its part inside the image normalized, then zero-padded
++    to the patch size (ZarrDataset pads a patch at the volume edge the same way)."""
++    inside = tuple(slice(w.start, min(w.stop, n)) for w, n in zip(window, spatial))
++    out = np.zeros((raw.shape[0],) + tuple(w.stop - w.start for w in window), dtype=np.float32)
++    out[(slice(None),) + tuple(slice(0, s.stop - s.start) for s in inside)] = \
++        normalize_window(raw[(slice(None),) + inside])
++    return torch.from_numpy(out)[None]
++
++
+ def run_inference(viewer: napari.Viewer,
+                   layer: napari.layers.Layer,
+                   checkpoint_path: str,
+@@ -265,13 +338,21 @@ def run_inference(viewer: napari.Viewer,
+     elif activation == "argmax":
+         post_transform = lambda x: torch.argmax(x, dim=1, keepdim=True).float()
+ 
++    normalize_window = None
++    if loader.normalization_scheme is not None:
++        normalize_window = _training_normalizer(loader.normalization_scheme, loader.intensity_properties)
++        print(f"Normalizing each window with the checkpoint's '{loader.normalization_scheme}' scheme")
++    else:
++        print("The checkpoint has no saved normalization; min-max scaling the image")
++
+     results = sliding_window_inference(model, np.asarray(image_data), roi_size, overlap=overlap,
+                                        batch_size=batch_size, sigma_scale=sigma_scale,
+-                                       post_transform=post_transform)
++                                       post_transform=post_transform, normalize_window=normalize_window)
+     new_layers = []
+     for output_name, result in results.items():
+         new_layers.append(viewer.add_image(result, name=f"{layer.name}_{model_name}_{output_name}",
+-                                           colormap='gray', blending='translucent'))
++                                           colormap='gray', blending='translucent',
++                                           **_source_transform(layer, result.ndim)))
+ 
+     print(f"Inference completed. Added {len(new_layers)} new layers to the viewer.")
+     return new_layers
+diff --git a/vesuvius/tests/napari_trainer/test_inference_checkpoint_config.py b/vesuvius/tests/napari_trainer/test_inference_checkpoint_config.py
+index 1b7e9b887..8b5986466 100644
+--- a/vesuvius/tests/napari_trainer/test_inference_checkpoint_config.py
++++ b/vesuvius/tests/napari_trainer/test_inference_checkpoint_config.py
+@@ -169,3 +169,113 @@ def test_extra_checkpoint_tensors_are_not_rejected(tmp_path):
+     model, _ = ModelLoader(path).load()
+ 
+     assert _differing_tensors(model, trained.state_dict()) == []
++
++
++def _checkpoint(tmp_path, **saved):
++    """A small 2D U-Net checkpoint (32x32 patch) as the trainer saves it, plus `saved`."""
++    torch.manual_seed(0)
++    trained = NetworkFromConfig(_manager([4, 8], {"ink": {"out_channels": 2, "activation": "none"}}))
++    path = tmp_path / "unet2d.pth"
++    torch.save({"model": trained.state_dict(), "model_config": trained.final_config, **saved}, path)
++    return str(path)
++
++
++@pytest.fixture
++def model_inputs(monkeypatch):
++    """Every batch the loaded network is called with, and whether it was contiguous."""
++    seen = []
++    real_load = ModelLoader.load
++
++    def load(self):
++        model, config = real_load(self)
++        model.register_forward_pre_hook(
++            lambda module, args: seen.append((args[0].detach().cpu().clone(), args[0].is_contiguous())))
++        return model, config
++
++    monkeypatch.setattr(ModelLoader, "load", load)
++    return seen
++
++
++def _first_window(model_inputs):
++    return model_inputs[0][0][0, 0].numpy()
++
++
++def test_zscore_checkpoint_sees_zscored_windows(tmp_path, no_gui_config, model_inputs):
++    # save_checkpoint stores the training dataset's normalization_scheme and intensity_properties
++    path = _checkpoint(tmp_path, normalization_scheme="zscore", intensity_properties={})
++    data = np.random.default_rng(0).normal(100, 10, (20, 48)).astype(np.float32)
++
++    run_inference(_Viewer(), SimpleNamespace(name="vol", data=data), path)
++
++    window = _first_window(model_inputs)  # the window at (0, 0); the image is 20 rows, the patch 32
++    inside = window[:20]
++    assert abs(inside.mean()) < 1e-4 and abs(inside.std() - 1) < 1e-3
++    np.testing.assert_allclose(inside, (data[:, :32] - data[:, :32].mean()) / data[:, :32].std(), atol=1e-4)
++    assert np.all(window[20:] == 0)  # padded after normalization, as the trainer pads a patch
++
++
++def test_ct_checkpoint_sees_its_saved_intensity_properties(tmp_path, no_gui_config, model_inputs):
++    props = {"mean": 100.0, "std": 10.0, "percentile_00_5": 85.0, "percentile_99_5": 115.0}
++    path = _checkpoint(tmp_path, normalization_scheme="ct", intensity_properties=props)
++    data = np.random.default_rng(0).normal(100, 10, (48, 48)).astype(np.float32)
++
++    run_inference(_Viewer(), SimpleNamespace(name="vol", data=data), path)
++
++    np.testing.assert_allclose(_first_window(model_inputs), (np.clip(data[:32, :32], 85, 115) - 100) / 10, atol=1e-5)
++
++
++def test_checkpoint_without_saved_preprocessing_keeps_whole_image_minmax(tmp_path, no_gui_config, model_inputs):
++    import vc_reader.transforms as A
++
++    path = _checkpoint(tmp_path)
++    data = np.random.default_rng(0).normal(100, 10, (48, 48)).astype(np.float32)
++
++    run_inference(_Viewer(), SimpleNamespace(name="vol", data=data), path)
++
++    expected = A.Normalize("minmax", eps=1e-5)(torch.as_tensor(data)[None]).numpy()[0]
++    np.testing.assert_array_equal(_first_window(model_inputs), expected[:32, :32])
++
++
++@pytest.mark.parametrize("saved", [{}, {"normalization_scheme": "zscore", "intensity_properties": {}}],
++                         ids=["no-saved-preprocessing", "zscore"])
++def test_the_network_gets_contiguous_windows(tmp_path, no_gui_config, model_inputs, saved):
++    path = _checkpoint(tmp_path, **saved)
++    data = np.random.default_rng(0).random((3, 50, 70)).astype(np.float32)[1]  # a strided view
++
++    run_inference(_Viewer(), SimpleNamespace(name="vol", data=data), path, batch_size=3)
++
++    assert len(model_inputs) > 1 and all(contiguous for _, contiguous in model_inputs)
++
++
++class _NapariViewer:
++    def __init__(self):
++        import napari
++
++        self.layers, self._image = [], napari.layers.Image
++
++    def add_image(self, data, **kwargs):
++        layer = self._image(data, **kwargs)
++        self.layers.append(layer)
++        return layer
++
++
++def test_prediction_layers_keep_the_source_layers_transform(tmp_path, no_gui_config):
++    import napari
++
++    path = _checkpoint(tmp_path, normalization_scheme="zscore", intensity_properties={})
++    source = napari.layers.Image(
++        np.random.default_rng(0).random((40, 48)).astype(np.float32), name="vol",
++        scale=(2.0, 0.5), translate=(10.0, -4.0), rotate=30.0, shear=[0.2],
++        affine=np.array([[1.0, 0.1, 3.0], [0.0, 1.0, -2.0], [0.0, 0.0, 1.0]]))
++    viewer = _NapariViewer()
++
++    run_inference(viewer, source, path)
++
++    (prediction,) = viewer.layers
++    assert prediction.data.shape == (1, 2, 40, 48)
++    for point in [(0, 0), (5, 7), (39, 47)]:
++        for channel in (0, 1):
++            np.testing.assert_allclose(prediction.data_to_world((0, channel) + point),
++                                       (0, channel) + tuple(source.data_to_world(point)), atol=1e-9)
++    np.testing.assert_allclose(prediction.scale[-2:], source.scale)
++    np.testing.assert_allclose(prediction.translate[-2:], source.translate)
+-- 
+2.47.3
+

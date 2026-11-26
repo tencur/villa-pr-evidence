@@ -1,0 +1,9 @@
+56b28fcb8: 42 passed, 25 warnings in 9.49s
+6198b3dc5: 3 failed, 39 passed, 25 warnings in 9.34s
+3c209902f: 7 failed, 35 passed, 25 warnings in 9.32s
+524f0ed14: 13 failed, 29 passed, 25 warnings in 9.97s
+9ee250e0d (tree_new): 14 failed, 28 passed, 25 warnings in 10.23s
+main: 37 failed, 5 passed, 25 warnings in 11.33s
+regression 56b28fcb8: 62 passed, 1 warning in 24.67s
+regression main: 62 passed, 1 warning in 24.35s
+done
