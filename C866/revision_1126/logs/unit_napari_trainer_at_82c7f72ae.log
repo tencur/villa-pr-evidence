@@ -1,0 +1,1499 @@
+..FFFF...............FFF                                                 [100%]
+=================================== FAILURES ===================================
+__________________ test_per_target_decoder_layout_is_restored __________________
+
+tmp_path = PosixPath('/dev/shm/c866pt_c/test_per_target_decoder_layout0')
+
+    def test_per_target_decoder_layout_is_restored(tmp_path):
+        # ink uses the shared decoder, surface its own: the saved config says separate_decoders: true
+        targets = {"ink": {"out_channels": 2, "activation": "none"},
+                   "surface": {"out_channels": 2, "activation": "none", "separate_decoder": True}}
+        torch.manual_seed(0)
+        trained = NetworkFromConfig(_manager([8, 16, 32], targets))
+        assert trained.final_config["separate_decoders"] is True
+        path = tmp_path / "mixed.pth"
+        torch.save({"model": trained.state_dict(), "model_config": trained.final_config}, path)
+    
+        model, _ = ModelLoader(path).load()
+    
+>       assert _differing_tensors(model, trained.state_dict()) == []
+E       AssertionError: assert ['task_heads....rm.bias', ...] == []
+E         
+E         Left contains 22 more items, first extra item: 'task_heads.ink.weight'
+E         Use -v to get more diff
+
+tests/napari_trainer/test_inference_checkpoint_config.py:86: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+Task 'surface' configured with separate decoder (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}, 'surface': {'out_channels': 2, 'activation': 'none', 'separate_decoder': True}}
+  target_z_projection: {}
+  separate_decoders: True
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size (32, 32)
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with separate decoder (2 channels)
+Task 'surface' configured with separate decoder (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}, 'surface': {'out_channels': 2, 'activation': 'none', 'separate_decoder': True}}
+  target_z_projection: {}
+  separate_decoders: True
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+____________________ test_nested_legacy_config_is_unwrapped ____________________
+
+tmp_path = PosixPath('/dev/shm/c866pt_c/test_nested_legacy_config_is_u0')
+
+    def test_nested_legacy_config_is_unwrapped(tmp_path):
+        trained_mgr = _manager([8, 16, 32], {"ink": {"out_channels": 2, "activation": "none"}})
+        torch.manual_seed(0)
+        trained = NetworkFromConfig(trained_mgr)
+        model_config = {k: v for k, v in trained_mgr.model_config.items() if k not in ("targets", "patch_size")}
+        legacy = {"model_config": model_config, "patch_size": [32, 32], "batch_size": 1, "in_channels": 1,
+                  "targets": {"ink": {"out_channels": 2, "activation": "none"}}}
+        path = tmp_path / "legacy.pth"
+        torch.save({"model": trained.state_dict(), "config": legacy}, path)
+    
+        model, config = ModelLoader(path).load()
+    
+>       assert _differing_tensors(model, trained.state_dict()) == []
+E       AssertionError: assert ['shared_enco....0.bias', ...] == []
+E         
+E         Left contains 89 more items, first extra item: 'shared_encoder.stem.convs.0.conv.weight'
+E         Use -v to get more diff
+
+tests/napari_trainer/test_inference_checkpoint_config.py:104: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size [32, 32]
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Configuring network from config file ---
+Auto-configured n_blocks_per_stage: [1, 3, 4, 6, 6, 6, 6]
+Using 2D kernel defaults: [3, 3]
+Using 2D pool defaults: [1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [32, 64, 128, 256, 320, 320, 320]
+  num_stages: 7
+  n_blocks_per_stage: [1, 3, 4, 6, 6, 6, 6]
+  n_conv_per_stage_decoder: [1, 1, 1, 1, 1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 32
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: [32, 32]
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: None
+  must_be_divisible_by: None
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Warning: Error loading state dict: Error(s) in loading state_dict for NetworkFromConfig:
+	size mismatch for shared_encoder.stem.convs.0.conv.weight: copying a param with shape torch.Size([8, 1, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 1, 3, 3]).
+	size mismatch for shared_encoder.stem.convs.0.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.0.weight: copying a param with shape torch.Size([8, 1, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 1, 3, 3]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.conv.weight: copying a param with shape torch.Size([8, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.0.weight: copying a param with shape torch.Size([8, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.conv.weight: copying a param with shape torch.Size([8, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.0.weight: copying a param with shape torch.Size([8, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.conv.weight: copying a param with shape torch.Size([16, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.conv.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.0.weight: copying a param with shape torch.Size([16, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.conv.weight: copying a param with shape torch.Size([16, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 64, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.conv.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.0.weight: copying a param with shape torch.Size([16, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 64, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.conv.weight: copying a param with shape torch.Size([32, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([128, 64, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.conv.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.norm.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.norm.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.0.weight: copying a param with shape torch.Size([32, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([128, 64, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.0.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.1.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.1.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.conv.weight: copying a param with shape torch.Size([32, 32, 3, 3]) from checkpoint, the shape in current model is torch.Size([128, 128, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.conv.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.norm.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.norm.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.0.weight: copying a param with shape torch.Size([32, 32, 3, 3]) from checkpoint, the shape in current model is torch.Size([128, 128, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.0.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.1.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.1.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for task_heads.ink.weight: copying a param with shape torch.Size([2, 8, 1, 1]) from checkpoint, the shape in current model is torch.Size([2, 32, 1, 1]).
+	size mismatch for shared_decoder.stages.0.convs.0.conv.weight: copying a param with shape torch.Size([16, 32, 3, 3]) from checkpoint, the shape in current model is torch.Size([320, 640, 3, 3]).
+	size mismatch for shared_decoder.stages.0.convs.0.conv.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.0.weight: copying a param with shape torch.Size([16, 32, 3, 3]) from checkpoint, the shape in current model is torch.Size([320, 640, 3, 3]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.conv.weight: copying a param with shape torch.Size([8, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([320, 640, 3, 3]).
+	size mismatch for shared_decoder.stages.1.convs.0.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.0.weight: copying a param with shape torch.Size([8, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([320, 640, 3, 3]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.transpconvs.0.weight: copying a param with shape torch.Size([32, 16, 2, 2]) from checkpoint, the shape in current model is torch.Size([320, 320, 1, 1]).
+	size mismatch for shared_decoder.transpconvs.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.transpconvs.1.weight: copying a param with shape torch.Size([16, 8, 2, 2]) from checkpoint, the shape in current model is torch.Size([320, 320, 1, 1]).
+	size mismatch for shared_decoder.transpconvs.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+Attempting to continue with partially loaded weights
+______________ test_primus_checkpoint_infers_with_its_input_shape ______________
+
+tmp_path = PosixPath('/dev/shm/c866pt_c/test_primus_checkpoint_infers_0')
+no_gui_config = None
+
+    def test_primus_checkpoint_infers_with_its_input_shape(tmp_path, no_gui_config):
+        mgr = SimpleNamespace(targets={"ink": {"out_channels": 2, "activation": "none"}}, train_patch_size=(16, 16, 16),
+                              train_batch_size=1, in_channels=1, autoconfigure=False, model_name="primus",
+                              enable_deep_supervision=False,
+                              model_config={"architecture_type": "primus_s", "input_shape": (16, 16, 16),
+                                            "patch_embed_size": (8, 8, 8)})
+        torch.manual_seed(0)
+        trained = NetworkFromConfig(mgr)
+        assert "patch_size" not in trained.final_config
+        path = tmp_path / "primus.pth"
+        torch.save({"model": trained.state_dict(), "model_config": trained.final_config}, path)
+        viewer = _Viewer()
+        image = SimpleNamespace(name="vol", data=np.random.default_rng(0).random((20, 24, 16)).astype(np.float32))
+    
+>       run_inference(viewer, image, str(path))
+
+tests/napari_trainer/test_inference_checkpoint_config.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+viewer = <tests.napari_trainer.test_inference_checkpoint_config._Viewer object at 0x7fff654238c0>
+layer = namespace(name='vol', data=array([[[0.6369617 , 0.26978672, 0.04097353, ..., 0.03358557,
+         0.72965544, 0.175655...97817, 0.17733009, 0.6091657 , ..., 0.01900586,
+         0.9410005 , 0.89085716]]], shape=(20, 24, 16), dtype=float32))
+checkpoint_path = '/dev/shm/c866pt_c/test_primus_checkpoint_infers_0/primus.pth'
+roi_size = None, overlap = 0.25, batch_size = 2, sigma_scale = 8.0
+activation_type = 'none'
+
+    def run_inference(viewer: napari.Viewer,
+                      layer: napari.layers.Layer,
+                      checkpoint_path: str,
+                      roi_size: Optional[Tuple[int, ...]] = None,
+                      overlap: float = 0.25,
+                      batch_size: int = 2,
+                      sigma_scale: float = 8.0,
+                      activation_type: str = "none") -> List[napari.layers.Layer]:
+    
+        config_manager = None
+        try:
+            from .main_window import _config_manager
+            if _config_manager is not None:
+                config_manager = _config_manager
+                print("Using global config manager from main_window")
+        except (ImportError, AttributeError):
+            print("No global config manager available")
+    
+        loader = ModelLoader(checkpoint_path, config_manager=config_manager)
+        model, model_config = loader.load()
+        model_name = Path(checkpoint_path).stem
+        image_data = layer.data
+    
+        if roi_size is None:
+            for key in ('patch_size', 'train_patch_size'):
+                if key in model_config:
+                    roi_size = tuple(model_config[key])
+                    print(f"Using {key} from model_config: {roi_size}")
+                    break
+            else:
+>               raise ValueError("No patch_size or train_patch_size found in model config. Cannot proceed with inference.")
+E               ValueError: No patch_size or train_patch_size found in model config. Cannot proceed with inference.
+
+src/vesuvius/napari_trainer/inference.py:211: ValueError
+----------------------------- Captured stdout call -----------------------------
+Using 3D operations based on patch_size (16, 16, 16)
+--- Initializing Primus architecture ---
+Using Primus-S configuration
+Using decoder normalization: LayerNormNd
+Using decoder activation: GELU
+Primus task 'ink' configured with shared decoder + head (2 channels)
+Primus network initialized with configuration:
+  model_name: primus
+  architecture_type: primus_s
+  primus_variant: S
+  patch_embed_size: (8, 8, 8)
+  input_shape: (16, 16, 16)
+  in_channels: 1
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  decoder_norm: LayerNormNd
+  decoder_act: GELU
+  separate_decoders: False
+  decoder_head_channels: 32
+  drop_path_rate: 0.0
+  patch_drop_rate: 0.0
+  proj_drop_rate: 0.0
+  attn_drop_rate: 0.0
+  num_register_tokens: 0
+  use_rot_pos_emb: True
+  use_abs_pos_embed: True
+  pos_emb_type: rope
+  mlp_ratio: 2.6666666666666665
+  init_values: 0.1
+  scale_attn_inner: True
+Using 3D operations based on patch_size (128, 128, 128)
+--- Initializing Primus architecture ---
+Using Primus-S configuration
+Using decoder normalization: LayerNormNd
+Using decoder activation: GELU
+Primus task 'ink' configured with shared decoder + head (2 channels)
+Primus network initialized with configuration:
+  model_name: Loaded_Model
+  architecture_type: primus_s
+  primus_variant: S
+  patch_embed_size: (8, 8, 8)
+  input_shape: (16, 16, 16)
+  in_channels: 1
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  decoder_norm: LayerNormNd
+  decoder_act: GELU
+  separate_decoders: False
+  decoder_head_channels: 32
+  drop_path_rate: 0.0
+  patch_drop_rate: 0.0
+  proj_drop_rate: 0.0
+  attn_drop_rate: 0.0
+  num_register_tokens: 0
+  use_rot_pos_emb: True
+  use_abs_pos_embed: True
+  pos_emb_type: rope
+  mlp_ratio: 2.6666666666666665
+  init_values: 0.1
+  scale_attn_inner: True
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+________________ test_missing_weights_stop_before_a_prediction _________________
+
+tmp_path = PosixPath('/dev/shm/c866pt_c/test_missing_weights_stop_befo0')
+no_gui_config = None
+
+    def test_missing_weights_stop_before_a_prediction(tmp_path, no_gui_config):
+        torch.manual_seed(0)
+        trained = NetworkFromConfig(_manager([8, 16, 32], {"ink": {"out_channels": 2, "activation": "none"}}))
+        state = trained.state_dict()
+        dropped = next(k for k in state if k.startswith("task_heads.ink."))
+        del state[dropped]
+        path = tmp_path / "incomplete.pth"
+        torch.save({"model": state, "model_config": trained.final_config}, path)
+        viewer = _Viewer()
+        image = SimpleNamespace(name="vol", data=np.zeros((32, 32), np.float32))
+    
+>       with pytest.raises(RuntimeError, match="no weights"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/napari_trainer/test_inference_checkpoint_config.py:154: Failed
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size (32, 32)
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+Using patch_size from model_config: (32, 32)
+Final roi_size for inference: (32, 32)
+Data shape: (32, 32), Using 2D inference
+Generated Gaussian map with shape (1, 32, 32), min: 0.0000, max: 1.0000
+Inference completed. Added 1 new layers to the viewer.
+----------------------------- Captured stderr call -----------------------------
+Sliding window:   0%|          | 0/1 [00:00<?, ?it/s]Sliding window: 100%|██████████| 1/1 [00:00<00:00, 269.04it/s]
+_____________________ test_default_config_is_package_data ______________________
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_c/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+
+    def test_default_config_is_package_data(main_window):
+        pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
+        patterns = tomllib.loads(pyproject.read_text())["tool"]["setuptools"]["package-data"]["vesuvius"]
+        package_dir = Path(main_window.__file__).resolve().parents[1]
+        relative = main_window.DEFAULT_CONFIG_PATH.relative_to(package_dir).as_posix()
+    
+>       assert any(fnmatch(relative, pattern) for pattern in patterns)
+E       assert False
+E        +  where False = any(<generator object test_default_config_is_package_data.<locals>.<genexpr> at 0x7fff592d43c0>)
+
+<work>/fixwork/c866rev/tree_c/vesuvius/tests/napari_trainer/test_main_window.py:339: AssertionError
+__________________ test_validation_metrics_accept_2d_patches ___________________
+
+    def test_validation_metrics_accept_2d_patches():
+        pred, gt = _batch()
+        trainer = SimpleNamespace(mgr=SimpleNamespace(targets={"ink": {"ignore_label": 2}}))
+        metrics = BaseTrainer._initialize_evaluation_metrics(trainer)["ink"]
+    
+        for metric in metrics:
+>           metric.update(pred=pred, gt=gt, mask=None)
+
+tests/napari_trainer/test_validation_2d.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/vesuvius/models/evaluation/base_metric.py:17: in update
+    result = self.compute(pred, gt, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/vesuvius/models/evaluation/voi.py:39: in compute
+    return compute_voi(
+src/vesuvius/models/evaluation/voi.py:238: in compute_voi
+    result = _compute_voi_3d(
+src/vesuvius/models/evaluation/voi.py:85: in _compute_voi_3d
+    slc = _bbox3d(union)
+          ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+mask = array([[ True,  True, False, ..., False, False, False],
+       [ True,  True, False, ...,  True, False, False],
+      ...True, False,  True, ..., False, False, False],
+       [ True, False,  True, ..., False, False, False]], shape=(32, 32))
+
+    def _bbox3d(mask: np.ndarray) -> Optional[Tuple[slice, slice, slice]]:
+        """Compute 3D bounding box of binary mask."""
+>       assert mask.ndim == 3
+               ^^^^^^^^^^^^^^
+E       AssertionError
+
+src/vesuvius/models/evaluation/voi.py:52: AssertionError
+________ test_2d_voi_equals_voi_of_the_same_patch_as_a_one_slice_volume ________
+
+    def test_2d_voi_equals_voi_of_the_same_patch_as_a_one_slice_volume():
+        pred, gt = _batch()
+    
+>       voi_2d = compute_voi(pred, gt, ignore_index=2)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/napari_trainer/test_validation_2d.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/vesuvius/models/evaluation/voi.py:238: in compute_voi
+    result = _compute_voi_3d(
+src/vesuvius/models/evaluation/voi.py:85: in _compute_voi_3d
+    slc = _bbox3d(union)
+          ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+mask = array([[ True,  True, False, ..., False, False, False],
+       [ True,  True, False, ...,  True, False, False],
+      ...True, False,  True, ..., False, False, False],
+       [ True, False,  True, ..., False, False, False]], shape=(32, 32))
+
+    def _bbox3d(mask: np.ndarray) -> Optional[Tuple[slice, slice, slice]]:
+        """Compute 3D bounding box of binary mask."""
+>       assert mask.ndim == 3
+               ^^^^^^^^^^^^^^
+E       AssertionError
+
+src/vesuvius/models/evaluation/voi.py:52: AssertionError
+=============================== warnings summary ===============================
+../../../venv/lib/python3.13/site-packages/torch/jit/_script.py:1643
+  <work>/fixwork/venv/lib/python3.13/site-packages/torch/jit/_script.py:1643: FutureWarning: `torch.jit.interface` is deprecated. Please use `torch.compile` instead.
+    warnings.warn(
+
+../../../venv-napari/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:300: 24 warnings
+  <work>/fixwork/venv-napari/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:300: PydanticDeprecatedSince20: `json_encoders` is deprecated. See https://pydantic.dev/docs/validation/2.14/concepts/serialization/#custom-serializers for alternatives. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+_______________ test_checkpoint_config_wins_over_the_gui_config ________________
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size (32, 32)
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+_____________ test_gui_config_is_used_for_a_checkpoint_without_one _____________
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using model configuration from config manager
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+________________ test_extra_checkpoint_tensors_are_not_rejected ________________
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size (32, 32)
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+______________________ test_main_loads_the_default_config ______________________
+----------------------------- Captured stdout call -----------------------------
+Detected 3D patch size (128, 128, 128), setting 3D operations
+Default config loaded from <work>/fixwork/c866rev/tree_c/vesuvius/src/vesuvius/models/configuration/single_task/ps128_dicece.yaml
+________________ test_run_training_trains_on_the_viewer_layers _________________
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Exported 'vol01' + 'vol01_ink' as image0, target 'ink'
+Wrote the viewer's layers to /dev/shm/c866pt_c/test_run_training_trains_on_th0/napari_trainer_h0ozo751/data (targets: ink)
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.1.
+Target patch size: (32, 32) (full resolution)
+Will attempt to use downsample level 2 for faster processing (would use patch size (8, 8))
+
+Processing volume 'image0' (1/1)
+Found 4 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 4
+4 patches have at least 10.0% labeled voxels
+
+Starting training...
+Removed the exported layers (/dev/shm/c866pt_c/test_run_training_trains_on_th0/napari_trainer_h0ozo751)
+----------------------------- Captured stderr call -----------------------------
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:34:25,211] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 2 for volume 'image0'
+[2026-11-26 04:34:25,212] INFO:vesuvius.models.datasets.find_valid_patches: Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+[2026-11-26 04:34:25,212] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:34:25,212] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 748.58it/s]
+------------------------------ Captured log call -------------------------------
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:762 Resolving downsample level 2 for volume 'image0'
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:788 Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:854 Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:1363 Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+_______________ test_training_uses_a_copy_of_the_selected_config _______________
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Exported 'vol01' + 'vol01_surface' as image0, target 'surface'
+Wrote the viewer's layers to /dev/shm/c866pt_c/test_training_uses_a_copy_of_t0/napari_trainer_688lyn3h/data (targets: surface)
+  - Set loss function for target 'surface' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.1.
+Target patch size: (32, 32) (full resolution)
+Will attempt to use downsample level 2 for faster processing (would use patch size (8, 8))
+
+Processing volume 'image0' (1/1)
+Found 4 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 4
+4 patches have at least 10.0% labeled voxels
+
+Starting training...
+Removed the exported layers (/dev/shm/c866pt_c/test_training_uses_a_copy_of_t0/napari_trainer_688lyn3h)
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Exported 'vol01' + 'vol01_ink' as image0, target 'ink'
+Wrote the viewer's layers to /dev/shm/c866pt_c/test_training_uses_a_copy_of_t0/napari_trainer_3ip4q6lu/data (targets: ink)
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.1.
+Target patch size: (32, 32) (full resolution)
+Will attempt to use downsample level 2 for faster processing (would use patch size (8, 8))
+
+Processing volume 'image0' (1/1)
+Found 4 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 4
+4 patches have at least 10.0% labeled voxels
+
+Starting training...
+Removed the exported layers (/dev/shm/c866pt_c/test_training_uses_a_copy_of_t0/napari_trainer_3ip4q6lu)
+----------------------------- Captured stderr call -----------------------------
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:34:25,235] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 2 for volume 'image0'
+[2026-11-26 04:34:25,235] INFO:vesuvius.models.datasets.find_valid_patches: Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+[2026-11-26 04:34:25,236] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:34:25,237] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 654.64it/s]
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:34:25,249] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 2 for volume 'image0'
+[2026-11-26 04:34:25,249] INFO:vesuvius.models.datasets.find_valid_patches: Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+[2026-11-26 04:34:25,249] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:34:25,250] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 662.71it/s]
+------------------------------ Captured log call -------------------------------
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:762 Resolving downsample level 2 for volume 'image0'
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:788 Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:854 Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:1363 Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:762 Resolving downsample level 2 for volume 'image0'
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:788 Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:854 Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:1363 Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+_________ test_label_layer_pairs_with_the_longest_matching_image_name __________
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Exported 'vol_crop' + 'vol_crop_ink' as image0, target 'ink'
+Wrote the viewer's layers to /dev/shm/c866pt_c/test_label_layer_pairs_with_th0/napari_trainer_fzaw65_0/data (targets: ink)
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.1.
+Target patch size: (32, 32) (full resolution)
+Will attempt to use downsample level 2 for faster processing (would use patch size (8, 8))
+
+Processing volume 'image0' (1/1)
+Found 4 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 4
+4 patches have at least 10.0% labeled voxels
+
+Starting training...
+Removed the exported layers (/dev/shm/c866pt_c/test_label_layer_pairs_with_th0/napari_trainer_fzaw65_0)
+----------------------------- Captured stderr call -----------------------------
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:34:25,266] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 2 for volume 'image0'
+[2026-11-26 04:34:25,266] INFO:vesuvius.models.datasets.find_valid_patches: Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+[2026-11-26 04:34:25,266] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:34:25,267] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 910.62it/s]
+------------------------------ Captured log call -------------------------------
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:762 Resolving downsample level 2 for volume 'image0'
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:788 Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:854 Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:1363 Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+_______ test_label_layer_on_another_grid_is_rejected[<lambda>-translate] _______
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+_________ test_label_layer_on_another_grid_is_rejected[<lambda>-scale] _________
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+_________ test_label_layer_on_another_grid_is_rejected[<lambda>-shape] _________
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+_ test_configs_that_read_other_data_are_rejected[dataset_config0-dataset_config.volumes] _
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+_ test_configs_that_read_other_data_are_rejected[dataset_config1-cross_frame] __
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+__________ test_exports_stay_in_a_run_directory_removed_after_the_run __________
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Exported '../../escaped' + '../../escaped_ink' as image0, target 'ink'
+Wrote the viewer's layers to /dev/shm/c866pt_c/test_exports_stay_in_a_run_dir0/napari_trainer_b3q3l8z_/data (targets: ink)
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.1.
+Target patch size: (32, 32) (full resolution)
+Will attempt to use downsample level 2 for faster processing (would use patch size (8, 8))
+
+Processing volume 'image0' (1/1)
+Found 4 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 4
+4 patches have at least 10.0% labeled voxels
+
+Starting training...
+Removed the exported layers (/dev/shm/c866pt_c/test_exports_stay_in_a_run_dir0/napari_trainer_b3q3l8z_)
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Exported '../../escaped' + '../../escaped_ink' as image0, target 'ink'
+Wrote the viewer's layers to /dev/shm/c866pt_c/test_exports_stay_in_a_run_dir0/napari_trainer_hnteoj9e/data (targets: ink)
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.1.
+Target patch size: (32, 32) (full resolution)
+Will attempt to use downsample level 2 for faster processing (would use patch size (8, 8))
+
+Processing volume 'image0' (1/1)
+Found 4 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 4
+4 patches have at least 10.0% labeled voxels
+
+Starting training...
+
+Error during training: training failed
+Removed the exported layers (/dev/shm/c866pt_c/test_exports_stay_in_a_run_dir0/napari_trainer_hnteoj9e)
+Starting training process...
+Using images and labels from current viewer
+----------------------------- Captured stderr call -----------------------------
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:34:25,321] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 2 for volume 'image0'
+[2026-11-26 04:34:25,321] INFO:vesuvius.models.datasets.find_valid_patches: Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+[2026-11-26 04:34:25,321] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:34:25,322] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 886.18it/s]
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:34:25,330] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 2 for volume 'image0'
+[2026-11-26 04:34:25,330] INFO:vesuvius.models.datasets.find_valid_patches: Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+[2026-11-26 04:34:25,330] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:34:25,331] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 883.01it/s]
+Traceback (most recent call last):
+  File "<work>/fixwork/c866rev/tree_c/vesuvius/src/vesuvius/napari_trainer/main_window.py", line 151, in run_training
+    trainer.train()
+    ~~~~~~~~~~~~~^^
+  File "<work>/fixwork/c866rev/tree_c/vesuvius/tests/napari_trainer/test_main_window.py", line 273, in train
+    raise RuntimeError("training failed")
+RuntimeError: training failed
+------------------------------ Captured log call -------------------------------
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:762 Resolving downsample level 2 for volume 'image0'
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:788 Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:854 Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:1363 Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:762 Resolving downsample level 2 for volume 'image0'
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:788 Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:854 Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:1363 Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+_______________ test_min_labeled_percentage_selects_the_patches ________________
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Exported 'vol01' + 'vol01_ink' as image0, target 'ink'
+Wrote the viewer's layers to /dev/shm/c866pt_c/test_min_labeled_percentage_se0/napari_trainer_c19qplqg/data (targets: ink)
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.0.
+Target patch size: (32, 32) (full resolution)
+Will attempt to use downsample level 2 for faster processing (would use patch size (8, 8))
+
+Processing volume 'image0' (1/1)
+Found 4 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 4
+4 patches have at least 0.0% labeled voxels
+
+Starting training...
+Removed the exported layers (/dev/shm/c866pt_c/test_min_labeled_percentage_se0/napari_trainer_c19qplqg)
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Exported 'vol01' + 'vol01_ink' as image0, target 'ink'
+Wrote the viewer's layers to /dev/shm/c866pt_c/test_min_labeled_percentage_se0/napari_trainer_son4_a7p/data (targets: ink)
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.01.
+Target patch size: (32, 32) (full resolution)
+Will attempt to use downsample level 2 for faster processing (would use patch size (8, 8))
+
+Processing volume 'image0' (1/1)
+Found 1 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 1
+1 patches have at least 1.0% labeled voxels
+
+Starting training...
+Removed the exported layers (/dev/shm/c866pt_c/test_min_labeled_percentage_se0/napari_trainer_son4_a7p)
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Exported 'vol01' + 'vol01_ink' as image0, target 'ink'
+Wrote the viewer's layers to /dev/shm/c866pt_c/test_min_labeled_percentage_se0/napari_trainer_4fi6wyij/data (targets: ink)
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.1.
+Target patch size: (32, 32) (full resolution)
+Will attempt to use downsample level 2 for faster processing (would use patch size (8, 8))
+
+Processing volume 'image0' (1/1)
+Found 0 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 0
+
+Error during training: No 32x32 patch of the paired layers has at least 10.0% labeled voxels; lower Min Labeled Percentage, the patch size, or label more.
+Removed the exported layers (/dev/shm/c866pt_c/test_min_labeled_percentage_se0/napari_trainer_4fi6wyij)
+----------------------------- Captured stderr call -----------------------------
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:34:25,343] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 2 for volume 'image0'
+[2026-11-26 04:34:25,343] INFO:vesuvius.models.datasets.find_valid_patches: Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+[2026-11-26 04:34:25,343] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:34:25,344] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 901.23it/s]
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:34:25,352] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 2 for volume 'image0'
+[2026-11-26 04:34:25,352] INFO:vesuvius.models.datasets.find_valid_patches: Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+[2026-11-26 04:34:25,352] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:34:25,353] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 1 valid positions identified (25.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 922.43it/s]
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:34:25,360] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 2 for volume 'image0'
+[2026-11-26 04:34:25,360] INFO:vesuvius.models.datasets.find_valid_patches: Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+[2026-11-26 04:34:25,360] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:34:25,361] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 0 valid positions identified (0.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 958.92it/s]
+Traceback (most recent call last):
+  File "<work>/fixwork/c866rev/tree_c/vesuvius/src/vesuvius/napari_trainer/main_window.py", line 145, in run_training
+    _write_patch_cache(mgr, min_labeled_percentage)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<work>/fixwork/c866rev/tree_c/vesuvius/src/vesuvius/napari_trainer/main_window.py", line 253, in _write_patch_cache
+    raise ValueError(
+        f"No {'x'.join(map(str, mgr.train_patch_size))} patch of the paired layers has at least "
+        f"{min_labeled_percentage}% labeled voxels; lower Min Labeled Percentage, the patch size, or label more.")
+ValueError: No 32x32 patch of the paired layers has at least 10.0% labeled voxels; lower Min Labeled Percentage, the patch size, or label more.
+------------------------------ Captured log call -------------------------------
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:762 Resolving downsample level 2 for volume 'image0'
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:788 Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:854 Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:1363 Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:762 Resolving downsample level 2 for volume 'image0'
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:788 Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:854 Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:1363 Volume 'image0': 1 valid positions identified (25.00% of candidates) in 0.00s
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:762 Resolving downsample level 2 for volume 'image0'
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:788 Level 2 unavailable for 'image0', using full resolution (patch size (32, 32))
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:854 Volume 'image0': downsampled array shape (64, 64), target patch (32, 32), candidate positions 4 (generated in 0.00s)
+INFO     vesuvius.models.datasets.find_valid_patches:find_valid_patches.py:1363 Volume 'image0': 0 valid positions identified (0.00% of candidates) in 0.00s
+_______________ test_3d_layers_with_patch_size_z_0_are_rejected ________________
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+_____ test_offered_losses_fit_the_default_target_and_keep_its_ignore_label _____
+----------------------------- Captured stdout call -----------------------------
+Target ink using multiple losses:
+  - DC_and_CE_loss (weight: 1.0)
+=========================== short test summary info ============================
+PASSED tests/napari_trainer/test_inference_checkpoint_config.py::test_checkpoint_config_wins_over_the_gui_config
+PASSED tests/napari_trainer/test_inference_checkpoint_config.py::test_gui_config_is_used_for_a_checkpoint_without_one
+PASSED tests/napari_trainer/test_inference_checkpoint_config.py::test_extra_checkpoint_tensors_are_not_rejected
+PASSED tests/napari_trainer/test_main_window.py::test_main_loads_the_default_config
+PASSED tests/napari_trainer/test_main_window.py::test_run_training_trains_on_the_viewer_layers
+PASSED tests/napari_trainer/test_main_window.py::test_loss_choices_are_losses_the_trainer_knows
+PASSED tests/napari_trainer/test_main_window.py::test_training_uses_a_copy_of_the_selected_config
+PASSED tests/napari_trainer/test_main_window.py::test_label_layer_pairs_with_the_longest_matching_image_name
+PASSED tests/napari_trainer/test_main_window.py::test_label_layer_on_another_grid_is_rejected[<lambda>-translate]
+PASSED tests/napari_trainer/test_main_window.py::test_label_layer_on_another_grid_is_rejected[<lambda>-scale]
+PASSED tests/napari_trainer/test_main_window.py::test_label_layer_on_another_grid_is_rejected[<lambda>-shape]
+PASSED tests/napari_trainer/test_main_window.py::test_configs_that_read_other_data_are_rejected[dataset_config0-dataset_config.volumes]
+PASSED tests/napari_trainer/test_main_window.py::test_configs_that_read_other_data_are_rejected[dataset_config1-cross_frame]
+PASSED tests/napari_trainer/test_main_window.py::test_exports_stay_in_a_run_directory_removed_after_the_run
+PASSED tests/napari_trainer/test_main_window.py::test_min_labeled_percentage_selects_the_patches
+PASSED tests/napari_trainer/test_main_window.py::test_3d_layers_with_patch_size_z_0_are_rejected
+PASSED tests/napari_trainer/test_main_window.py::test_offered_losses_fit_the_default_target_and_keep_its_ignore_label
+FAILED tests/napari_trainer/test_inference_checkpoint_config.py::test_per_target_decoder_layout_is_restored
+FAILED tests/napari_trainer/test_inference_checkpoint_config.py::test_nested_legacy_config_is_unwrapped
+FAILED tests/napari_trainer/test_inference_checkpoint_config.py::test_primus_checkpoint_infers_with_its_input_shape
+FAILED tests/napari_trainer/test_inference_checkpoint_config.py::test_missing_weights_stop_before_a_prediction
+FAILED tests/napari_trainer/test_main_window.py::test_default_config_is_package_data
+FAILED tests/napari_trainer/test_validation_2d.py::test_validation_metrics_accept_2d_patches
+FAILED tests/napari_trainer/test_validation_2d.py::test_2d_voi_equals_voi_of_the_same_patch_as_a_one_slice_volume
+7 failed, 17 passed, 25 warnings in 8.73s

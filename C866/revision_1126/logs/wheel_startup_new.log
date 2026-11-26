@@ -1,0 +1,6 @@
+WARNING: QOpenGLWidget is not supported on this platform.
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+Detected 3D patch size (128, 128, 128), setting 3D operations
+Default config loaded from /dev/shm/c866whl_new/unpacked/vesuvius/models/configuration/single_task/ps128_dicece.yaml
+RESULT {"main_window": "/dev/shm/c866whl_new/unpacked/vesuvius/napari_trainer/main_window.py", "docked_widgets": ["config file", "inference", "training"], "config": "/dev/shm/c866whl_new/unpacked/vesuvius/models/configuration/single_task/ps128_dicece.yaml", "main": "returned"}

@@ -1,0 +1,83 @@
+WARNING: QOpenGLWidget is not supported on this platform.
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/jit/_script.py:1643: FutureWarning: `torch.jit.interface` is deprecated. Please use `torch.compile` instead.
+  warnings.warn(
+Detected 3D patch size (128, 128, 128), setting 3D operations
+Default config loaded from <work>/fixwork/c866rev/tree_launchfix/vesuvius/src/vesuvius/models/configuration/single_task/ps128_dicece.yaml
+Using global config manager from main_window
+Using dimensionality (3D) from ConfigManager
+--- Initializing Primus architecture ---
+Using Primus-M configuration
+Using decoder normalization: LayerNormNd
+Using decoder activation: GELU
+Primus task 'ink' configured with shared decoder + head (2 channels)
+Primus network initialized with configuration:
+  model_name: Model
+  architecture_type: primus_m
+  primus_variant: M
+  patch_embed_size: [8, 8, 8]
+  input_shape: (128, 128, 128)
+  in_channels: 1
+  targets: {'ink': {'activation': 'none', 'ignore_label': 2, 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0}], 'out_channels': 2}}
+  target_z_projection: {}
+  decoder_norm: LayerNormNd
+  decoder_act: GELU
+  separate_decoders: False
+  decoder_head_channels: 32
+  drop_path_rate: 0.0
+  patch_drop_rate: 0.0
+  proj_drop_rate: 0.0
+  attn_drop_rate: 0.0
+  num_register_tokens: 0
+  use_rot_pos_emb: True
+  use_abs_pos_embed: True
+  pos_emb_type: rope
+  mlp_ratio: 2.6666666666666665
+  init_values: 0.1
+  scale_attn_inner: True
+Loading weights from 'model' key in checkpoint
+Warning: Error loading state dict: Error(s) in loading state_dict for NetworkFromConfig:
+	size mismatch for task_heads.ink.weight: copying a param with shape torch.Size([2, 8, 1, 1, 1]) from checkpoint, the shape in current model is torch.Size([2, 32, 1, 1, 1]).
+Attempting to continue with partially loaded weights
+Using patch_size from model_config: (32, 32, 32)
+Final roi_size for inference: (32, 32, 32)
+Data shape: (64, 128, 128), Using 3D inference
+Generated Gaussian map with shape (1, 32, 32, 32), min: 0.0000, max: 1.0000
+Sliding window:   0%|          | 0/38 [00:00<?, ?it/s]Sliding window:   0%|          | 0/38 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "<work>/fixwork/c866rev/tree_launchfix/vesuvius/src/vesuvius/napari_trainer/inference_widget.py", line 52, in inference_widget
+    results = run_inference(
+        viewer=viewer,
+    ...<5 lines>...
+        activation_type=activation_type.value
+    )
+  File "<work>/fixwork/c866rev/tree_launchfix/vesuvius/src/vesuvius/napari_trainer/inference.py", line 226, in run_inference
+    results = sliding_window_inference(model, np.asarray(image_data), roi_size, overlap=overlap,
+                                       batch_size=batch_size, sigma_scale=sigma_scale,
+                                       post_transform=post_transform)
+  File "<work>/fixwork/c866rev/tree_launchfix/vesuvius/src/vesuvius/napari_trainer/inference.py", line 157, in sliding_window_inference
+    for name, pred in _as_outputs(model(batch)).items():
+                                  ~~~~~^^^^^^^
+  File "<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "<work>/fixwork/c866rev/tree_launchfix/vesuvius/src/vesuvius/models/build/build_network_from_config.py", line 1609, in forward
+    features = self.shared_encoder(x)
+  File "<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "<work>/fixwork/c866rev/tree_launchfix/vesuvius/src/vesuvius/models/build/primus_wrapper.py", line 178, in forward
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: PrimusEncoder received a runtime spatial shape that does not match the configured input_shape. Expected (128, 128, 128), got (32, 32, 32). Primus uses fixed positional embeddings and requires a consistent patch size.
+inference error: PrimusEncoder received a runtime spatial shape that does not match the configured input_shape. Expected (128, 128, 128), got (32, 32, 32). Primus uses fixed positional embeddings and requires a consistent patch size.
+RESULT {"seed": 0, "checkpoint_tensors": 90, "tensors_not_loaded_from_checkpoint": 89, "output_layers": {}, "main": "returned"}

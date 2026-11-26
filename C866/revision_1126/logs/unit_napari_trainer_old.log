@@ -1,0 +1,1830 @@
+..FFFF....FFFFFFFFFFFFFF                                                 [100%]
+=================================== FAILURES ===================================
+__________________ test_per_target_decoder_layout_is_restored __________________
+
+tmp_path = PosixPath('/dev/shm/c866pt_old/test_per_target_decoder_layout0')
+
+    def test_per_target_decoder_layout_is_restored(tmp_path):
+        # ink uses the shared decoder, surface its own: the saved config says separate_decoders: true
+        targets = {"ink": {"out_channels": 2, "activation": "none"},
+                   "surface": {"out_channels": 2, "activation": "none", "separate_decoder": True}}
+        torch.manual_seed(0)
+        trained = NetworkFromConfig(_manager([8, 16, 32], targets))
+        assert trained.final_config["separate_decoders"] is True
+        path = tmp_path / "mixed.pth"
+        torch.save({"model": trained.state_dict(), "model_config": trained.final_config}, path)
+    
+        model, _ = ModelLoader(path).load()
+    
+>       assert _differing_tensors(model, trained.state_dict()) == []
+E       AssertionError: assert ['task_heads....rm.bias', ...] == []
+E         
+E         Left contains 22 more items, first extra item: 'task_heads.ink.weight'
+E         Use -v to get more diff
+
+tests/napari_trainer/test_inference_checkpoint_config.py:86: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+Task 'surface' configured with separate decoder (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}, 'surface': {'out_channels': 2, 'activation': 'none', 'separate_decoder': True}}
+  target_z_projection: {}
+  separate_decoders: True
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size (32, 32)
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with separate decoder (2 channels)
+Task 'surface' configured with separate decoder (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}, 'surface': {'out_channels': 2, 'activation': 'none', 'separate_decoder': True}}
+  target_z_projection: {}
+  separate_decoders: True
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+____________________ test_nested_legacy_config_is_unwrapped ____________________
+
+tmp_path = PosixPath('/dev/shm/c866pt_old/test_nested_legacy_config_is_u0')
+
+    def test_nested_legacy_config_is_unwrapped(tmp_path):
+        trained_mgr = _manager([8, 16, 32], {"ink": {"out_channels": 2, "activation": "none"}})
+        torch.manual_seed(0)
+        trained = NetworkFromConfig(trained_mgr)
+        model_config = {k: v for k, v in trained_mgr.model_config.items() if k not in ("targets", "patch_size")}
+        legacy = {"model_config": model_config, "patch_size": [32, 32], "batch_size": 1, "in_channels": 1,
+                  "targets": {"ink": {"out_channels": 2, "activation": "none"}}}
+        path = tmp_path / "legacy.pth"
+        torch.save({"model": trained.state_dict(), "config": legacy}, path)
+    
+        model, config = ModelLoader(path).load()
+    
+>       assert _differing_tensors(model, trained.state_dict()) == []
+E       AssertionError: assert ['shared_enco....0.bias', ...] == []
+E         
+E         Left contains 89 more items, first extra item: 'shared_encoder.stem.convs.0.conv.weight'
+E         Use -v to get more diff
+
+tests/napari_trainer/test_inference_checkpoint_config.py:104: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size [32, 32]
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Configuring network from config file ---
+Auto-configured n_blocks_per_stage: [1, 3, 4, 6, 6, 6, 6]
+Using 2D kernel defaults: [3, 3]
+Using 2D pool defaults: [1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [32, 64, 128, 256, 320, 320, 320]
+  num_stages: 7
+  n_blocks_per_stage: [1, 3, 4, 6, 6, 6, 6]
+  n_conv_per_stage_decoder: [1, 1, 1, 1, 1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 32
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: [32, 32]
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: None
+  must_be_divisible_by: None
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Warning: Error loading state dict: Error(s) in loading state_dict for NetworkFromConfig:
+	size mismatch for shared_encoder.stem.convs.0.conv.weight: copying a param with shape torch.Size([8, 1, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 1, 3, 3]).
+	size mismatch for shared_encoder.stem.convs.0.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.0.weight: copying a param with shape torch.Size([8, 1, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 1, 3, 3]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stem.convs.0.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.conv.weight: copying a param with shape torch.Size([8, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.0.weight: copying a param with shape torch.Size([8, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv1.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.conv.weight: copying a param with shape torch.Size([8, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.0.weight: copying a param with shape torch.Size([8, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([32, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.0.blocks.0.conv2.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([32]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.conv.weight: copying a param with shape torch.Size([16, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.conv.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.0.weight: copying a param with shape torch.Size([16, 8, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 32, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv1.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.conv.weight: copying a param with shape torch.Size([16, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 64, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.conv.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.0.weight: copying a param with shape torch.Size([16, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([64, 64, 3, 3]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.1.blocks.0.conv2.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([64]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.conv.weight: copying a param with shape torch.Size([32, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([128, 64, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.conv.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.norm.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.norm.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.0.weight: copying a param with shape torch.Size([32, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([128, 64, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.0.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.1.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv1.all_modules.1.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.conv.weight: copying a param with shape torch.Size([32, 32, 3, 3]) from checkpoint, the shape in current model is torch.Size([128, 128, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.conv.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.norm.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.norm.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.0.weight: copying a param with shape torch.Size([32, 32, 3, 3]) from checkpoint, the shape in current model is torch.Size([128, 128, 3, 3]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.0.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.1.weight: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for shared_encoder.stages.2.blocks.0.conv2.all_modules.1.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([128]).
+	size mismatch for task_heads.ink.weight: copying a param with shape torch.Size([2, 8, 1, 1]) from checkpoint, the shape in current model is torch.Size([2, 32, 1, 1]).
+	size mismatch for shared_decoder.stages.0.convs.0.conv.weight: copying a param with shape torch.Size([16, 32, 3, 3]) from checkpoint, the shape in current model is torch.Size([320, 640, 3, 3]).
+	size mismatch for shared_decoder.stages.0.convs.0.conv.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.norm.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.norm.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.0.weight: copying a param with shape torch.Size([16, 32, 3, 3]) from checkpoint, the shape in current model is torch.Size([320, 640, 3, 3]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.1.weight: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.0.convs.0.all_modules.1.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.conv.weight: copying a param with shape torch.Size([8, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([320, 640, 3, 3]).
+	size mismatch for shared_decoder.stages.1.convs.0.conv.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.norm.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.norm.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.0.weight: copying a param with shape torch.Size([8, 16, 3, 3]) from checkpoint, the shape in current model is torch.Size([320, 640, 3, 3]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.0.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.1.weight: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.stages.1.convs.0.all_modules.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.transpconvs.0.weight: copying a param with shape torch.Size([32, 16, 2, 2]) from checkpoint, the shape in current model is torch.Size([320, 320, 1, 1]).
+	size mismatch for shared_decoder.transpconvs.0.bias: copying a param with shape torch.Size([16]) from checkpoint, the shape in current model is torch.Size([320]).
+	size mismatch for shared_decoder.transpconvs.1.weight: copying a param with shape torch.Size([16, 8, 2, 2]) from checkpoint, the shape in current model is torch.Size([320, 320, 1, 1]).
+	size mismatch for shared_decoder.transpconvs.1.bias: copying a param with shape torch.Size([8]) from checkpoint, the shape in current model is torch.Size([320]).
+Attempting to continue with partially loaded weights
+______________ test_primus_checkpoint_infers_with_its_input_shape ______________
+
+tmp_path = PosixPath('/dev/shm/c866pt_old/test_primus_checkpoint_infers_0')
+no_gui_config = None
+
+    def test_primus_checkpoint_infers_with_its_input_shape(tmp_path, no_gui_config):
+        mgr = SimpleNamespace(targets={"ink": {"out_channels": 2, "activation": "none"}}, train_patch_size=(16, 16, 16),
+                              train_batch_size=1, in_channels=1, autoconfigure=False, model_name="primus",
+                              enable_deep_supervision=False,
+                              model_config={"architecture_type": "primus_s", "input_shape": (16, 16, 16),
+                                            "patch_embed_size": (8, 8, 8)})
+        torch.manual_seed(0)
+        trained = NetworkFromConfig(mgr)
+        assert "patch_size" not in trained.final_config
+        path = tmp_path / "primus.pth"
+        torch.save({"model": trained.state_dict(), "model_config": trained.final_config}, path)
+        viewer = _Viewer()
+        image = SimpleNamespace(name="vol", data=np.random.default_rng(0).random((20, 24, 16)).astype(np.float32))
+    
+>       run_inference(viewer, image, str(path))
+
+tests/napari_trainer/test_inference_checkpoint_config.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+viewer = <tests.napari_trainer.test_inference_checkpoint_config._Viewer object at 0x7fff48c8f8c0>
+layer = namespace(name='vol', data=array([[[0.6369617 , 0.26978672, 0.04097353, ..., 0.03358557,
+         0.72965544, 0.175655...97817, 0.17733009, 0.6091657 , ..., 0.01900586,
+         0.9410005 , 0.89085716]]], shape=(20, 24, 16), dtype=float32))
+checkpoint_path = '/dev/shm/c866pt_old/test_primus_checkpoint_infers_0/primus.pth'
+roi_size = None, overlap = 0.25, batch_size = 2, sigma_scale = 8.0
+activation_type = 'none'
+
+    def run_inference(viewer: napari.Viewer,
+                      layer: napari.layers.Layer,
+                      checkpoint_path: str,
+                      roi_size: Optional[Tuple[int, ...]] = None,
+                      overlap: float = 0.25,
+                      batch_size: int = 2,
+                      sigma_scale: float = 8.0,
+                      activation_type: str = "none") -> List[napari.layers.Layer]:
+    
+        config_manager = None
+        try:
+            from .main_window import _config_manager
+            if _config_manager is not None:
+                config_manager = _config_manager
+                print("Using global config manager from main_window")
+        except (ImportError, AttributeError):
+            print("No global config manager available")
+    
+        loader = ModelLoader(checkpoint_path, config_manager=config_manager)
+        model, model_config = loader.load()
+        model_name = Path(checkpoint_path).stem
+        image_data = layer.data
+    
+        if roi_size is None:
+            for key in ('patch_size', 'train_patch_size'):
+                if key in model_config:
+                    roi_size = tuple(model_config[key])
+                    print(f"Using {key} from model_config: {roi_size}")
+                    break
+            else:
+>               raise ValueError("No patch_size or train_patch_size found in model config. Cannot proceed with inference.")
+E               ValueError: No patch_size or train_patch_size found in model config. Cannot proceed with inference.
+
+src/vesuvius/napari_trainer/inference.py:211: ValueError
+----------------------------- Captured stdout call -----------------------------
+Using 3D operations based on patch_size (16, 16, 16)
+--- Initializing Primus architecture ---
+Using Primus-S configuration
+Using decoder normalization: LayerNormNd
+Using decoder activation: GELU
+Primus task 'ink' configured with shared decoder + head (2 channels)
+Primus network initialized with configuration:
+  model_name: primus
+  architecture_type: primus_s
+  primus_variant: S
+  patch_embed_size: (8, 8, 8)
+  input_shape: (16, 16, 16)
+  in_channels: 1
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  decoder_norm: LayerNormNd
+  decoder_act: GELU
+  separate_decoders: False
+  decoder_head_channels: 32
+  drop_path_rate: 0.0
+  patch_drop_rate: 0.0
+  proj_drop_rate: 0.0
+  attn_drop_rate: 0.0
+  num_register_tokens: 0
+  use_rot_pos_emb: True
+  use_abs_pos_embed: True
+  pos_emb_type: rope
+  mlp_ratio: 2.6666666666666665
+  init_values: 0.1
+  scale_attn_inner: True
+Using 3D operations based on patch_size (128, 128, 128)
+--- Initializing Primus architecture ---
+Using Primus-S configuration
+Using decoder normalization: LayerNormNd
+Using decoder activation: GELU
+Primus task 'ink' configured with shared decoder + head (2 channels)
+Primus network initialized with configuration:
+  model_name: Loaded_Model
+  architecture_type: primus_s
+  primus_variant: S
+  patch_embed_size: (8, 8, 8)
+  input_shape: (16, 16, 16)
+  in_channels: 1
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  decoder_norm: LayerNormNd
+  decoder_act: GELU
+  separate_decoders: False
+  decoder_head_channels: 32
+  drop_path_rate: 0.0
+  patch_drop_rate: 0.0
+  proj_drop_rate: 0.0
+  attn_drop_rate: 0.0
+  num_register_tokens: 0
+  use_rot_pos_emb: True
+  use_abs_pos_embed: True
+  pos_emb_type: rope
+  mlp_ratio: 2.6666666666666665
+  init_values: 0.1
+  scale_attn_inner: True
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+________________ test_missing_weights_stop_before_a_prediction _________________
+
+tmp_path = PosixPath('/dev/shm/c866pt_old/test_missing_weights_stop_befo0')
+no_gui_config = None
+
+    def test_missing_weights_stop_before_a_prediction(tmp_path, no_gui_config):
+        torch.manual_seed(0)
+        trained = NetworkFromConfig(_manager([8, 16, 32], {"ink": {"out_channels": 2, "activation": "none"}}))
+        state = trained.state_dict()
+        dropped = next(k for k in state if k.startswith("task_heads.ink."))
+        del state[dropped]
+        path = tmp_path / "incomplete.pth"
+        torch.save({"model": state, "model_config": trained.final_config}, path)
+        viewer = _Viewer()
+        image = SimpleNamespace(name="vol", data=np.zeros((32, 32), np.float32))
+    
+>       with pytest.raises(RuntimeError, match="no weights"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/napari_trainer/test_inference_checkpoint_config.py:154: Failed
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size (32, 32)
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+Using patch_size from model_config: (32, 32)
+Final roi_size for inference: (32, 32)
+Data shape: (32, 32), Using 2D inference
+Generated Gaussian map with shape (1, 32, 32), min: 0.0000, max: 1.0000
+Inference completed. Added 1 new layers to the viewer.
+----------------------------- Captured stderr call -----------------------------
+Sliding window:   0%|          | 0/1 [00:00<?, ?it/s]Sliding window: 100%|██████████| 1/1 [00:00<00:00, 272.53it/s]
+_______________ test_training_uses_a_copy_of_the_selected_config _______________
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = [namespace(mgr=<vesuvius.models.configuration.config_manager.ConfigManager object at 0x7fff3dc156d0>, data_path=PosixP...})], targets={'ink': {'out_channels': 2, 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}]}})]
+
+    def test_training_uses_a_copy_of_the_selected_config(main_window, recorded):
+        selected = main_window._config_manager
+        before = (deepcopy(selected.convert_to_dict()), selected.data_path, selected.train_patch_size)
+    
+        _viewer(*_pair(target="surface"))
+        _train(main_window)
+        _viewer(*_pair(target="ink"))
+        _train(main_window)
+    
+        assert main_window._config_manager is selected
+>       assert (selected.convert_to_dict(), selected.data_path, selected.train_patch_size) == before
+E       AssertionError: assert ({'tr_setup':...3'), (32, 32)) == ({'tr_setup':...28, 128, 128))
+E         
+E         At index 0 diff: {'tr_setup': {}, 'tr_config': {'patch_size': [32, 32], 'enable_deep_supervision': False, 'max_epoch': 1}, 'model_config': {'architecture_type': 'primus_m', 'patch_embed_size': [8, 8, 8], 'conv_op': 'nn.Conv2d', 'norm_op': 'nn.InstanceNorm2d', 'targets': {'ink': {'out_channels': 2, 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}]}}}, 'dataset_config': {'valid_patch_find_resolution': 2, 'valid_patch_value': 1, 'min_labeled_ratio': 0.1, 'min_bbox_percent': 0.9, 'normalization_scheme': 'zscore', 'skip_patch_validation': False, 'ome...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:200: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_training_uses_a_copy_of_t0/napari_trainer_cu5b00vm (targets: surface)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'surface' to nnUNet_DC_and_CE_loss
+
+Starting training...
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_training_uses_a_copy_of_t0/napari_trainer_zx5i1ml3 (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+------------------------------ Captured log call -------------------------------
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+_________ test_label_layer_pairs_with_the_longest_matching_image_name __________
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = []
+
+    def test_label_layer_pairs_with_the_longest_matching_image_name(main_window, recorded):
+        rng = np.random.default_rng(1)
+        vol = _Image(rng.integers(0, 255, size=(64, 64)).astype(np.uint8), "vol")
+        crop, label = _pair("vol_crop")
+    
+        _viewer(vol, crop, label)
+>       _train(main_window)
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:186: in _train
+    main_window.run_training(patch_size_z=z, patch_size_x=32, patch_size_y=32,
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py:165: in run_training
+    trainer.train()
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:160: in train
+    dataset = ZarrDataset(mgr=self.mgr, is_training=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py:147: in __init__
+    self._discover_and_load_volumes()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <vesuvius.models.datasets.zarr_dataset.ZarrDataset object at 0x7fff3dc17ed0>
+
+    def _discover_and_load_volumes(self) -> None:
+        """Discover and load all OME-Zarr volumes."""
+        volumes_cfg = getattr(self.mgr, "dataset_config", {}).get("volumes")
+        if volumes_cfg:
+            self._load_explicit_volumes(volumes_cfg)
+            return
+    
+        images_dir = self.data_path / "images"
+        labels_dir = self.data_path / "labels"
+    
+        if not images_dir.exists():
+            raise FileNotFoundError(f"Images directory not found: {images_dir}")
+    
+        # Find all image zarrs
+        image_zarrs = {
+            p.stem: p for p in images_dir.iterdir()
+            if p.is_dir() and p.suffix == ".zarr"
+        }
+    
+        if not image_zarrs:
+            raise ValueError(f"No .zarr directories found in {images_dir}")
+    
+        logger.info("Found %d image volumes in %s", len(image_zarrs), images_dir)
+    
+        # Build volume list
+        for volume_id, image_path in sorted(image_zarrs.items()):
+            label_paths: Dict[str, Optional[Path]] = {}
+            label_arrays: Dict[str, Optional[ZarrReader]] = {}
+            has_any_label = False
+    
+            for target in self.target_names:
+                label_path = labels_dir / f"{volume_id}_{target}.zarr"
+                if label_path.exists():
+                    label_paths[target] = label_path
+                    label_arrays[target] = self._open_zarr(label_path)
+                    has_any_label = True
+                else:
+                    if not self.allow_unlabeled_data:
+>                       raise FileNotFoundError(
+                            f"Label not found: {label_path} (set allow_unlabeled_data=True to allow)"
+                        )
+E                       FileNotFoundError: Label not found: /dev/shm/c866pt_old/test_label_layer_pairs_with_th0/napari_trainer_iv3gh1b5/labels/vol_ink.zarr (set allow_unlabeled_data=True to allow)
+
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py:202: FileNotFoundError
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_label_layer_pairs_with_th0/napari_trainer_iv3gh1b5 (targets: crop_ink, ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'crop_ink' to nnUNet_DC_and_CE_loss
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+
+Error during training: Label not found: /dev/shm/c866pt_old/test_label_layer_pairs_with_th0/napari_trainer_iv3gh1b5/labels/vol_ink.zarr (set allow_unlabeled_data=True to allow)
+----------------------------- Captured stderr call -----------------------------
+Traceback (most recent call last):
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py", line 165, in run_training
+    trainer.train()
+    ~~~~~~~~~~~~~^^
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py", line 160, in train
+    dataset = ZarrDataset(mgr=self.mgr, is_training=True)
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py", line 147, in __init__
+    self._discover_and_load_volumes()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py", line 202, in _discover_and_load_volumes
+    raise FileNotFoundError(
+        f"Label not found: {label_path} (set allow_unlabeled_data=True to allow)"
+    )
+FileNotFoundError: Label not found: /dev/shm/c866pt_old/test_label_layer_pairs_with_th0/napari_trainer_iv3gh1b5/labels/vol_ink.zarr (set allow_unlabeled_data=True to allow)
+_______ test_label_layer_on_another_grid_is_rejected[<lambda>-translate] _______
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = [namespace(mgr=<vesuvius.models.configuration.config_manager.ConfigManager object at 0x7fff3dc14690>, data_path=PosixP...', 'ignore_label': 2, 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}], 'out_channels': 2}})]
+change = <function <lambda> at 0x7fff49515940>, message = 'translate'
+
+    @pytest.mark.parametrize("change, message", [
+        (lambda image, label: setattr(label, "translate", np.array([5.0, 0.0])), "translate"),
+        (lambda image, label: setattr(label, "scale", np.array([2.0, 2.0])), "scale"),
+        (lambda image, label: setattr(label, "data", label.data[:, :32]), "shape"),
+    ])
+    def test_label_layer_on_another_grid_is_rejected(main_window, recorded, change, message):
+        image, label = _pair()
+        image.translate, image.scale = np.zeros(2), np.ones(2)
+        label.translate, label.scale = np.zeros(2), np.ones(2)
+        change(image, label)
+    
+        _viewer(image, label)
+>       with pytest.raises(ValueError, match=message):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:235: Failed
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_label_layer_on_another_gr0/napari_trainer_ldq5wv3p (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+------------------------------ Captured log call -------------------------------
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+_________ test_label_layer_on_another_grid_is_rejected[<lambda>-scale] _________
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = [namespace(mgr=<vesuvius.models.configuration.config_manager.ConfigManager object at 0x7fff48ae7390>, data_path=PosixP...', 'ignore_label': 2, 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}], 'out_channels': 2}})]
+change = <function <lambda> at 0x7fff49515a80>, message = 'scale'
+
+    @pytest.mark.parametrize("change, message", [
+        (lambda image, label: setattr(label, "translate", np.array([5.0, 0.0])), "translate"),
+        (lambda image, label: setattr(label, "scale", np.array([2.0, 2.0])), "scale"),
+        (lambda image, label: setattr(label, "data", label.data[:, :32]), "shape"),
+    ])
+    def test_label_layer_on_another_grid_is_rejected(main_window, recorded, change, message):
+        image, label = _pair()
+        image.translate, image.scale = np.zeros(2), np.ones(2)
+        label.translate, label.scale = np.zeros(2), np.ones(2)
+        change(image, label)
+    
+        _viewer(image, label)
+>       with pytest.raises(ValueError, match=message):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:235: Failed
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_label_layer_on_another_gr1/napari_trainer_34eeud9k (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+------------------------------ Captured log call -------------------------------
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+_________ test_label_layer_on_another_grid_is_rejected[<lambda>-shape] _________
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = [namespace(mgr=<vesuvius.models.configuration.config_manager.ConfigManager object at 0x7fff48ae60d0>, data_path=PosixP...', 'ignore_label': 2, 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}], 'out_channels': 2}})]
+change = <function <lambda> at 0x7fff495158a0>, message = 'shape'
+
+    @pytest.mark.parametrize("change, message", [
+        (lambda image, label: setattr(label, "translate", np.array([5.0, 0.0])), "translate"),
+        (lambda image, label: setattr(label, "scale", np.array([2.0, 2.0])), "scale"),
+        (lambda image, label: setattr(label, "data", label.data[:, :32]), "shape"),
+    ])
+    def test_label_layer_on_another_grid_is_rejected(main_window, recorded, change, message):
+        image, label = _pair()
+        image.translate, image.scale = np.zeros(2), np.ones(2)
+        label.translate, label.scale = np.zeros(2), np.ones(2)
+        change(image, label)
+    
+        _viewer(image, label)
+>       with pytest.raises(ValueError, match=message):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:235: Failed
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_label_layer_on_another_gr2/napari_trainer_v6e2pbj6 (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+------------------------------ Captured log call -------------------------------
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+_ test_configs_that_read_other_data_are_rejected[dataset_config0-dataset_config.volumes] _
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = []
+dataset_config = {'volumes': [{'image': 'elsewhere.zarr', 'label': 'elsewhere_ink.zarr'}]}
+message = 'dataset_config.volumes'
+
+    @pytest.mark.parametrize("dataset_config, message", [
+        ({"volumes": [{"image": "elsewhere.zarr", "label": "elsewhere_ink.zarr"}]}, "dataset_config.volumes"),
+        ({"dataset_type": "cross_frame", "image_zarr_url": "file:///nowhere/image.zarr",
+          "labels_zarr_url": "file:///nowhere/labels.zarr", "transform_json_url": "file:///nowhere/t.json"},
+         "cross_frame"),
+    ])
+    def test_configs_that_read_other_data_are_rejected(main_window, recorded, dataset_config, message):
+        main_window._config_manager.dataset_config.update(dataset_config)
+    
+        _viewer(*_pair())
+        with pytest.raises(ValueError, match=message):
+>           _train(main_window)
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:186: in _train
+    main_window.run_training(patch_size_z=z, patch_size_x=32, patch_size_y=32,
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py:165: in run_training
+    trainer.train()
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:160: in train
+    dataset = ZarrDataset(mgr=self.mgr, is_training=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py:147: in __init__
+    self._discover_and_load_volumes()
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py:168: in _discover_and_load_volumes
+    self._load_explicit_volumes(volumes_cfg)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <vesuvius.models.datasets.zarr_dataset.ZarrDataset object at 0x7fff48ae7890>
+volumes_cfg = [{'image': 'elsewhere.zarr', 'label': 'elsewhere_ink.zarr'}]
+
+    def _load_explicit_volumes(self, volumes_cfg) -> None:
+        """Load explicit volume specs from dataset_config.volumes."""
+        if isinstance(volumes_cfg, dict):
+            volume_specs = list(volumes_cfg.values())
+        elif isinstance(volumes_cfg, (list, tuple)):
+            volume_specs = list(volumes_cfg)
+        else:
+            raise ValueError("dataset_config.volumes must be a list or mapping")
+    
+        image_id_counts: Dict[str, int] = {}
+        logger.info("Loading %d explicit volume specs", len(volume_specs))
+    
+        for volume_idx, spec in enumerate(volume_specs):
+            if isinstance(spec, (str, Path)):
+                spec = {"image": spec}
+            if not isinstance(spec, dict):
+                raise ValueError("Each explicit volume entry must be a mapping or path string")
+    
+            image_path = self._resolve_explicit_volume_path(
+                spec.get("image") or spec.get("image_path")
+            )
+            if image_path is None:
+                raise ValueError("Explicit volume entries must define 'image' or 'image_path'")
+            if not image_path.exists():
+>               raise FileNotFoundError(f"Explicit image volume not found: {image_path}")
+E               FileNotFoundError: Explicit image volume not found: <work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/configuration/single_task/elsewhere.zarr
+
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py:251: FileNotFoundError
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_configs_that_read_other_d0/napari_trainer_bz79u12u (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+
+Error during training: Explicit image volume not found: <work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/configuration/single_task/elsewhere.zarr
+----------------------------- Captured stderr call -----------------------------
+Traceback (most recent call last):
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py", line 165, in run_training
+    trainer.train()
+    ~~~~~~~~~~~~~^^
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py", line 160, in train
+    dataset = ZarrDataset(mgr=self.mgr, is_training=True)
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py", line 147, in __init__
+    self._discover_and_load_volumes()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py", line 168, in _discover_and_load_volumes
+    self._load_explicit_volumes(volumes_cfg)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py", line 251, in _load_explicit_volumes
+    raise FileNotFoundError(f"Explicit image volume not found: {image_path}")
+FileNotFoundError: Explicit image volume not found: <work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/configuration/single_task/elsewhere.zarr
+_ test_configs_that_read_other_data_are_rejected[dataset_config1-cross_frame] __
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = [namespace(mgr=<vesuvius.models.configuration.config_manager.ConfigManager object at 0x7fff48ae5590>, data_path=PosixP...', 'ignore_label': 2, 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}], 'out_channels': 2}})]
+dataset_config = {'dataset_type': 'cross_frame', 'image_zarr_url': 'file:///nowhere/image.zarr', 'labels_zarr_url': 'file:///nowhere/labels.zarr', 'transform_json_url': 'file:///nowhere/t.json'}
+message = 'cross_frame'
+
+    @pytest.mark.parametrize("dataset_config, message", [
+        ({"volumes": [{"image": "elsewhere.zarr", "label": "elsewhere_ink.zarr"}]}, "dataset_config.volumes"),
+        ({"dataset_type": "cross_frame", "image_zarr_url": "file:///nowhere/image.zarr",
+          "labels_zarr_url": "file:///nowhere/labels.zarr", "transform_json_url": "file:///nowhere/t.json"},
+         "cross_frame"),
+    ])
+    def test_configs_that_read_other_data_are_rejected(main_window, recorded, dataset_config, message):
+        main_window._config_manager.dataset_config.update(dataset_config)
+    
+        _viewer(*_pair())
+>       with pytest.raises(ValueError, match=message):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:250: Failed
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_configs_that_read_other_d1/napari_trainer_ifsujxjz (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+------------------------------ Captured log call -------------------------------
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+__________ test_exports_stay_in_a_run_directory_removed_after_the_run __________
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = []
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fff3cb2de50>
+tmp_path = PosixPath('/dev/shm/c866pt_old/test_exports_stay_in_a_run_dir0')
+
+    def test_exports_stay_in_a_run_directory_removed_after_the_run(main_window, recorded, monkeypatch, tmp_path):
+        import vesuvius.models.training.train as train
+    
+        _viewer(*_pair("../../escaped"))
+>       _train(main_window)
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:259: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:186: in _train
+    main_window.run_training(patch_size_z=z, patch_size_x=32, patch_size_y=32,
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py:165: in run_training
+    trainer.train()
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:160: in train
+    dataset = ZarrDataset(mgr=self.mgr, is_training=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py:147: in __init__
+    self._discover_and_load_volumes()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <vesuvius.models.datasets.zarr_dataset.ZarrDataset object at 0x7fff48ae6710>
+
+    def _discover_and_load_volumes(self) -> None:
+        """Discover and load all OME-Zarr volumes."""
+        volumes_cfg = getattr(self.mgr, "dataset_config", {}).get("volumes")
+        if volumes_cfg:
+            self._load_explicit_volumes(volumes_cfg)
+            return
+    
+        images_dir = self.data_path / "images"
+        labels_dir = self.data_path / "labels"
+    
+        if not images_dir.exists():
+            raise FileNotFoundError(f"Images directory not found: {images_dir}")
+    
+        # Find all image zarrs
+        image_zarrs = {
+            p.stem: p for p in images_dir.iterdir()
+            if p.is_dir() and p.suffix == ".zarr"
+        }
+    
+        if not image_zarrs:
+>           raise ValueError(f"No .zarr directories found in {images_dir}")
+E           ValueError: No .zarr directories found in /dev/shm/c866pt_old/test_exports_stay_in_a_run_dir0/napari_trainer_ar95jfz9/images
+
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py:184: ValueError
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_exports_stay_in_a_run_dir0/napari_trainer_ar95jfz9 (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+
+Error during training: No .zarr directories found in /dev/shm/c866pt_old/test_exports_stay_in_a_run_dir0/napari_trainer_ar95jfz9/images
+----------------------------- Captured stderr call -----------------------------
+Traceback (most recent call last):
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py", line 165, in run_training
+    trainer.train()
+    ~~~~~~~~~~~~~^^
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py", line 160, in train
+    dataset = ZarrDataset(mgr=self.mgr, is_training=True)
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py", line 147, in __init__
+    self._discover_and_load_volumes()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/datasets/zarr_dataset.py", line 184, in _discover_and_load_volumes
+    raise ValueError(f"No .zarr directories found in {images_dir}")
+ValueError: No .zarr directories found in /dev/shm/c866pt_old/test_exports_stay_in_a_run_dir0/napari_trainer_ar95jfz9/images
+_______________ test_min_labeled_percentage_selects_the_patches ________________
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = [namespace(mgr=<vesuvius.models.configuration.config_manager.ConfigManager object at 0x7fff48ae6ad0>, data_path=PosixP...', 'ignore_label': 2, 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}], 'out_channels': 2}})]
+
+    def test_min_labeled_percentage_selects_the_patches(main_window, recorded):
+        image, label = _pair()
+        label.data = np.zeros_like(label.data)
+        label.data[4:8, 4:8] = 1  # 16 of the 1024 pixels of one 32x32 patch
+    
+        _viewer(image, label)
+        _train(main_window, percent=0.0)
+        _train(main_window, percent=1.0)
+    
+>       assert [len(run.dataset._patches) for run in recorded] == [4, 1]
+E       assert [4, 4] == [4, 1]
+E         
+E         At index 1 diff: 4 != 1
+E         Use -v to get more diff
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:296: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_min_labeled_percentage_se0/napari_trainer_474j3q9m (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_min_labeled_percentage_se0/napari_trainer_v0thgh0m (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+------------------------------ Captured log call -------------------------------
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+_______________ test_3d_layers_with_patch_size_z_0_are_rejected ________________
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+recorded = [namespace(mgr=<vesuvius.models.configuration.config_manager.ConfigManager object at 0x7fff3dc15810>, data_path=PosixP...', 'ignore_label': 2, 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}], 'out_channels': 2}})]
+
+    def test_3d_layers_with_patch_size_z_0_are_rejected(main_window, recorded):
+        _viewer(*_pair(shape=(8, 64, 64)))
+    
+>       with pytest.raises(ValueError, match="Patch Size Z"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:305: Failed
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_3d_layers_with_patch_size0/napari_trainer_3vprd6ey (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+------------------------------ Captured log call -------------------------------
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+_____ test_offered_losses_fit_the_default_target_and_keep_its_ignore_label _____
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+
+    def test_offered_losses_fit_the_default_target_and_keep_its_ignore_label(main_window):
+        import torch
+        from vesuvius.models.training.train import BaseTrainer
+    
+        widget = main_window.run_training.options["loss_function"]
+        torch.manual_seed(0)
+        target = (torch.rand(2, 1, 16, 16) > 0.5).float()
+        target[:, :, :4] = 2  # ignore label of the default config
+        fg = (target == 1).float()
+        correct = torch.cat([10 - 20 * fg, 20 * fg - 10], dim=1)  # two-channel logits that match the target
+        for name in widget["choices"]:
+            task = {"ignore_label": 2, "losses": [{"name": name, "weight": 1.0, "kwargs": {}}]}
+            trainer = SimpleNamespace(mgr=SimpleNamespace(targets={"ink": task}, enable_deep_supervision=False))
+            loss_fn = BaseTrainer._build_loss(trainer)["ink"][0][0]
+    
+>           loss = loss_fn(correct, target)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:325: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/modules/module.py:1783: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/modules/module.py:1794: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/training/loss/nnunet_losses.py:351: in forward
+    ce_loss = (self.ce(net_output, target_regions) * mask).sum() / denom
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/modules/module.py:1783: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/modules/module.py:1794: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/modules/loss.py:838: in forward
+    return F.binary_cross_entropy_with_logits(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = tensor([[[[ 10.,  10.,  10.,  ...,  10.,  10.,  10.],
+          [ 10.,  10.,  10.,  ...,  10.,  10.,  10.],
+          ...,  10.],
+          [-10., -10., -10.,  ..., -10.,  10., -10.],
+          [-10., -10.,  10.,  ...,  10., -10.,  10.]]]])
+target = tensor([], size=(2, 0, 16, 16)), weight = None, size_average = None
+reduce = None, reduction = 'none', pos_weight = None
+
+    def binary_cross_entropy_with_logits(
+        input: Tensor,
+        target: Tensor,
+        weight: Tensor | None = None,
+        size_average: bool | None = None,
+        reduce: bool | None = None,
+        reduction: str = "mean",
+        pos_weight: Tensor | None = None,
+    ) -> Tensor:
+        r"""Compute Binary Cross Entropy between target and input logits.
+    
+        See :class:`~torch.nn.BCEWithLogitsLoss` for details.
+    
+        Args:
+            input: Tensor of arbitrary shape as unnormalized scores (often referred to as logits).
+            target: Tensor of the same shape as input with values between 0 and 1
+            weight (Tensor, optional): a manual rescaling weight. If provided, the dimension
+               of weight supports :ref:`broadcasting to a common shape <broadcasting-semantics>`
+               with respect to the input (and target) shape.
+            size_average (bool, optional): Deprecated (see :attr:`reduction`).
+            reduce (bool, optional): Deprecated (see :attr:`reduction`).
+            reduction (str, optional): Specifies the reduction to apply to the output:
+                ``'none'`` | ``'mean'`` | ``'sum'``. ``'none'``: no reduction will be applied,
+                ``'mean'``: the sum of the output will be divided by the number of
+                elements in the output, ``'sum'``: the output will be summed. Note: :attr:`size_average`
+                and :attr:`reduce` are in the process of being deprecated, and in the meantime,
+                specifying either of those two args will override :attr:`reduction`. Default: ``'mean'``
+            pos_weight (Tensor, optional): a weight of positive examples to be broadcasted with target.
+                Must be a tensor with equal size along the class dimension to the number of classes.
+                Pay close attention to PyTorch's broadcasting semantics in order to achieve the desired
+                operations. For a target of size [B, C, H, W] (where B is batch size) pos_weight of
+                size [B, C, H, W] will apply different pos_weights to each element of the batch or
+                [C, H, W] the same pos_weights across the batch. To apply the same positive weight
+                along all spatial dimensions for a 2D multi-class target [C, H, W] use: [C, 1, 1].
+                Default: ``None``
+    
+        Examples::
+    
+             >>> input = torch.randn(3, requires_grad=True)
+             >>> target = torch.empty(3).random_(2)
+             >>> loss = F.binary_cross_entropy_with_logits(input, target)
+             >>> loss.backward()
+        """
+        if has_torch_function_variadic(input, target, weight, pos_weight):
+            return handle_torch_function(
+                binary_cross_entropy_with_logits,
+                (input, target, weight, pos_weight),
+                input,
+                target,
+                weight=weight,
+                size_average=size_average,
+                reduce=reduce,
+                reduction=reduction,
+                pos_weight=pos_weight,
+            )
+        if size_average is not None or reduce is not None:
+            reduction_enum = _Reduction.legacy_get_enum(size_average, reduce)
+        else:
+            reduction_enum = _Reduction.get_enum(reduction)
+    
+        if not (target.size() == input.size()):
+>           raise ValueError(
+                f"Target size ({target.size()}) must be the same as input size ({input.size()})"
+            )
+E           ValueError: Target size (torch.Size([2, 0, 16, 16])) must be the same as input size (torch.Size([2, 2, 16, 16]))
+
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/nn/functional.py:3695: ValueError
+----------------------------- Captured stdout call -----------------------------
+Target ink using multiple losses:
+  - DC_and_CE_loss (weight: 1.0)
+Target ink using multiple losses:
+  - DC_and_BCE_loss (weight: 1.0)
+_____________________ test_default_config_is_package_data ______________________
+
+main_window = <module 'vesuvius.napari_trainer.main_window' from '<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py'>
+
+    def test_default_config_is_package_data(main_window):
+        pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
+        patterns = tomllib.loads(pyproject.read_text())["tool"]["setuptools"]["package-data"]["vesuvius"]
+        package_dir = Path(main_window.__file__).resolve().parents[1]
+        relative = main_window.DEFAULT_CONFIG_PATH.relative_to(package_dir).as_posix()
+    
+>       assert any(fnmatch(relative, pattern) for pattern in patterns)
+E       assert False
+E        +  where False = any(<generator object test_default_config_is_package_data.<locals>.<genexpr> at 0x7fff3dd883c0>)
+
+<work>/fixwork/c866rev/tree_old/vesuvius/tests/napari_trainer/test_main_window.py:339: AssertionError
+__________________ test_validation_metrics_accept_2d_patches ___________________
+
+    def test_validation_metrics_accept_2d_patches():
+        pred, gt = _batch()
+        trainer = SimpleNamespace(mgr=SimpleNamespace(targets={"ink": {"ignore_label": 2}}))
+        metrics = BaseTrainer._initialize_evaluation_metrics(trainer)["ink"]
+    
+        for metric in metrics:
+>           metric.update(pred=pred, gt=gt, mask=None)
+
+tests/napari_trainer/test_validation_2d.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/vesuvius/models/evaluation/base_metric.py:17: in update
+    result = self.compute(pred, gt, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/vesuvius/models/evaluation/voi.py:39: in compute
+    return compute_voi(
+src/vesuvius/models/evaluation/voi.py:238: in compute_voi
+    result = _compute_voi_3d(
+src/vesuvius/models/evaluation/voi.py:85: in _compute_voi_3d
+    slc = _bbox3d(union)
+          ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+mask = array([[ True,  True, False, ..., False, False, False],
+       [ True,  True, False, ...,  True, False, False],
+      ...True, False,  True, ..., False, False, False],
+       [ True, False,  True, ..., False, False, False]], shape=(32, 32))
+
+    def _bbox3d(mask: np.ndarray) -> Optional[Tuple[slice, slice, slice]]:
+        """Compute 3D bounding box of binary mask."""
+>       assert mask.ndim == 3
+               ^^^^^^^^^^^^^^
+E       AssertionError
+
+src/vesuvius/models/evaluation/voi.py:52: AssertionError
+________ test_2d_voi_equals_voi_of_the_same_patch_as_a_one_slice_volume ________
+
+    def test_2d_voi_equals_voi_of_the_same_patch_as_a_one_slice_volume():
+        pred, gt = _batch()
+    
+>       voi_2d = compute_voi(pred, gt, ignore_index=2)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/napari_trainer/test_validation_2d.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/vesuvius/models/evaluation/voi.py:238: in compute_voi
+    result = _compute_voi_3d(
+src/vesuvius/models/evaluation/voi.py:85: in _compute_voi_3d
+    slc = _bbox3d(union)
+          ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+mask = array([[ True,  True, False, ..., False, False, False],
+       [ True,  True, False, ...,  True, False, False],
+      ...True, False,  True, ..., False, False, False],
+       [ True, False,  True, ..., False, False, False]], shape=(32, 32))
+
+    def _bbox3d(mask: np.ndarray) -> Optional[Tuple[slice, slice, slice]]:
+        """Compute 3D bounding box of binary mask."""
+>       assert mask.ndim == 3
+               ^^^^^^^^^^^^^^
+E       AssertionError
+
+src/vesuvius/models/evaluation/voi.py:52: AssertionError
+=============================== warnings summary ===============================
+../../../venv/lib/python3.13/site-packages/torch/jit/_script.py:1643
+  <work>/fixwork/venv/lib/python3.13/site-packages/torch/jit/_script.py:1643: FutureWarning: `torch.jit.interface` is deprecated. Please use `torch.compile` instead.
+    warnings.warn(
+
+../../../venv-napari/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:300: 24 warnings
+  <work>/fixwork/venv-napari/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:300: PydanticDeprecatedSince20: `json_encoders` is deprecated. See https://pydantic.dev/docs/validation/2.14/concepts/serialization/#custom-serializers for alternatives. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+_______________ test_checkpoint_config_wins_over_the_gui_config ________________
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size (32, 32)
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+_____________ test_gui_config_is_used_for_a_checkpoint_without_one _____________
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using model configuration from config manager
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+________________ test_extra_checkpoint_tensors_are_not_rejected ________________
+----------------------------- Captured stdout call -----------------------------
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: m
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Using 2D operations based on patch_size (32, 32)
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (32, 32) to (32, 32) to ensure divisibility by pooling factors [8 8]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: Loaded_Model
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (32, 32)
+  batch_size: 1
+  in_channels: 1
+  autoconfigure: False
+  targets: {'ink': {'out_channels': 2, 'activation': 'none'}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [3, 3]
+  must_be_divisible_by: [8 8]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Loading weights from 'model' key in checkpoint
+Model weights loaded successfully
+______________________ test_main_loads_the_default_config ______________________
+----------------------------- Captured stdout call -----------------------------
+Detected 3D patch size (128, 128, 128), setting 3D operations
+Default config loaded from <work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/configuration/single_task/ps128_dicece.yaml
+________________ test_run_training_trains_on_the_viewer_layers _________________
+----------------------------- Captured stdout call -----------------------------
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [32, 32] and 2D ops
+Wrote the viewer's layers to /dev/shm/c866pt_old/test_run_training_trains_on_th0/napari_trainer_jme6u0a3 (targets: ink)
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+------------------------------ Captured log call -------------------------------
+WARNING  vesuvius.models.datasets.zarr_dataset:zarr_dataset.py:454 No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+=========================== short test summary info ============================
+PASSED tests/napari_trainer/test_inference_checkpoint_config.py::test_checkpoint_config_wins_over_the_gui_config
+PASSED tests/napari_trainer/test_inference_checkpoint_config.py::test_gui_config_is_used_for_a_checkpoint_without_one
+PASSED tests/napari_trainer/test_inference_checkpoint_config.py::test_extra_checkpoint_tensors_are_not_rejected
+PASSED tests/napari_trainer/test_main_window.py::test_main_loads_the_default_config
+PASSED tests/napari_trainer/test_main_window.py::test_run_training_trains_on_the_viewer_layers
+PASSED tests/napari_trainer/test_main_window.py::test_loss_choices_are_losses_the_trainer_knows
+FAILED tests/napari_trainer/test_inference_checkpoint_config.py::test_per_target_decoder_layout_is_restored
+FAILED tests/napari_trainer/test_inference_checkpoint_config.py::test_nested_legacy_config_is_unwrapped
+FAILED tests/napari_trainer/test_inference_checkpoint_config.py::test_primus_checkpoint_infers_with_its_input_shape
+FAILED tests/napari_trainer/test_inference_checkpoint_config.py::test_missing_weights_stop_before_a_prediction
+FAILED tests/napari_trainer/test_main_window.py::test_training_uses_a_copy_of_the_selected_config
+FAILED tests/napari_trainer/test_main_window.py::test_label_layer_pairs_with_the_longest_matching_image_name
+FAILED tests/napari_trainer/test_main_window.py::test_label_layer_on_another_grid_is_rejected[<lambda>-translate]
+FAILED tests/napari_trainer/test_main_window.py::test_label_layer_on_another_grid_is_rejected[<lambda>-scale]
+FAILED tests/napari_trainer/test_main_window.py::test_label_layer_on_another_grid_is_rejected[<lambda>-shape]
+FAILED tests/napari_trainer/test_main_window.py::test_configs_that_read_other_data_are_rejected[dataset_config0-dataset_config.volumes]
+FAILED tests/napari_trainer/test_main_window.py::test_configs_that_read_other_data_are_rejected[dataset_config1-cross_frame]
+FAILED tests/napari_trainer/test_main_window.py::test_exports_stay_in_a_run_directory_removed_after_the_run
+FAILED tests/napari_trainer/test_main_window.py::test_min_labeled_percentage_selects_the_patches
+FAILED tests/napari_trainer/test_main_window.py::test_3d_layers_with_patch_size_z_0_are_rejected
+FAILED tests/napari_trainer/test_main_window.py::test_offered_losses_fit_the_default_target_and_keep_its_ignore_label
+FAILED tests/napari_trainer/test_main_window.py::test_default_config_is_package_data
+FAILED tests/napari_trainer/test_validation_2d.py::test_validation_metrics_accept_2d_patches
+FAILED tests/napari_trainer/test_validation_2d.py::test_2d_voi_equals_voi_of_the_same_patch_as_a_one_slice_volume
+18 failed, 6 passed, 25 warnings in 9.18s

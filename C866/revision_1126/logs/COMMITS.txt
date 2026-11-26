@@ -1,0 +1,27 @@
+9ee250e0d2b8c5ba9dadfe1a2915472b0bfb348c Ben vesuvius: ship the napari trainer's default config in the wheel
+cbea85f479e8373913ef80768500f7a47cdba441 Ben napari_trainer: restore the checkpoint's network and stop on missing weights
+41775063dbf86f4ba01cd4a9384243cd17319826 Ben models: compute VOI on 2D validation patches
+82c7f72ae10dede81615363e6551f59a62cfb78a Ben napari_trainer: train on a per-run copy of the config and the paired layers
+1d3b563ed8c1af26ae0b69262fe4bd63bf51b524 Ben napari_trainer: build the inference network from the checkpoint config
+2333252cbcc2255fa707d85026ba3f6cf0a34af8 Ben napari_trainer: launch with the default config and train on the viewer layers
+
+ vesuvius/pyproject.toml                            |   1 +
+ vesuvius/src/vesuvius/models/evaluation/voi.py     |  21 +-
+ .../models/preprocessing/patches/generate.py       |  10 +
+ vesuvius/src/vesuvius/napari_trainer/inference.py  | 125 +++++++----
+ .../src/vesuvius/napari_trainer/main_window.py     | 233 +++++++++++++--------
+ .../test_inference_checkpoint_config.py            | 113 +++++++++-
+ vesuvius/tests/napari_trainer/test_main_window.py  | 219 ++++++++++++++++++-
+ .../tests/napari_trainer/test_validation_2d.py     |  42 ++++
+ 8 files changed, 615 insertions(+), 149 deletions(-)
+
+ vesuvius/pyproject.toml                            |   1 +
+ vesuvius/src/vesuvius/models/evaluation/voi.py     |  21 +-
+ .../models/preprocessing/patches/generate.py       |  10 +
+ vesuvius/src/vesuvius/napari_trainer/inference.py  | 126 +++++---
+ .../src/vesuvius/napari_trainer/main_window.py     | 239 ++++++++++-----
+ vesuvius/tests/napari_trainer/__init__.py          |   0
+ .../test_inference_checkpoint_config.py            | 171 +++++++++++
+ vesuvius/tests/napari_trainer/test_main_window.py  | 339 +++++++++++++++++++++
+ .../tests/napari_trainer/test_validation_2d.py     |  42 +++
+ 9 files changed, 821 insertions(+), 128 deletions(-)

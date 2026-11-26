@@ -1,0 +1,9 @@
+  warnings.warn(
+  return F.mse_loss(input, target, reduction=self.reduction)
+  return F.l1_loss(input, target, reduction=self.reduction)
+nnUNet_DC_and_CE_loss: runs; loss(matching)=-1.0000 loss(swapped)=20.0000 -> prefers matching: True; loss with ignored region changed=-1.0000 -> ignores label 2: True
+nnUNet_DC_and_BCE_loss: ValueError: Target size (torch.Size([2, 0, 16, 16])) must be the same as input size (torch.Size([2, 2, 16, 16]))
+MemoryEfficientSoftDiceLoss: runs; loss(matching)=-0.7496 loss(swapped)=-0.2036 -> prefers matching: True; loss with ignored region changed=-0.8677 -> ignores label 2: False
+BCEWithLogitsLoss: ValueError: Target size (torch.Size([2, 1, 16, 16])) must be the same as input size (torch.Size([2, 2, 16, 16]))
+MSELoss: runs; loss(matching)=201.0312 loss(swapped)=201.0312 -> prefers matching: False; loss with ignored region changed=201.0312 -> ignores label 2: True
+L1Loss: runs; loss(matching)=20.0000 loss(swapped)=20.0000 -> prefers matching: False; loss with ignored region changed=20.0000 -> ignores label 2: True

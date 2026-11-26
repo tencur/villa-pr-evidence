@@ -1,0 +1,206 @@
+WARNING: QOpenGLWidget is not supported on this platform.
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+Detected 3D patch size (128, 128, 128), setting 3D operations
+Default config loaded from <work>/fixwork/c866rev/tree_new/vesuvius/src/vesuvius/models/configuration/single_task/ps128_dicece.yaml
+selected config :  (PosixPath('<work>/fixwork/c866rev/test/session/configs/tiny_unet_2d_ink.yaml'),)
+Detected 2D patch size (64, 64), setting 2D operations
+Config loaded from <work>/fixwork/c866rev/test/session/configs/tiny_unet_2d_ink.yaml
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [64, 64] and 2D ops
+Detected 2D patch size (64, 64), setting 2D operations
+Updated patch size: (64, 64)
+Updated min labeled ratio: 0.10
+Updated max epochs: 2
+Updated skip_patch_validation: False
+Updated min bbox percent: 0.00
+Exported 'vol01' + 'vol01_ink' as image0, target 'ink'
+Set targets: ['ink']
+Output channels: (2,)
+Wrote the viewer's layers to /tmp/napari_trainer_qzitrd5c/data (targets: ink)
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+Finding valid patches with bounding box coverage >= 0.0 and labeled fraction >= 0.1.
+Target patch size: (64, 64) (full resolution)
+Will attempt to use downsample level 1 for faster processing (would use patch size (32, 32))
+Processing volumes:   0%|          | 0/1 [00:00<?, ?it/s][2026-11-26 04:52:40,116] INFO:vesuvius.models.datasets.find_valid_patches: Resolving downsample level 1 for volume 'image0'
+[2026-11-26 04:52:40,116] INFO:vesuvius.models.datasets.find_valid_patches: Level 1 unavailable for 'image0', using full resolution (patch size (64, 64))
+[2026-11-26 04:52:40,116] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': downsampled array shape (128, 128), target patch (64, 64), candidate positions 4 (generated in 0.00s)
+
+Processing volume 'image0' (1/1)
+
+  image0 blocks:   0%|          | 0/1 [00:00<?, ?it/s][A
+                                                      [A[2026-11-26 04:52:40,117] INFO:vesuvius.models.datasets.find_valid_patches: Volume 'image0': 4 valid positions identified (100.00% of candidates) in 0.00s
+Processing volumes: 100%|██████████| 1/1 [00:00<00:00, 926.30it/s]
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/jit/_script.py:1643: FutureWarning: `torch.jit.interface` is deprecated. Please use `torch.compile` instead.
+  warnings.warn(
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:431: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:437: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+Found 4 valid patches in 'image0'
+
+Total valid patches found across all 1 volumes: 4
+4 patches have at least 10.0% labeled voxels
+Using CPU device
+
+Starting training...
+Using ZarrDataset (training)
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (64, 64) to (64, 64) to ensure divisibility by pooling factors [16 16]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: napari_tiny_unet_2d
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (64, 64)
+  batch_size: 2
+  in_channels: 1
+  autoconfigure: True
+  targets: {'ink': {'activation': 'none', 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}], 'out_channels': 2}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [4, 4]
+  must_be_divisible_by: [16 16]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Validation dataset shares the same source as training; using random split
+Split: 3 FG + 0 BG patches for training, 1 FG patches for validation
+Using poly learning rate scheduler over 2 epochs
+Target ink using multiple losses:
+  - DC_and_CE_loss (weight: 1.0)
+Early stopping disabled
+Epoch 1/2:   0%|          | 0/2 [00:00<?, ?it/s]Epoch 1/2:   0%|          | 0/2 [00:01<?, ?it/s, ink: 0.3643]Epoch 1/2:  50%|█████     | 1/2 [00:01<00:01,  1.04s/it, ink: 0.3643]Epoch 1/2:  50%|█████     | 1/2 [00:01<00:01,  1.04s/it, ink: 0.3321]Epoch 1/2: 100%|██████████| 2/2 [00:01<00:00,  1.49it/s, ink: 0.3321]Epoch 1/2: 100%|██████████| 2/2 [00:01<00:00,  1.38it/s, ink: 0.3321]
+Using optimizer : SGD
+Using scheduler : PolyLRScheduler (per-iteration: False)
+Gradient accumulation steps : 1
+Items from the first batch -- Double check that your shapes and values are expected:
+patch_info: (dictionary with keys: ['volume_name', 'position'])
+  volume_name: ['image0', 'image0']
+  position: [tensor([64,  0]), tensor([0, 0])]
+is_unlabeled: torch.bool, torch.Size([2]), min False max False
+image: torch.float32, torch.Size([2, 1, 64, 64]), min -4.637990474700928 max 6.996327877044678
+ink: torch.float32, torch.Size([2, 1, 64, 64]), min 0.0 max 1.0
+padding_mask: torch.float32, torch.Size([2, 1, 64, 64]), min 1.0 max 1.0
+
+[Train] Epoch 1 completed.
+  Learning rate(s) = 0.01000000
+  ink: Avg Loss = 0.3321
+  [DEBUG] Raw loss averages:
+    ink/DC_and_CE_loss: raw=0.332102, weight=1.0, weighted=0.332102
+Validation 1:   0%|          | 0/1 [00:00<?, ?it/s]Validation 1:   0%|          | 0/1 [00:00<?, ?it/s, ink: 0.1859]Validation 1: 100%|██████████| 1/1 [00:00<00:00,  6.24it/s, ink: 0.1859]Validation 1: 100%|██████████| 1/1 [00:00<00:00,  6.24it/s, ink: 0.1859]
+[Epoch 0] Saving PNG to: checkpoints/napari_tiny_unet_2d_1126260452/napari_tiny_unet_2d_debug_epoch1.png
+
+[Validation] Epoch 1 summary:
+  Task 'ink': Avg validation loss = 0.1859
+
+[Validation Metrics]
+  Task 'ink':
+    connected_components_connected_components_difference_class_1: 257.0000
+    connected_components_connected_components_difference_class_0: 2.0000
+    connected_components_connected_components_difference_total: 259.0000
+    iou_dice_iou_class_1: 0.3265
+    iou_dice_dice_class_1: 0.4923
+    iou_dice_dice_class_0: 0.7829
+    iou_dice_mean_iou: 0.4848
+    iou_dice_iou_class_0: 0.6432
+    iou_dice_mean_dice: 0.6376
+    voi_voi_score: 0.2097
+    voi_voi_split: 3.1719
+    voi_voi_merge: 0.5960
+    voi_voi_total: 3.7679
+Checkpoint saved to: checkpoints/napari_tiny_unet_2d_1126260452/napari_tiny_unet_2d_epoch1.pth
+
+Checkpoint management:
+  Last 3 checkpoints: ['epoch1', 'epoch1']
+  Best 2 checkpoints: ['epoch1 (loss=0.1859)']
+Epoch 2/2:   0%|          | 0/2 [00:00<?, ?it/s]Epoch 2/2:   0%|          | 0/2 [00:01<?, ?it/s, ink: 0.2856]Epoch 2/2:  50%|█████     | 1/2 [00:01<00:01,  1.05s/it, ink: 0.2856]Epoch 2/2:  50%|█████     | 1/2 [00:01<00:01,  1.05s/it, ink: 0.2130]Epoch 2/2: 100%|██████████| 2/2 [00:01<00:00,  1.49it/s, ink: 0.2130]Epoch 2/2: 100%|██████████| 2/2 [00:01<00:00,  1.38it/s, ink: 0.2130]
+Using optimizer : SGD
+Using scheduler : PolyLRScheduler (per-iteration: False)
+Gradient accumulation steps : 1
+
+[Train] Epoch 2 completed.
+  Learning rate(s) = 0.00535887
+  ink: Avg Loss = 0.2130
+  [DEBUG] Raw loss averages:
+    ink/DC_and_CE_loss: raw=0.203958, weight=1.0, weighted=0.203958
+Validation 2:   0%|          | 0/1 [00:00<?, ?it/s]Validation 2:   0%|          | 0/1 [00:00<?, ?it/s, ink: 0.0612]Validation 2: 100%|██████████| 1/1 [00:00<00:00,  6.69it/s, ink: 0.0612]Validation 2: 100%|██████████| 1/1 [00:00<00:00,  6.68it/s, ink: 0.0612]
+[Epoch 1] Saving PNG to: checkpoints/napari_tiny_unet_2d_1126260452/napari_tiny_unet_2d_debug_epoch2.png
+
+[Validation] Epoch 2 summary:
+  Task 'ink': Avg validation loss = 0.0612
+
+[Validation Metrics]
+  Task 'ink':
+    connected_components_connected_components_difference_class_1: 242.0000
+    connected_components_connected_components_difference_class_0: 28.0000
+    connected_components_connected_components_difference_total: 270.0000
+    iou_dice_iou_class_1: 0.4308
+    iou_dice_dice_class_1: 0.6022
+    iou_dice_dice_class_0: 0.8218
+    iou_dice_mean_iou: 0.5642
+    iou_dice_iou_class_0: 0.6976
+    iou_dice_mean_dice: 0.7120
+    voi_voi_score: 0.2393
+    voi_voi_split: 2.6582
+    voi_voi_merge: 0.5202
+    voi_voi_total: 3.1783
+Checkpoint saved to: checkpoints/napari_tiny_unet_2d_1126260452/napari_tiny_unet_2d_epoch2.pth
+
+Checkpoint management:
+  Last 3 checkpoints: ['epoch1', 'epoch2', 'epoch2']
+  Best 2 checkpoints: ['epoch2 (loss=0.0612)', 'epoch1 (loss=0.1859)']
+Training Finished!
+Checkpoint saved to: checkpoints/napari_tiny_unet_2d/napari_tiny_unet_2d_final.pth
+Final model saved to checkpoints/napari_tiny_unet_2d/napari_tiny_unet_2d_final.pth
+Model configuration is embedded in the checkpoint
+Removed the exported layers (/tmp/napari_trainer_qzitrd5c)
+RESULT {"widget": {"patch_size_z": 0, "patch_size_x": 64, "patch_size_y": 64, "min_labeled_percentage": 10.0, "max_epochs": 2, "loss_function": "nnUNet_DC_and_CE_loss", "call_button": false}, "config": "<work>/fixwork/c866rev/test/session/configs/tiny_unet_2d_ink.yaml", "datasets": [{"is_training": true, "volumes": [{"volume": "image0", "image_path": "/tmp/napari_trainer_qzitrd5c/data/images/image0.zarr", "image_equals_viewer_layer": true, "ink_label_equals_viewer_layer": true}], "patches": 4}, {"is_training": false, "volumes": [{"volume": "image0", "image_path": "/tmp/napari_trainer_qzitrd5c/data/images/image0.zarr", "image_equals_viewer_layer": true, "ink_label_equals_viewer_layer": true}], "patches": 4}], "run_training": "returned", "checkpoints": ["checkpoints/napari_tiny_unet_2d/napari_tiny_unet_2d_final.pth", "checkpoints/napari_tiny_unet_2d_1126260452/napari_tiny_unet_2d_epoch1.pth", "checkpoints/napari_tiny_unet_2d_1126260452/napari_tiny_unet_2d_epoch2.pth"], "main": "returned"}

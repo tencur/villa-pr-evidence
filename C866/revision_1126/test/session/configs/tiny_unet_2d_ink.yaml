@@ -1,0 +1,33 @@
+# A small 2D U-Net so a CPU can train it in minutes; chosen in the trainer's config picker.
+tr_setup:
+  model_name: "napari_tiny_unet_2d"
+
+tr_config:
+  patch_size: [64, 64]
+  batch_size: 2
+  max_steps_per_epoch: 40
+  max_val_steps_per_epoch: 4
+  enable_deep_supervision: false
+
+model_config:
+  basic_encoder_block: "BasicBlockD"
+  basic_decoder_block: "ConvBlock"
+  bottleneck_block: "BasicBlockD"
+  features_per_stage: [8, 16, 32]
+  n_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  strides: [[1, 1], [2, 2], [2, 2]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  separate_decoders: false
+  autoconfigure: false
+
+dataset_config:
+  normalization_scheme: "zscore"
+  targets:
+    ink:
+      activation: "none"
+      losses:
+        - name: "nnUNet_DC_and_CE_loss"
+          weight: 1.0

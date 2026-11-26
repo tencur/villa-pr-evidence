@@ -1,0 +1,156 @@
+WARNING: QOpenGLWidget is not supported on this platform.
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+WARNING: This plugin does not support propagateSizeHints()
+WARNING: QOpenGLWidget: Failed to create context
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/jit/_script.py:1643: FutureWarning: `torch.jit.interface` is deprecated. Please use `torch.compile` instead.
+  warnings.warn(
+No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+No patch cache found. Enumerating all patches without validation. Run `vesuvius.find_patches --config <config.yaml>` to generate cache.
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:431: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+<work>/fixwork/venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:437: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+Detected 3D patch size (128, 128, 128), setting 3D operations
+Default config loaded from <work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/configuration/single_task/ps128_dicece.yaml
+selected config :  (PosixPath('<work>/fixwork/c866rev/test/session/configs/tiny_unet_2d_ink.yaml'),)
+Detected 2D patch size (64, 64), setting 2D operations
+Config loaded from <work>/fixwork/c866rev/test/session/configs/tiny_unet_2d_ink.yaml
+Starting training process...
+Using images and labels from current viewer
+Detected 2D setup; using patch size [64, 64] and 2D ops
+Detected 2D patch size (64, 64), setting 2D operations
+Updated patch size: (64, 64)
+Updated min labeled ratio: 0.10
+Updated max epochs: 2
+Updated skip_patch_validation: False
+Updated min bbox percent: 0.90
+Set targets: ['ink']
+Output channels: (2,)
+Wrote the viewer's layers to /tmp/napari_trainer_zpds2h13 (targets: ink)
+Using CPU device
+
+Applying nnUNet_DC_and_CE_loss to all detected targets...
+  - Set loss function for target 'ink' to nnUNet_DC_and_CE_loss
+
+Starting training...
+Using ZarrDataset (training)
+Using dimensionality (2D) from ConfigManager
+Using 2D convolutions (nn.Conv2d)
+Using 2D normalization (nn.InstanceNorm2d)
+--- Partial autoconfiguration: using provided features_per_stage ---
+Using provided features_per_stage: [8, 16, 32]
+Detected 3 stages from features_per_stage
+Patch size adjusted from (64, 64) to (64, 64) to ensure divisibility by pooling factors [16 16]
+Using provided n_blocks_per_stage: [1, 1, 1]
+Task 'ink' configured with shared decoder + head (2 channels)
+NetworkFromConfig initialized with final configuration:
+  model_name: napari_tiny_unet_2d
+  basic_encoder_block: BasicBlockD
+  basic_decoder_block: ConvBlock
+  bottleneck_block: BasicBlockD
+  features_per_stage: [8, 16, 32]
+  num_stages: 3
+  n_blocks_per_stage: [1, 1, 1]
+  n_conv_per_stage_decoder: [1, 1]
+  kernel_sizes: [[3, 3], [3, 3], [3, 3]]
+  pool_op_kernel_sizes: [[1, 1], [2, 2], [2, 2]]
+  conv_op: Conv2d
+  conv_bias: True
+  norm_op: InstanceNorm2d
+  norm_op_kwargs: {'affine': True, 'eps': 1e-05}
+  dropout_op: None
+  dropout_op_kwargs: None
+  nonlin: LeakyReLU
+  nonlin_kwargs: {'inplace': True, 'negative_slope': 0.01}
+  strides: [[1, 1], [2, 2], [2, 2]]
+  return_skips: True
+  do_stem: True
+  stem_channels: 8
+  bottleneck_channels: None
+  stochastic_depth_p: 0.0
+  squeeze_excitation: False
+  squeeze_excitation_reduction_ratio: 0.0625
+  squeeze_excitation_type: channel
+  squeeze_excitation_add_maxpool: False
+  pool_type: conv
+  upsample_mode: transpconv
+  op_dims: 2
+  patch_size: (64, 64)
+  batch_size: 2
+  in_channels: 1
+  autoconfigure: True
+  targets: {'ink': {'activation': 'none', 'losses': [{'name': 'nnUNet_DC_and_CE_loss', 'weight': 1.0, 'kwargs': {}}], 'out_channels': 2}}
+  target_z_projection: {}
+  separate_decoders: False
+  num_pool_per_axis: [4, 4]
+  must_be_divisible_by: [16 16]
+  guide_backbone: None
+  guide_backbone_config_path: None
+  guide_freeze: True
+  guide_patch_grid: None
+  guide_stage_keys: None
+  guide_skip_concat_projector_channels: None
+  guide_feature_gate_alpha: None
+  guide_tokenbook_tokens: None
+  guide_tokenbook_prototype_weighting: mean
+  guide_tokenbook_weight_mlp_hidden: None
+  guide_compile_policy: off
+  guide_fusion_stage: None
+Validation dataset shares the same source as training; using random split
+Split: 3 FG + 0 BG patches for training, 1 FG patches for validation
+Using poly learning rate scheduler over 2 epochs
+Target ink using multiple losses:
+  - DC_and_CE_loss (weight: 1.0)
+Early stopping disabled
+Epoch 1/2:   0%|          | 0/2 [00:00<?, ?it/s]Epoch 1/2:   0%|          | 0/2 [00:01<?, ?it/s, ink: 0.1481]Epoch 1/2:  50%|█████     | 1/2 [00:01<00:01,  1.03s/it, ink: 0.1481]Epoch 1/2:  50%|█████     | 1/2 [00:01<00:01,  1.03s/it, ink: 0.1018]Epoch 1/2: 100%|██████████| 2/2 [00:01<00:00,  1.48it/s, ink: 0.1018]Epoch 1/2: 100%|██████████| 2/2 [00:01<00:00,  1.37it/s, ink: 0.1018]
+Using optimizer : SGD
+Using scheduler : PolyLRScheduler (per-iteration: False)
+Gradient accumulation steps : 1
+Items from the first batch -- Double check that your shapes and values are expected:
+patch_info: (dictionary with keys: ['volume_name', 'position'])
+  volume_name: ['vol01', 'vol01']
+  position: [tensor([ 0, 64]), tensor([64, 64])]
+is_unlabeled: torch.bool, torch.Size([2]), min False max False
+image: torch.float32, torch.Size([2, 1, 64, 64]), min -2.2381255626678467 max 1.9099007844924927
+ink: torch.float32, torch.Size([2, 1, 64, 64]), min 0.0 max 1.0
+padding_mask: torch.float32, torch.Size([2, 1, 64, 64]), min 1.0 max 1.0
+
+[Train] Epoch 1 completed.
+  Learning rate(s) = 0.01000000
+  ink: Avg Loss = 0.1018
+  [DEBUG] Raw loss averages:
+    ink/DC_and_CE_loss: raw=0.101780, weight=1.0, weighted=0.101780
+Validation 1:   0%|          | 0/1 [00:00<?, ?it/s]Validation 1:   0%|          | 0/1 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/napari_trainer/main_window.py", line 165, in run_training
+    trainer.train()
+    ~~~~~~~~~~~~~^^
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/training/train.py", line 2351, in train
+    metric.update(pred=pred_val, gt=gt_val, mask=mask_tensor)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/evaluation/base_metric.py", line 17, in update
+    result = self.compute(pred, gt, **kwargs)
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/evaluation/voi.py", line 39, in compute
+    return compute_voi(
+        pred=pred,
+    ...<5 lines>...
+        mask=mask,
+    )
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/evaluation/voi.py", line 238, in compute_voi
+    result = _compute_voi_3d(
+        pred_bin=pred_bin,
+    ...<3 lines>...
+        alpha=alpha,
+    )
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/evaluation/voi.py", line 85, in _compute_voi_3d
+    slc = _bbox3d(union)
+  File "<work>/fixwork/c866rev/tree_old/vesuvius/src/vesuvius/models/evaluation/voi.py", line 52, in _bbox3d
+    assert mask.ndim == 3
+           ^^^^^^^^^^^^^^
+AssertionError
+
+Error during training: 
+RESULT {"widget": {"patch_size_z": 0, "patch_size_x": 64, "patch_size_y": 64, "min_labeled_percentage": 10.0, "max_epochs": 2, "loss_function": "nnUNet_DC_and_CE_loss", "call_button": false}, "config": "<work>/fixwork/c866rev/test/session/configs/tiny_unet_2d_ink.yaml", "datasets": [{"is_training": true, "volumes": [{"volume": "vol01", "image_path": "/tmp/napari_trainer_zpds2h13/images/vol01.zarr", "image_equals_viewer_layer": true, "ink_label_equals_viewer_layer": true}], "patches": 4}, {"is_training": false, "volumes": [{"volume": "vol01", "image_path": "/tmp/napari_trainer_zpds2h13/images/vol01.zarr", "image_equals_viewer_layer": true, "ink_label_equals_viewer_layer": true}], "patches": 4}], "run_training": "AssertionError: ", "checkpoints": [], "main": "returned"}

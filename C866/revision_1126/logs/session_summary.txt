@@ -1,0 +1,13 @@
+new=9ee250e0d old=1d3b563ed launchfix=2333252cb 2026-11-26T04:37:33Z
+new_train3d exit 0 (706s)
+checkpoint3d work_new_train3d/checkpoints/napari_tiny_unet/napari_tiny_unet_final.pth
+new_infer_default exit 0 (22s)
+new_infer_other exit 0 (21s)
+launchfix_infer_other_seed0_3884 exit 0 (52s)
+launchfix_infer_other_seed0_18016 exit 0 (51s)
+launchfix_infer_other_seed1_31296 exit 0 (50s)
+new_train2d exit 0 (14s)
+checkpoint2d work_new_train2d/checkpoints/napari_tiny_unet_2d/napari_tiny_unet_2d_final.pth
+old_train2d exit 0 (11s)
+old_train2d checkpoints: 0
+done

@@ -1,0 +1,1124 @@
+From 82c7f72ae10dede81615363e6551f59a62cfb78a Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 04:33:30 +0000
+Subject: [PATCH 1/4] napari_trainer: train on a per-run copy of the config and
+ the paired layers
+
+run_training changed the GUI's selected config in place: its data_path,
+targets, patch size and ops. A later run or a weights-only inference
+fallback then saw the last run's settings instead of the selected YAML
+(ink -> surface -> ink lost ignore_label: 2). Each run now works on a
+deep copy of the selected config.
+
+The layer export paired a label with every image whose name it starts
+with ('vol_crop_ink' also matched 'vol'), accepted labels of another
+shape or on another grid (sampled at the image's raw indices), wrote to
+paths built from layer display names with overwrite on, and left the
+export behind. A config with dataset_config.volumes or a cross_frame
+dataset read its own data instead. Now a label belongs to the image with
+the longest matching name, it must have the image's shape, scale,
+translate, rotate, shear and affine, targets must be plain names, such
+configs are rejected, and the export is written under indexed names to
+a per-run temporary directory that is removed when the run ends, also
+after an error. The optional <image>_mask layer is still not used.
+
+The Min Labeled Percentage had no effect: without a patch cache
+ZarrDataset enumerates every patch. The run now writes the cache with
+vesuvius.find_patches' generator (split so it takes a loaded config),
+selecting patches by the widget's percentage (bounding-box criterion
+off), and stops with an error when no patch qualifies. 3D layers with
+Patch Size Z 0 stop with an error instead of reaching the 2D sampler.
+
+Only nnUNet_DC_and_CE_loss is offered: the BCE losses fail on the
+default two-channel prediction and one-channel target, MSE/L1 broadcast
+the label over both channels, and the standalone Dice loss does not
+honour the ignore label.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../models/preprocessing/patches/generate.py  |  10 +
+ .../vesuvius/napari_trainer/main_window.py    | 233 +++++++++++-------
+ .../tests/napari_trainer/test_main_window.py  | 209 +++++++++++++++-
+ 3 files changed, 359 insertions(+), 93 deletions(-)
+
+diff --git a/vesuvius/src/vesuvius/models/preprocessing/patches/generate.py b/vesuvius/src/vesuvius/models/preprocessing/patches/generate.py
+index 2ef25ebd5..3f44d5eaa 100644
+--- a/vesuvius/src/vesuvius/models/preprocessing/patches/generate.py
++++ b/vesuvius/src/vesuvius/models/preprocessing/patches/generate.py
+@@ -79,7 +79,17 @@ def generate_patch_caches(
+     # Load config
+     mgr = ConfigManager(verbose=True)
+     mgr.load_config(config_path)
++    return generate_patch_caches_for_config(mgr, input_path=input_path, cache_dir=cache_dir, force=force)
+ 
++
++def generate_patch_caches_for_config(
++    mgr: ConfigManager,
++    *,
++    input_path: Optional[Path] = None,
++    cache_dir: Optional[Path] = None,
++    force: bool = False,
++) -> PatchCacheResult:
++    """generate_patch_caches for a config that is already loaded (e.g. one changed in memory)."""
+     if input_path is not None:
+         mgr.data_path = Path(input_path)
+ 
+diff --git a/vesuvius/src/vesuvius/napari_trainer/main_window.py b/vesuvius/src/vesuvius/napari_trainer/main_window.py
+index e0c3527b6..1d2edd536 100644
+--- a/vesuvius/src/vesuvius/napari_trainer/main_window.py
++++ b/vesuvius/src/vesuvius/napari_trainer/main_window.py
+@@ -14,6 +14,8 @@ import napari.layers
+ import json
+ import yaml
+ from pathlib import Path
++import re
++import shutil
+ import tempfile
+ import torch.nn as nn
+ 
+@@ -42,9 +44,8 @@ def filespicker(filenames: Sequence[Path] = str(DEFAULT_CONFIG_PATH)) -> Sequenc
+     patch_size_y={'widget_type': 'SpinBox', 'label': 'Patch Size Y', 'min': 0, 'max': 4096, 'value': 128},
+     min_labeled_percentage={'widget_type': 'FloatSpinBox', 'label': 'Min Labeled Percentage', 'min': 0.0, 'max': 100.0, 'step': 1.0, 'value': 10.0},
+     max_epochs={'widget_type': 'SpinBox', 'label': 'Max Epochs', 'min': 1, 'max': 1000, 'value': 5},
+-    loss_function={'widget_type': 'ComboBox', 'choices': ["nnUNet_DC_and_CE_loss", "nnUNet_DC_and_BCE_loss",
+-                                                         "MemoryEfficientSoftDiceLoss", "BCEWithLogitsLoss",
+-                                                         "MSELoss", "L1Loss"], 'value': "nnUNet_DC_and_CE_loss"}
++    # Losses for the default target: two output channels, one label channel, ignore label kept.
++    loss_function={'widget_type': 'ComboBox', 'choices': ["nnUNet_DC_and_CE_loss"], 'value': "nnUNet_DC_and_CE_loss"}
+ )
+ def run_training(patch_size_z: int = 0, patch_size_x: int = 128, patch_size_y: int = 128,
+                 min_labeled_percentage: float = 10.0,
+@@ -56,9 +57,6 @@ def run_training(patch_size_z: int = 0, patch_size_x: int = 128, patch_size_y: i
+     
+     print("Starting training process...")
+     print("Using images and labels from current viewer")
+-    
+-    # Set data format before updating other configurations
+-    _config_manager.data_format = 'napari'
+ 
+     # Check if viewer has valid image-label pairs
+     viewer = napari.current_viewer()
+@@ -78,97 +76,145 @@ def run_training(patch_size_z: int = 0, patch_size_x: int = 128, patch_size_y: i
+     if not label_layers:
+         print("Error: No label layers found in the viewer.")
+         return
+-    
+-    # Determine dimensionality from layers if possible
+-    all_ndims = []
+-    for l in image_layers + label_layers:
+-        try:
+-            all_ndims.append(int(getattr(l, 'data', None).ndim))
+-        except Exception:
+-            pass
+-    is_2d_view = (len(all_ndims) > 0 and all(n == 2 for n in all_ndims))
+-
+-    # Handle 2D case when either patch_size_z == 0 or viewer layers are 2D
+-    if is_2d_view or patch_size_z == 0:
++
++    pairs = _pair_layers(image_layers, label_layers)
++    if not pairs:
++        print("Error: No valid image-label pairs found.")
++        print("Label layers should be named as: {image_name}_{target_name}")
++        print("For example: if image is 'image1', label should be 'image1_ink'")
++        return
++
++    # Training changes the config (data, targets, patch size, ops); work on a copy so the
++    # selected config stays as loaded for the next run and for inference's fallback.
++    mgr = deepcopy(_config_manager)
++    _check_trains_on_viewer_layers(mgr, pairs)
++
++    # Determine dimensionality from the paired layers
++    all_ndims = [np.ndim(l.data) for img, labels in pairs for l in [img] + [lbl for _, lbl in labels]]
++    is_2d_view = all(n == 2 for n in all_ndims)
++    if not is_2d_view and patch_size_z == 0:
++        raise ValueError(
++            f"The paired layers are {max(all_ndims)}D, but Patch Size Z is 0, which selects 2D patches. "
++            "Set Patch Size Z for 3D training.")
++
++    # Set data format before updating other configurations
++    mgr.data_format = 'napari'
++
++    # Handle 2D case when the viewer layers are 2D
++    if is_2d_view:
+         new_patch_size = [patch_size_y, patch_size_x]  # 2D: [height, width]
+         # Force 2D ops in manager to avoid accidental 3D config
+-        _config_manager.op_dims = 2
++        mgr.op_dims = 2
+         # Hint datasets about dimensionality
+-        if hasattr(_config_manager, 'dataset_config'):
+-            _config_manager.dataset_config['force_2d'] = True
+-            _config_manager.dataset_config.pop('force_3d', None)
+-        if hasattr(_config_manager, 'model_config'):
+-            _config_manager.model_config["conv_op"] = "nn.Conv2d"
+-            _config_manager.model_config["norm_op"] = "nn.InstanceNorm2d"
++        if hasattr(mgr, 'dataset_config'):
++            mgr.dataset_config['force_2d'] = True
++            mgr.dataset_config.pop('force_3d', None)
++        if hasattr(mgr, 'model_config'):
++            mgr.model_config["conv_op"] = "nn.Conv2d"
++            mgr.model_config["norm_op"] = "nn.InstanceNorm2d"
+         print(f"Detected 2D setup; using patch size {new_patch_size} and 2D ops")
+     else:
+         new_patch_size = [patch_size_z, patch_size_y, patch_size_x]  # 3D: [depth, height, width]
+-        _config_manager.op_dims = 3
+-        if hasattr(_config_manager, 'dataset_config'):
+-            _config_manager.dataset_config['force_3d'] = True
+-            _config_manager.dataset_config.pop('force_2d', None)
+-        if hasattr(_config_manager, 'model_config'):
+-            _config_manager.model_config["conv_op"] = "nn.Conv3d"
+-            _config_manager.model_config["norm_op"] = "nn.InstanceNorm3d"
++        mgr.op_dims = 3
++        if hasattr(mgr, 'dataset_config'):
++            mgr.dataset_config['force_3d'] = True
++            mgr.dataset_config.pop('force_2d', None)
++        if hasattr(mgr, 'model_config'):
++            mgr.model_config["conv_op"] = "nn.Conv3d"
++            mgr.model_config["norm_op"] = "nn.InstanceNorm3d"
+         print(f"Detected 3D setup; using patch size {new_patch_size} and 3D ops")
+ 
+     min_labeled_ratio = min_labeled_percentage / 100.0
+ 
+-    # Update configuration with new parameters
+-    _config_manager.update_config(
++    # Update configuration with new parameters. Patches are selected by the widget's
++    # labeled percentage alone; the label bounding-box criterion is off.
++    mgr.update_config(
+         patch_size=new_patch_size,
+         min_labeled_ratio=min_labeled_ratio,
+         max_epochs=max_epochs,
+         skip_patch_validation=False,
+-        min_bbox_percent=0.90
++        min_bbox_percent=0.0
+     )
+ 
+-    # Now that data_format is set to 'napari', the dataset orchestrator will handle target detection
+-    # The napari adapter extracts images from the viewer and configures targets automatically
+-
+-    # Check for proper naming convention
+-    valid_pairs = False
+-    for img_layer in image_layers:
+-        for lbl_layer in label_layers:
+-            if lbl_layer.name.startswith(f"{img_layer.name}_") and not lbl_layer.name.endswith("_mask"):
+-                valid_pairs = True
+-                break
+-        if valid_pairs:
+-            break
+-    
+-    if not valid_pairs:
+-        print("Error: No valid image-label pairs found.")
+-        print("Label layers should be named as: {image_name}_{target_name}")
+-        print("For example: if image is 'image1', label should be 'image1_ink'")
+-        return
+-
+-    _export_viewer_layers(image_layers, label_layers)
+-
++    run_dir = Path(tempfile.mkdtemp(prefix="napari_trainer_"))
+     try:
++        _export_viewer_layers(mgr, pairs, run_dir / "data")
++        for target_name in mgr.targets:
++            mgr.targets[target_name]['losses'] = [{"name": loss_function, "weight": 1.0, "kwargs": {}}]
++            print(f"  - Set loss function for target '{target_name}' to {loss_function}")
++        _write_patch_cache(mgr, min_labeled_percentage)
++
+         from vesuvius.models.training.train import BaseTrainer
+-        
+-        # Create trainer - it will initialize the dataset which will detect targets
+-        trainer = BaseTrainer(mgr=_config_manager, verbose=True)
+-        
+-        # Now apply the selected loss function to all detected targets
+-        if hasattr(_config_manager, 'targets') and _config_manager.targets:
+-            print(f"\nApplying {loss_function} to all detected targets...")
+-            for target_name in _config_manager.targets:
+-                _config_manager.targets[target_name]['losses'] = [{
+-                    "name": loss_function,
+-                    "weight": 1.0,
+-                    "kwargs": {}
+-                }]
+-                print(f"  - Set loss function for target '{target_name}' to {loss_function}")
+-        
++
++        trainer = BaseTrainer(mgr=mgr, verbose=True)
+         print("\nStarting training...")
+         trainer.train()
+-        
++
+     except Exception as e:
+         print(f"\nError during training: {e}")
+         import traceback
+         traceback.print_exc()
+         raise
++    finally:
++        shutil.rmtree(run_dir, ignore_errors=True)
++        print(f"Removed the exported layers ({run_dir})")
++
++
++def _pair_layers(image_layers, label_layers):
++    """Pair each '<image>_<target>' label layer with its image layer. A label whose name
++    starts with several image names ('vol_crop_ink' with images 'vol' and 'vol_crop')
++    belongs to the longest one. Returns [(image_layer, [(target, label_layer), ...]), ...]."""
++    pairs = {}
++    for lbl_layer in label_layers:
++        if lbl_layer.name.endswith("_mask"):
++            continue
++        owners = [img for img in image_layers if lbl_layer.name.startswith(f"{img.name}_")]
++        if not owners:
++            continue
++        img_layer = max(owners, key=lambda l: len(l.name))
++        target = lbl_layer.name[len(img_layer.name) + 1:]
++        pairs.setdefault(img_layer.name, (img_layer, []))[1].append((target, lbl_layer))
++    return list(pairs.values())
++
++
++def _check_trains_on_viewer_layers(mgr, pairs):
++    """Refuse configs that would train on other data, targets that are not plain names,
++    and labels that do not cover their image voxel for voxel."""
++    dataset_config = getattr(mgr, 'dataset_config', None) or {}
++    if dataset_config.get("volumes"):
++        raise ValueError(
++            "The selected config lists dataset_config.volumes; the trainer would read those "
++            "volumes instead of the viewer's layers. Choose a config without 'volumes'.")
++    dataset_type = str(dataset_config.get("dataset_type", "zarr")).strip().lower()
++    if dataset_type != "zarr":
++        raise ValueError(
++            f"The selected config uses dataset_type '{dataset_type}', which reads its own image and "
++            "label data instead of the viewer's layers. Choose a config with the default 'zarr' dataset.")
++
++    for img_layer, labels in pairs:
++        for target, lbl_layer in labels:
++            if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", target):
++                raise ValueError(
++                    f"Label layer '{lbl_layer.name}' names the target '{target}'; target names may only "
++                    "contain letters, digits, '_' and '-'.")
++            if np.shape(lbl_layer.data) != np.shape(img_layer.data):
++                raise ValueError(
++                    f"Label layer '{lbl_layer.name}' has shape {np.shape(lbl_layer.data)}, but image layer "
++                    f"'{img_layer.name}' has shape {np.shape(img_layer.data)}; a label layer must cover "
++                    "its image voxel for voxel.")
++            for attr in ("scale", "translate", "rotate", "shear", "affine"):
++                img_value, lbl_value = getattr(img_layer, attr, None), getattr(lbl_layer, attr, None)
++                img_value = getattr(img_value, "affine_matrix", img_value)
++                lbl_value = getattr(lbl_value, "affine_matrix", lbl_value)
++                if img_value is None and lbl_value is None:
++                    continue
++                if (img_value is None or lbl_value is None or np.shape(img_value) != np.shape(lbl_value)
++                        or not np.allclose(img_value, lbl_value)):
++                    raise ValueError(
++                        f"Label layer '{lbl_layer.name}' is not on the grid of image layer '{img_layer.name}': "
++                        f"its {attr} is {lbl_value}, the image's is {img_value}. Training reads both by "
++                        "array index, so they need the same scale, translate, rotate, shear and affine.")
++
+ 
+ def _write_layer_zarr(path, data):
+     from vc_reader.reader import ZarrWriter
+@@ -178,29 +224,38 @@ def _write_layer_zarr(path, data):
+     ZarrWriter.create(path, shape=data.shape, chunks=chunks, dtype=data.dtype, overwrite=True)[...] = data
+ 
+ 
+-def _export_viewer_layers(image_layers, label_layers):
+-    """Write each image layer and its '<image>_<target>' label layers to a new
+-    data_path in the images/ + labels/ layout the trainer's ZarrDataset reads,
+-    and set the config's data_path and targets to them."""
+-    data_path = Path(tempfile.mkdtemp(prefix="napari_trainer_"))
++def _export_viewer_layers(mgr, pairs, data_path):
++    """Write the paired layers to data_path in the images/ + labels/ layout the trainer's
++    ZarrDataset reads (file names are indexes, not layer names), and set the run's
++    data_path and targets to them."""
+     targets = {}
+-    for img_layer in image_layers:
+-        pairs = [l for l in label_layers
+-                 if l.name.startswith(f"{img_layer.name}_") and not l.name.endswith("_mask")]
+-        if not pairs:
+-            continue
+-        _write_layer_zarr(data_path / "images" / f"{img_layer.name}.zarr", img_layer.data)
+-        for lbl_layer in pairs:
+-            _write_layer_zarr(data_path / "labels" / f"{lbl_layer.name}.zarr", lbl_layer.data)
+-            target = lbl_layer.name[len(img_layer.name) + 1:]
++    for index, (img_layer, labels) in enumerate(pairs):
++        volume_id = f"image{index}"
++        _write_layer_zarr(data_path / "images" / f"{volume_id}.zarr", img_layer.data)
++        for target, lbl_layer in labels:
++            _write_layer_zarr(data_path / "labels" / f"{volume_id}_{target}.zarr", lbl_layer.data)
+             # A target the loaded config defines keeps its settings (losses, ignore label, ...).
+-            targets.setdefault(target, deepcopy(_config_manager.targets.get(target, {})))
++            targets.setdefault(target, deepcopy(mgr.targets.get(target, {})))
++            print(f"Exported '{img_layer.name}' + '{lbl_layer.name}' as {volume_id}, target '{target}'")
+ 
+-    _config_manager.data_path = data_path
+-    _config_manager.set_targets_and_data(targets, {})
++    mgr.data_path = data_path
++    mgr.set_targets_and_data(targets, {})
+     print(f"Wrote the viewer's layers to {data_path} (targets: {', '.join(targets)})")
+ 
+ 
++def _write_patch_cache(mgr, min_labeled_percentage):
++    """Select the training patches with at least the widget's labeled percentage, with
++    vesuvius.find_patches' generator; ZarrDataset reads the cache it writes to data_path."""
++    from vesuvius.models.preprocessing.patches.generate import generate_patch_caches_for_config
++
++    result = generate_patch_caches_for_config(mgr, force=True)
++    if result.total_fg_patches == 0:
++        raise ValueError(
++            f"No {'x'.join(map(str, mgr.train_patch_size))} patch of the paired layers has at least "
++            f"{min_labeled_percentage}% labeled voxels; lower Min Labeled Percentage, the patch size, or label more.")
++    print(f"{result.total_fg_patches} patches have at least {min_labeled_percentage}% labeled voxels")
++
++
+ def main():
+     viewer = napari.Viewer()
+     global _config_manager
+diff --git a/vesuvius/tests/napari_trainer/test_main_window.py b/vesuvius/tests/napari_trainer/test_main_window.py
+index 1ce65d7f6..cf101ba53 100644
+--- a/vesuvius/tests/napari_trainer/test_main_window.py
++++ b/vesuvius/tests/napari_trainer/test_main_window.py
+@@ -8,7 +8,9 @@ import inspect
+ import sys
+ import tempfile
+ import types
++from copy import deepcopy
+ from pathlib import Path
++from types import SimpleNamespace
+ 
+ import numpy as np
+ import pytest
+@@ -92,6 +94,9 @@ def test_run_training_trains_on_the_viewer_layers(main_window, monkeypatch):
+         def train(self):
+             seen["dataset"] = ZarrDataset(mgr=self.mgr, is_training=True)
+             seen["targets"] = {name: dict(info) for name, info in self.mgr.targets.items()}
++            # the exported layers are removed when the run ends
++            seen["arrays"] = [(np.asarray(v.image_array[:]), np.asarray(v.label_arrays["ink"][:]))
++                              for v in seen["dataset"]._volumes]
+ 
+     monkeypatch.setattr(train, "BaseTrainer", RecordingTrainer)
+ 
+@@ -110,10 +115,10 @@ def test_run_training_trains_on_the_viewer_layers(main_window, monkeypatch):
+     main_window.run_training(patch_size_z=0, patch_size_x=32, patch_size_y=32,
+                              min_labeled_percentage=10.0, max_epochs=1)
+ 
+-    volumes = seen["dataset"]._volumes
+-    assert [v.volume_id for v in volumes] == ["vol01"]
+-    np.testing.assert_array_equal(np.asarray(volumes[0].image_array[:]), image)
+-    np.testing.assert_array_equal(np.asarray(volumes[0].label_arrays["ink"][:]), label)
++    volumes = seen["arrays"]
++    assert len(volumes) == 1
++    np.testing.assert_array_equal(volumes[0][0], image)
++    np.testing.assert_array_equal(volumes[0][1], label)
+     assert list(seen["targets"]) == ["ink"]
+     assert seen["targets"]["ink"]["losses"][0]["name"] == "nnUNet_DC_and_CE_loss"
+ 
+@@ -126,3 +131,199 @@ def test_loss_choices_are_losses_the_trainer_knows(main_window):
+                                       inspect.signature(main_window.run_training).parameters["loss_function"].default}
+     for name in sorted(names):
+         _create_loss(name, {}, None, -100, None)
++
++
++def _default_manager():
++    import vesuvius
++    from vesuvius.models.configuration.config_manager import ConfigManager
++
++    mgr = ConfigManager(verbose=False)
++    mgr.load_config(Path(vesuvius.__file__).parent / "models/configuration/single_task/ps128_dicece.yaml")
++    return mgr
++
++
++@pytest.fixture
++def recorded(main_window, monkeypatch):
++    """BaseTrainer replaced by a recorder of the config and dataset each run trains on."""
++    from vesuvius.models.datasets import ZarrDataset
++    import vesuvius.models.training.train as train
++
++    runs = []
++
++    class RecordingTrainer:
++        def __init__(self, mgr, verbose=True):
++            self.mgr = mgr
++
++        def train(self):
++            dataset = ZarrDataset(mgr=self.mgr, is_training=True)
++            arrays = [(np.asarray(v.image_array[:]),
++                       {t: np.asarray(a[:]) for t, a in v.label_arrays.items() if a is not None})
++                      for v in dataset._volumes]  # read now: the export is removed when the run ends
++            runs.append(SimpleNamespace(mgr=self.mgr, data_path=Path(self.mgr.data_path), dataset=dataset,
++                                        arrays=arrays, targets=deepcopy(self.mgr.targets)))
++
++    monkeypatch.setattr(train, "BaseTrainer", RecordingTrainer)
++    main_window._config_manager = _default_manager()
++    return runs
++
++
++def _viewer(*layers):
++    viewer = sys.modules["napari"].Viewer()
++    viewer.layers = list(layers)
++    return viewer
++
++
++def _pair(name="vol01", target="ink", shape=(64, 64)):
++    image = np.random.default_rng(0).integers(0, 255, size=shape).astype(np.uint8)
++    label = np.zeros(shape, dtype=np.uint8)
++    label[..., 8:56, 8:56] = 1
++    return _Image(image, name), _Labels(label, f"{name}_{target}")
++
++
++def _train(main_window, z=0, percent=10.0):
++    main_window.run_training(patch_size_z=z, patch_size_x=32, patch_size_y=32,
++                             min_labeled_percentage=percent, max_epochs=1)
++
++
++def test_training_uses_a_copy_of_the_selected_config(main_window, recorded):
++    selected = main_window._config_manager
++    before = (deepcopy(selected.convert_to_dict()), selected.data_path, selected.train_patch_size)
++
++    _viewer(*_pair(target="surface"))
++    _train(main_window)
++    _viewer(*_pair(target="ink"))
++    _train(main_window)
++
++    assert main_window._config_manager is selected
++    assert (selected.convert_to_dict(), selected.data_path, selected.train_patch_size) == before
++    assert all(run.mgr is not selected for run in recorded)
++    assert list(recorded[0].targets) == ["surface"]
++    # ink -> surface -> ink keeps the YAML's ink settings
++    assert list(recorded[1].targets) == ["ink"]
++    assert recorded[1].targets["ink"]["ignore_label"] == 2
++
++
++def test_label_layer_pairs_with_the_longest_matching_image_name(main_window, recorded):
++    rng = np.random.default_rng(1)
++    vol = _Image(rng.integers(0, 255, size=(64, 64)).astype(np.uint8), "vol")
++    crop, label = _pair("vol_crop")
++
++    _viewer(vol, crop, label)
++    _train(main_window)
++
++    volumes = recorded[0].arrays
++    assert len(volumes) == 1
++    np.testing.assert_array_equal(volumes[0][0], crop.data)
++    np.testing.assert_array_equal(volumes[0][1]["ink"], label.data)
++    assert list(recorded[0].targets) == ["ink"]
++
++
++@pytest.mark.parametrize("change, message", [
++    (lambda image, label: setattr(label, "translate", np.array([5.0, 0.0])), "translate"),
++    (lambda image, label: setattr(label, "scale", np.array([2.0, 2.0])), "scale"),
++    (lambda image, label: setattr(label, "data", label.data[:, :32]), "shape"),
++])
++def test_label_layer_on_another_grid_is_rejected(main_window, recorded, change, message):
++    image, label = _pair()
++    image.translate, image.scale = np.zeros(2), np.ones(2)
++    label.translate, label.scale = np.zeros(2), np.ones(2)
++    change(image, label)
++
++    _viewer(image, label)
++    with pytest.raises(ValueError, match=message):
++        _train(main_window)
++    assert recorded == []
++
++
++@pytest.mark.parametrize("dataset_config, message", [
++    ({"volumes": [{"image": "elsewhere.zarr", "label": "elsewhere_ink.zarr"}]}, "dataset_config.volumes"),
++    ({"dataset_type": "cross_frame", "image_zarr_url": "file:///nowhere/image.zarr",
++      "labels_zarr_url": "file:///nowhere/labels.zarr", "transform_json_url": "file:///nowhere/t.json"},
++     "cross_frame"),
++])
++def test_configs_that_read_other_data_are_rejected(main_window, recorded, dataset_config, message):
++    main_window._config_manager.dataset_config.update(dataset_config)
++
++    _viewer(*_pair())
++    with pytest.raises(ValueError, match=message):
++        _train(main_window)
++    assert recorded == []
++
++
++def test_exports_stay_in_a_run_directory_removed_after_the_run(main_window, recorded, monkeypatch, tmp_path):
++    import vesuvius.models.training.train as train
++
++    _viewer(*_pair("../../escaped"))
++    _train(main_window)
++
++    data_path = recorded[0].data_path
++    assert data_path.is_relative_to(tmp_path)
++    assert not data_path.exists()
++    assert [p for p in tmp_path.rglob("*") if "escaped" in p.name] == []
++    assert [p for p in tmp_path.iterdir() if p.name.startswith("napari_trainer_")] == []
++
++    class FailingTrainer:
++        def __init__(self, mgr, verbose=True):
++            self.mgr = mgr
++
++        def train(self):
++            recorded.append(Path(self.mgr.data_path))
++            raise RuntimeError("training failed")
++
++    monkeypatch.setattr(train, "BaseTrainer", FailingTrainer)
++    with pytest.raises(RuntimeError, match="training failed"):
++        _train(main_window)
++    assert recorded[-1].is_relative_to(tmp_path) and not recorded[-1].exists()
++
++    image, label = _pair()
++    label.name = "vol01_../../escaped"
++    _viewer(image, label)
++    with pytest.raises(ValueError, match="target"):
++        _train(main_window)
++
++
++def test_min_labeled_percentage_selects_the_patches(main_window, recorded):
++    image, label = _pair()
++    label.data = np.zeros_like(label.data)
++    label.data[4:8, 4:8] = 1  # 16 of the 1024 pixels of one 32x32 patch
++
++    _viewer(image, label)
++    _train(main_window, percent=0.0)
++    _train(main_window, percent=1.0)
++
++    assert [len(run.dataset._patches) for run in recorded] == [4, 1]
++    assert [p.position for p in recorded[1].dataset._patches] == [(0, 0)]
++    with pytest.raises(ValueError, match="Min Labeled Percentage"):
++        _train(main_window, percent=10.0)
++
++
++def test_3d_layers_with_patch_size_z_0_are_rejected(main_window, recorded):
++    _viewer(*_pair(shape=(8, 64, 64)))
++
++    with pytest.raises(ValueError, match="Patch Size Z"):
++        _train(main_window, z=0)
++    assert recorded == []
++
++
++def test_offered_losses_fit_the_default_target_and_keep_its_ignore_label(main_window):
++    import torch
++    from vesuvius.models.training.train import BaseTrainer
++
++    widget = main_window.run_training.options["loss_function"]
++    torch.manual_seed(0)
++    target = (torch.rand(2, 1, 16, 16) > 0.5).float()
++    target[:, :, :4] = 2  # ignore label of the default config
++    fg = (target == 1).float()
++    correct = torch.cat([10 - 20 * fg, 20 * fg - 10], dim=1)  # two-channel logits that match the target
++    for name in widget["choices"]:
++        task = {"ignore_label": 2, "losses": [{"name": name, "weight": 1.0, "kwargs": {}}]}
++        trainer = SimpleNamespace(mgr=SimpleNamespace(targets={"ink": task}, enable_deep_supervision=False))
++        loss_fn = BaseTrainer._build_loss(trainer)["ink"][0][0]
++
++        loss = loss_fn(correct, target)
++        assert torch.isfinite(loss), name
++        assert loss < loss_fn(correct.flip(1), target), name
++        changed = correct.clone()
++        changed[:, :, :4] = torch.randn_like(changed[:, :, :4]) * 10  # only where the label is ignored
++        torch.testing.assert_close(loss_fn(changed, target), loss, msg=name)
++
+-- 
+2.47.3
+
+
+From 41775063dbf86f4ba01cd4a9384243cd17319826 Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 04:33:57 +0000
+Subject: [PATCH 2/4] models: compute VOI on 2D validation patches
+
+The trainer installs VOIMetric for every target, but its bounding-box
+crop asserted a 3D mask, so validation of a 2D model (the napari
+trainer's 2D workflow) stopped with an AssertionError before the first
+checkpoint. Compute the bounding box for 2D and 3D masks;
+label_components already reads connectivity 26 as 8 on a 2D mask, so a
+2D patch gives the same VOI as the same patch as a one-slice volume.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../src/vesuvius/models/evaluation/voi.py     | 21 ++++------
+ .../napari_trainer/test_validation_2d.py      | 42 +++++++++++++++++++
+ 2 files changed, 51 insertions(+), 12 deletions(-)
+ create mode 100644 vesuvius/tests/napari_trainer/test_validation_2d.py
+
+diff --git a/vesuvius/src/vesuvius/models/evaluation/voi.py b/vesuvius/src/vesuvius/models/evaluation/voi.py
+index 8a8731ef3..49e93573c 100644
+--- a/vesuvius/src/vesuvius/models/evaluation/voi.py
++++ b/vesuvius/src/vesuvius/models/evaluation/voi.py
+@@ -12,7 +12,8 @@ class VOIMetric(BaseMetric):
+     Variation of Information (VOI) metric for 3D segmentation.
+ 
+     Computes VOI between connected-component labelings derived from binary FG masks.
+-    Uses 26-connectivity for 3D connected components.
++    Uses 26-connectivity for 3D connected components; on 2D patches
++    label_components reads it as 8-connectivity.
+ 
+     Returns:
+         voi_total: voi_split + voi_merge (lower is better)
+@@ -47,17 +48,17 @@ class VOIMetric(BaseMetric):
+         )
+ 
+ 
+-def _bbox3d(mask: np.ndarray) -> Optional[Tuple[slice, slice, slice]]:
+-    """Compute 3D bounding box of binary mask."""
+-    assert mask.ndim == 3
++def _bbox3d(mask: np.ndarray) -> Optional[Tuple[slice, ...]]:
++    """Compute the bounding box of a binary 2D or 3D mask."""
++    assert mask.ndim in (2, 3)
+     sls = []
+-    for ax in range(3):
+-        proj = mask.any(axis=tuple(i for i in range(3) if i != ax))
++    for ax in range(mask.ndim):
++        proj = mask.any(axis=tuple(i for i in range(mask.ndim) if i != ax))
+         idx = np.flatnonzero(proj)
+         if idx.size == 0:
+             return None
+         sls.append(slice(int(idx[0]), int(idx[-1]) + 1))
+-    return (sls[0], sls[1], sls[2])
++    return tuple(sls)
+ 
+ 
+ def _compute_voi_3d(
+@@ -86,11 +87,7 @@ def _compute_voi_3d(
+     if slc is not None:
+         crop_ratio = 0.7
+         full_n = int(np.prod(gt_bin.shape, dtype=np.int64))
+-        bbox_n = int(
+-            (slc[0].stop - slc[0].start) *
+-            (slc[1].stop - slc[1].start) *
+-            (slc[2].stop - slc[2].start)
+-        )
++        bbox_n = int(np.prod([sl.stop - sl.start for sl in slc], dtype=np.int64))
+         use_crop = (bbox_n <= int(crop_ratio * full_n))
+ 
+         if use_crop:
+diff --git a/vesuvius/tests/napari_trainer/test_validation_2d.py b/vesuvius/tests/napari_trainer/test_validation_2d.py
+new file mode 100644
+index 000000000..6e29250ef
+--- /dev/null
++++ b/vesuvius/tests/napari_trainer/test_validation_2d.py
+@@ -0,0 +1,42 @@
++"""The trainer's validation metrics accept the 2D patches of the napari trainer's 2D workflow."""
++from types import SimpleNamespace
++
++import pytest
++
++torch = pytest.importorskip("torch")
++pytest.importorskip("vc_reader")
++
++from vesuvius.models.evaluation.voi import compute_voi
++from vesuvius.models.training.train import BaseTrainer
++
++
++def _batch():
++    torch.manual_seed(0)
++    gt = torch.zeros(2, 1, 32, 32)
++    gt[:, :, 4:12, 4:28] = 1
++    gt[:, :, 20:28, 4:14] = 1
++    gt[:, :, :, 30:] = 2  # ignore label
++    pred = torch.randn(2, 2, 32, 32)
++    pred[:, 1] += 4 * (gt[:, 0] == 1)
++    return pred, gt
++
++
++def test_validation_metrics_accept_2d_patches():
++    pred, gt = _batch()
++    trainer = SimpleNamespace(mgr=SimpleNamespace(targets={"ink": {"ignore_label": 2}}))
++    metrics = BaseTrainer._initialize_evaluation_metrics(trainer)["ink"]
++
++    for metric in metrics:
++        metric.update(pred=pred, gt=gt, mask=None)
++
++    assert {type(m).__name__ for m in metrics} >= {"VOIMetric"}
++
++
++def test_2d_voi_equals_voi_of_the_same_patch_as_a_one_slice_volume():
++    pred, gt = _batch()
++
++    voi_2d = compute_voi(pred, gt, ignore_index=2)
++    voi_3d = compute_voi(pred[:, :, None], gt[:, :, None], ignore_index=2)
++
++    assert voi_2d == pytest.approx(voi_3d)
++    assert voi_2d["voi_total"] > 0
+-- 
+2.47.3
+
+
+From cbea85f479e8373913ef80768500f7a47cdba441 Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 04:33:57 +0000
+Subject: [PATCH 3/4] napari_trainer: restore the checkpoint's network and stop
+ on missing weights
+
+Building from the checkpoint config missed three layouts the GUI config
+path had loaded: a target on the shared decoder next to one with its own
+decoder (the saved config says separate_decoders: true globally, so the
+shared target got a new, untrained decoder), the nested legacy 'config'
+(read as if it were the model config), and Primus, which saves its patch
+as input_shape while inference tiles with patch_size. Each target now
+gets the decoder its weights were saved with, the legacy config is
+unwrapped as vesuvius.predict does, and input_shape is returned as
+patch_size.
+
+load_state_dict(strict=False) also printed success when network tensors
+were missing from the checkpoint, and the output layer came from
+untrained weights. Missing tensors (and shape mismatches) now stop
+inference with an error before any layer is added; extra checkpoint
+tensors, such as deep-supervision or old shared-decoder heads, are
+skipped as before. DDP/torch.compile key prefixes are stripped.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../src/vesuvius/napari_trainer/inference.py  | 125 ++++++++++++------
+ .../test_inference_checkpoint_config.py       | 113 +++++++++++++++-
+ 2 files changed, 194 insertions(+), 44 deletions(-)
+
+diff --git a/vesuvius/src/vesuvius/napari_trainer/inference.py b/vesuvius/src/vesuvius/napari_trainer/inference.py
+index 876e40acd..c334542c9 100644
+--- a/vesuvius/src/vesuvius/napari_trainer/inference.py
++++ b/vesuvius/src/vesuvius/napari_trainer/inference.py
+@@ -9,10 +9,54 @@ from tqdm.auto import tqdm
+ import contextlib
+ from typing import Optional, List, Tuple, Dict, Any, Union, Callable
+ import itertools
++from copy import deepcopy
+ 
+ from vesuvius.models.run.blending import generate_gaussian_map
+ from vesuvius.utils.models.helpers import compute_steps_for_sliding_window
+ 
++def _checkpoint_model_config(checkpoint_data):
++    """The network config a train.py checkpoint was saved with: its 'model_config', or the
++    nested legacy 'config' unwrapped (as vesuvius.predict reads it). Primus saves its patch
++    as 'input_shape'; it is also returned as 'patch_size', which inference tiles with."""
++    if checkpoint_data.get('model_config'):
++        model_config = deepcopy(checkpoint_data['model_config'])
++    else:
++        legacy = checkpoint_data['config']
++        model_config = deepcopy(legacy.get('model_config') or {})
++        if 'patch_size' in legacy:
++            model_config.setdefault('patch_size', list(legacy['patch_size']))
++        for key in ('batch_size', 'in_channels', 'targets'):
++            if key in legacy:
++                model_config.setdefault(key, deepcopy(legacy[key]))
++    if 'patch_size' not in model_config and 'train_patch_size' not in model_config and 'input_shape' in model_config:
++        model_config['patch_size'] = list(model_config['input_shape'])
++    return model_config
++
++
++def _apply_saved_decoder_layout(model_config, state_dict):
++    """Rebuild each target with the decoder its weights were saved with. The saved
++    'separate_decoders' is True as soon as one target has its own decoder, so a target
++    that used the shared decoder would otherwise get a separate, untrained one."""
++    for name, info in (model_config.get('targets') or {}).items():
++        if any(k.startswith(f"task_decoders.{name}.") for k in state_dict):
++            info['separate_decoder'] = True
++        elif any(k.startswith(f"task_heads.{name}.") for k in state_dict):
++            info['separate_decoder'] = False
++
++
++def _strip_wrapper_prefixes(state_dict):
++    """Drop DDP ('module.') and torch.compile ('_orig_mod.') key prefixes."""
++    def strip(key):
++        changed = True
++        while changed:
++            changed = False
++            for prefix in ('module.', '_orig_mod.'):
++                if key.startswith(prefix):
++                    key, changed = key[len(prefix):], True
++        return key
++    return {strip(k): v for k, v in state_dict.items()}
++
++
+ # Model loader class
+ class ModelLoader:
+     """
+@@ -28,20 +72,18 @@ class ModelLoader:
+             raise FileNotFoundError(f"Checkpoint not found: {self.checkpoint_path}")
+             
+         checkpoint_data = torch.load(self.checkpoint_path, map_location='cpu', weights_only=False)
+-        
+-        # Try to extract model configuration
+-        model_config = {}
+-        if 'model_config' in checkpoint_data:
+-            model_config = checkpoint_data['model_config']
+-        elif 'config' in checkpoint_data:
+-            model_config = checkpoint_data['config']
+-        elif self.config_manager is not None:
+-            # Use config from config manager
+-            model_config = self.config_manager.model_config
+-            print(f"Using model configuration from config manager")
++
++        if 'model' in checkpoint_data:
++            print("Loading weights from 'model' key in checkpoint")
++            model_state_dict = checkpoint_data['model']
++        elif 'model_state_dict' in checkpoint_data:
++            model_state_dict = checkpoint_data['model_state_dict']
++        elif 'state_dict' in checkpoint_data:
++            model_state_dict = checkpoint_data['state_dict']
+         else:
+-            print(f"Warning: No model configuration found in checkpoint. Using empty config.")
+-        
++            model_state_dict = checkpoint_data
++        model_state_dict = _strip_wrapper_prefixes(model_state_dict)
++
+         from vesuvius.models.build.build_network_from_config import NetworkFromConfig
+         
+         class MinimalConfigManager:
+@@ -56,46 +98,43 @@ class ModelLoader:
+                 
+                 self.spacing = [1] * len(self.train_patch_size)
+                 self.model_name = "Loaded_Model"
+-                
++
+         # The checkpoint's own config describes the network its weights belong to;
+         # the GUI's config manager is only a fallback for checkpoints without one.
+-        checkpoint_has_config = 'model_config' in checkpoint_data or 'config' in checkpoint_data
+-        if self.config_manager is not None and not checkpoint_has_config:
++        if checkpoint_data.get('model_config') or isinstance(checkpoint_data.get('config'), dict):
++            model_config = _checkpoint_model_config(checkpoint_data)
++            _apply_saved_decoder_layout(model_config, model_state_dict)
++            mgr = MinimalConfigManager(model_config)
++        elif self.config_manager is not None:
++            # Use config from config manager
++            model_config = self.config_manager.model_config
+             mgr = self.config_manager
++            print(f"Using model configuration from config manager")
+         else:
++            print(f"Warning: No model configuration found in checkpoint. Using empty config.")
++            model_config = {}
+             mgr = MinimalConfigManager(model_config)
+             
+         model = NetworkFromConfig(mgr)
+         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+         model = model.to(device)
+-        
+-        model_state_dict = None
+-        if 'model' in checkpoint_data:
+-            print("Loading weights from 'model' key in checkpoint")
+-            model_state_dict = checkpoint_data['model']
+-        elif 'model_state_dict' in checkpoint_data:
+-            model_state_dict = checkpoint_data['model_state_dict']
+-        elif 'state_dict' in checkpoint_data:
+-            model_state_dict = checkpoint_data['state_dict']
+-        else:
+-            model_state_dict = checkpoint_data
+-        
+-        # Check if this is a compiled model state dict (keys will have "_orig_mod." prefix)
+-        is_compiled_state_dict = any("_orig_mod." in key for key in model_state_dict.keys())
+-        
+-        # If we're on CUDA and the state dict is from a compiled model,
+-        # compile our model before loading weights
+-        if device.type == 'cuda' and is_compiled_state_dict:
+-            print("On CUDA with compiled model checkpoint - compiling model before loading weights")
+-            model = torch.compile(model)
+-            
+-        # Load the state dict
++
++        # Every tensor of the network must come from the checkpoint; checkpoint tensors the
++        # network does not use (e.g. deep-supervision or old shared-decoder heads) are skipped.
+         try:
+-            model.load_state_dict(model_state_dict, strict=False)
+-            print("Model weights loaded successfully")
+-        except Exception as e:
+-            print(f"Warning: Error loading state dict: {str(e)}")
+-            print("Attempting to continue with partially loaded weights")
++            missing, unexpected = model.load_state_dict(model_state_dict, strict=False)
++        except RuntimeError as e:
++            raise RuntimeError(f"The weights in {self.checkpoint_path} do not fit the network built "
++                               f"from its config: {e}") from e
++        if missing:
++            raise RuntimeError(
++                f"{self.checkpoint_path} has no weights for {len(missing)} of the network's "
++                f"{len(model.state_dict())} tensors ({', '.join(missing[:5])}{', ...' if len(missing) > 5 else ''}); "
++                "not running inference with untrained weights.")
++        if unexpected:
++            print(f"Skipped {len(unexpected)} checkpoint tensors the inference network does not use "
++                  f"({', '.join(unexpected[:5])}{', ...' if len(unexpected) > 5 else ''})")
++        print("Model weights loaded successfully")
+                 
+         return model, model_config
+ 
+diff --git a/vesuvius/tests/napari_trainer/test_inference_checkpoint_config.py b/vesuvius/tests/napari_trainer/test_inference_checkpoint_config.py
+index 034a93c3c..1b7e9b887 100644
+--- a/vesuvius/tests/napari_trainer/test_inference_checkpoint_config.py
++++ b/vesuvius/tests/napari_trainer/test_inference_checkpoint_config.py
+@@ -1,13 +1,16 @@
+ """The napari trainer's inference builds the network a checkpoint was trained with."""
++import sys
++import types
+ from types import SimpleNamespace
+ 
++import numpy as np
+ import pytest
+ 
+ torch = pytest.importorskip("torch")
+ pytest.importorskip("napari")
+ 
+ from vesuvius.models.build.build_network_from_config import NetworkFromConfig
+-from vesuvius.napari_trainer.inference import ModelLoader
++from vesuvius.napari_trainer.inference import ModelLoader, run_inference
+ 
+ 
+ def _manager(features, targets):
+@@ -58,3 +61,111 @@ def test_gui_config_is_used_for_a_checkpoint_without_one(tmp_path):
+     model, _ = ModelLoader(path, config_manager=gui).load()
+ 
+     assert _differing_tensors(model, trained.state_dict()) == []
++
++
++def _outputs(model, shape=(1, 1, 32, 32)):
++    torch.manual_seed(1)
++    x = torch.randn(*shape)
++    model.eval()
++    with torch.no_grad():
++        return model(x)
++
++
++def test_per_target_decoder_layout_is_restored(tmp_path):
++    # ink uses the shared decoder, surface its own: the saved config says separate_decoders: true
++    targets = {"ink": {"out_channels": 2, "activation": "none"},
++               "surface": {"out_channels": 2, "activation": "none", "separate_decoder": True}}
++    torch.manual_seed(0)
++    trained = NetworkFromConfig(_manager([8, 16, 32], targets))
++    assert trained.final_config["separate_decoders"] is True
++    path = tmp_path / "mixed.pth"
++    torch.save({"model": trained.state_dict(), "model_config": trained.final_config}, path)
++
++    model, _ = ModelLoader(path).load()
++
++    assert _differing_tensors(model, trained.state_dict()) == []
++    expected, got = _outputs(trained), _outputs(model)
++    for name in targets:
++        torch.testing.assert_close(got[name], expected[name])
++
++
++def test_nested_legacy_config_is_unwrapped(tmp_path):
++    trained_mgr = _manager([8, 16, 32], {"ink": {"out_channels": 2, "activation": "none"}})
++    torch.manual_seed(0)
++    trained = NetworkFromConfig(trained_mgr)
++    model_config = {k: v for k, v in trained_mgr.model_config.items() if k not in ("targets", "patch_size")}
++    legacy = {"model_config": model_config, "patch_size": [32, 32], "batch_size": 1, "in_channels": 1,
++              "targets": {"ink": {"out_channels": 2, "activation": "none"}}}
++    path = tmp_path / "legacy.pth"
++    torch.save({"model": trained.state_dict(), "config": legacy}, path)
++
++    model, config = ModelLoader(path).load()
++
++    assert _differing_tensors(model, trained.state_dict()) == []
++    assert list(config["patch_size"]) == [32, 32]
++
++
++class _Viewer:
++    def __init__(self):
++        self.added = []
++
++    def add_image(self, data, name, **kwargs):
++        self.added.append((name, data))
++        return SimpleNamespace(name=name, data=data)
++
++
++@pytest.fixture
++def no_gui_config(monkeypatch):
++    main_window = types.ModuleType("vesuvius.napari_trainer.main_window")
++    main_window._config_manager = None
++    monkeypatch.setitem(sys.modules, "vesuvius.napari_trainer.main_window", main_window)
++
++
++def test_primus_checkpoint_infers_with_its_input_shape(tmp_path, no_gui_config):
++    mgr = SimpleNamespace(targets={"ink": {"out_channels": 2, "activation": "none"}}, train_patch_size=(16, 16, 16),
++                          train_batch_size=1, in_channels=1, autoconfigure=False, model_name="primus",
++                          enable_deep_supervision=False,
++                          model_config={"architecture_type": "primus_s", "input_shape": (16, 16, 16),
++                                        "patch_embed_size": (8, 8, 8)})
++    torch.manual_seed(0)
++    trained = NetworkFromConfig(mgr)
++    assert "patch_size" not in trained.final_config
++    path = tmp_path / "primus.pth"
++    torch.save({"model": trained.state_dict(), "model_config": trained.final_config}, path)
++    viewer = _Viewer()
++    image = SimpleNamespace(name="vol", data=np.random.default_rng(0).random((20, 24, 16)).astype(np.float32))
++
++    run_inference(viewer, image, str(path))
++
++    assert [(name, data.shape) for name, data in viewer.added] == [("vol_primus_ink", (1, 2, 20, 24, 16))]
++
++
++def test_missing_weights_stop_before_a_prediction(tmp_path, no_gui_config):
++    torch.manual_seed(0)
++    trained = NetworkFromConfig(_manager([8, 16, 32], {"ink": {"out_channels": 2, "activation": "none"}}))
++    state = trained.state_dict()
++    dropped = next(k for k in state if k.startswith("task_heads.ink."))
++    del state[dropped]
++    path = tmp_path / "incomplete.pth"
++    torch.save({"model": state, "model_config": trained.final_config}, path)
++    viewer = _Viewer()
++    image = SimpleNamespace(name="vol", data=np.zeros((32, 32), np.float32))
++
++    with pytest.raises(RuntimeError, match="no weights"):
++        run_inference(viewer, image, str(path))
++    assert viewer.added == []
++
++
++def test_extra_checkpoint_tensors_are_not_rejected(tmp_path):
++    torch.manual_seed(0)
++    trained = NetworkFromConfig(_manager([8, 16, 32], {"ink": {"out_channels": 2, "activation": "none"}}))
++    state = dict(trained.state_dict())
++    # e.g. the segmentation layers an older shared decoder or a deep-supervision decoder saved
++    state["shared_decoder.seg_layers.0.weight"] = torch.zeros(2, 16, 1, 1)
++    state["shared_decoder.seg_layers.0.bias"] = torch.zeros(2)
++    path = tmp_path / "extra.pth"
++    torch.save({"model": state, "model_config": trained.final_config}, path)
++
++    model, _ = ModelLoader(path).load()
++
++    assert _differing_tensors(model, trained.state_dict()) == []
+-- 
+2.47.3
+
+
+From 9ee250e0d2b8c5ba9dadfe1a2915472b0bfb348c Mon Sep 17 00:00:00 2001
+From: Ben <60955077+tencur@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 04:33:57 +0000
+Subject: [PATCH 4/4] vesuvius: ship the napari trainer's default config in the
+ wheel
+
+vesuvius.napari_trainer loads models/configuration/single_task/
+ps128_dicece.yaml at startup, but the YAML was not package data, so an
+installed wheel raised FileNotFoundError before the window opened.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ vesuvius/pyproject.toml                           |  1 +
+ vesuvius/tests/napari_trainer/test_main_window.py | 10 ++++++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/vesuvius/pyproject.toml b/vesuvius/pyproject.toml
+index e645bf3b8..3a7c67c63 100644
+--- a/vesuvius/pyproject.toml
++++ b/vesuvius/pyproject.toml
+@@ -187,6 +187,7 @@ where = ["src"]
+ [tool.setuptools.package-data]
+ vesuvius = [
+     "install/configs/cubes.yaml",
++    "models/configuration/single_task/ps128_dicece.yaml",
+     "ink_detection/configs/*.json",
+     "tifxyz_label_transfer/*.cpp",
+     "neural_tracing/fiber_trace_3d/fiber_lemon.cpp",
+diff --git a/vesuvius/tests/napari_trainer/test_main_window.py b/vesuvius/tests/napari_trainer/test_main_window.py
+index cf101ba53..c987f5c38 100644
+--- a/vesuvius/tests/napari_trainer/test_main_window.py
++++ b/vesuvius/tests/napari_trainer/test_main_window.py
+@@ -6,9 +6,11 @@ config manager, the layer export and the trainer's ZarrDataset are the real ones
+ import importlib
+ import inspect
+ import sys
++import tomllib
+ import tempfile
+ import types
+ from copy import deepcopy
++from fnmatch import fnmatch
+ from pathlib import Path
+ from types import SimpleNamespace
+ 
+@@ -327,3 +329,11 @@ def test_offered_losses_fit_the_default_target_and_keep_its_ignore_label(main_wi
+         changed[:, :, :4] = torch.randn_like(changed[:, :, :4]) * 10  # only where the label is ignored
+         torch.testing.assert_close(loss_fn(changed, target), loss, msg=name)
+ 
++
++def test_default_config_is_package_data(main_window):
++    pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
++    patterns = tomllib.loads(pyproject.read_text())["tool"]["setuptools"]["package-data"]["vesuvius"]
++    package_dir = Path(main_window.__file__).resolve().parents[1]
++    relative = main_window.DEFAULT_CONFIG_PATH.relative_to(package_dir).as_posix()
++
++    assert any(fnmatch(relative, pattern) for pattern in patterns)
+-- 
+2.47.3
+
