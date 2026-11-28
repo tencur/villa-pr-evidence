@@ -1,0 +1,8 @@
+## merge 3b3618644: where the axis length in check_axis_heads_patch_cache.py is below 0.99
+covered voxels 30400, length >= 0.99: 30143 (257 below, min 0.06131).
+Control: the same patches with every sign +1 and no sign_invariant mark (plain signed blend, same RNG draws):
+  min length 0.00376 = 0.06131^2; staged/cached/in-memory again bit-identical / max diff 0.
+The short voxels are where only the near-zero Gaussian tails of patches cover: the blend divides by
+sum(w) + 1e-8, giving w/(w+eps) for a signed vector and sqrt(w/(w+eps)) for the orientation-tensor
+length. That division (main and 07e29fccd alike) is untouched by the merge.
+(control = check_axis_heads_patch_cache.py with the `sign_invariant` mark removed and all signs +1)

@@ -1,0 +1,226 @@
+## merge 3b3618644: check_axis_heads_patch_cache.py
+Creating final output store: <scratch>/ref_None.zarr
+  Shape: (6, 24, 32, 40), Chunks: (1, 8, 8, 8)
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 3 parts...
+Loading bboxes:   0%|          | 0/3 [00:00<?, ?it/s]Loading bboxes: 100%|██████████| 3/3 [00:00<00:00, 1971.01it/s]
+  Filtering to relevant parts based on 60 chunks...
+  Reduced from 3 to 3 relevant parts
+  Loading coordinates and non-empty masks for 3 relevant parts...
+Loading metadata:   0%|          | 0/3 [00:00<?, ?it/s]Loading metadata: 100%|██████████| 3/3 [00:00<00:00, 1075.74it/s]
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+Generated Gaussian map with shape (1, 8, 8, 8), min: 0.0000, max: 1.0000
+chunks None: reference axis length over 30400 covered voxels: min 0.06131 max 0.99987
+Using 2 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <scratch>/parts
+Found 3 parts (IDs 0..2)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 8, 8, 8)
+  Patch Size: (8, 8, 8)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (24, 32, 40)
+Creating final output store: <scratch>/merged_None_256.zarr
+  Shape: (6, 24, 32, 40), Chunks: (1, 8, 8, 8)
+Generated Gaussian map with shape (1, 8, 8, 8), min: 0.0000, max: 1.0000
+Divided volume into 60 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Using cached bounding boxes for 3 parts
+  Filtering to relevant parts based on 60 chunks...
+  Reduced from 3 to 3 relevant parts
+  Loading coordinates and non-empty masks for 3 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 60
+  Skipped (no patches): 0
+  To process: 60
+  Total patch assignments: 719
+  Batches of neighbouring chunks: 8
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 0.1s
+  Chunks processed: 60
+  Chunks skipped (empty): 0
+  Patches processed: 719
+  Workers: 2
+  Avg rate: 639.1 chunks/s
+  Zarr chunk reads: 378
+  Patches reused from the batch cache: 341
+  Avg chunk size (uncompressed): 12.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.05 GB/s (2 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <scratch>/merged_None_256.zarr
+chunks None: merge_inference_outputs patch_cache_mb=256 bit-identical to reference: True
+Using 2 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <scratch>/parts
+Found 3 parts (IDs 0..2)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 8, 8, 8)
+  Patch Size: (8, 8, 8)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (24, 32, 40)
+Creating final output store: <scratch>/merged_None_0.zarr
+  Shape: (6, 24, 32, 40), Chunks: (1, 8, 8, 8)
+Generated Gaussian map with shape (1, 8, 8, 8), min: 0.0000, max: 1.0000
+Divided volume into 60 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Using cached bounding boxes for 3 parts
+  Filtering to relevant parts based on 60 chunks...
+  Reduced from 3 to 3 relevant parts
+  Loading coordinates and non-empty masks for 3 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 60
+  Skipped (no patches): 0
+  To process: 60
+  Total patch assignments: 719
+  Batches of neighbouring chunks: 60
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 0.1s
+  Chunks processed: 60
+  Chunks skipped (empty): 0
+  Patches processed: 719
+  Workers: 2
+  Avg rate: 562.1 chunks/s
+  Zarr chunk reads: 719
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 12.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.08 GB/s (2 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <scratch>/merged_None_0.zarr
+chunks None: merge_inference_outputs patch_cache_mb=  0 bit-identical to reference: True
+Generated Gaussian map with shape (1, 8, 8, 8), min: 0.0000, max: 1.0000
+Creating final output store: <scratch>/inmemory_None.zarr
+  Shape: (6, 24, 32, 40), Chunks: (1, 8, 8, 8)
+chunks None: InMemoryBlender max |diff| vs staged reference: 0.00000
+Creating final output store: <scratch>/ref_(10, 12, 12).zarr
+  Shape: (6, 24, 32, 40), Chunks: (1, 10, 12, 12)
+
+--- Building Spatial Patch Index ---
+  Using cached bounding boxes for 3 parts
+  Filtering to relevant parts based on 36 chunks...
+  Reduced from 3 to 3 relevant parts
+  Loading coordinates and non-empty masks for 3 relevant parts...
+Loading metadata:   0%|          | 0/3 [00:00<?, ?it/s]Loading metadata: 100%|██████████| 3/3 [00:00<00:00, 2014.56it/s]
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+Generated Gaussian map with shape (1, 8, 8, 8), min: 0.0000, max: 1.0000
+chunks (10, 12, 12): reference axis length over 30400 covered voxels: min 0.06131 max 0.99987
+Using 2 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <scratch>/parts
+Found 3 parts (IDs 0..2)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 8, 8, 8)
+  Patch Size: (8, 8, 8)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (24, 32, 40)
+Creating final output store: <scratch>/merged_(10, 12, 12)_256.zarr
+  Shape: (6, 24, 32, 40), Chunks: (1, 10, 12, 12)
+Generated Gaussian map with shape (1, 8, 8, 8), min: 0.0000, max: 1.0000
+Divided volume into 36 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Using cached bounding boxes for 3 parts
+  Filtering to relevant parts based on 36 chunks...
+  Reduced from 3 to 3 relevant parts
+  Loading coordinates and non-empty masks for 3 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 36
+  Skipped (no patches): 0
+  To process: 36
+  Total patch assignments: 654
+  Batches of neighbouring chunks: 8
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 0.1s
+  Chunks processed: 36
+  Chunks skipped (empty): 0
+  Patches processed: 654
+  Workers: 2
+  Avg rate: 460.1 chunks/s
+  Zarr chunk reads: 366
+  Patches reused from the batch cache: 288
+  Avg chunk size (uncompressed): 12.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.05 GB/s (2 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <scratch>/merged_(10, 12, 12)_256.zarr
+chunks (10, 12, 12): merge_inference_outputs patch_cache_mb=256 bit-identical to reference: True
+Using 2 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: <scratch>/parts
+Found 3 parts (IDs 0..2)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 8, 8, 8)
+  Patch Size: (8, 8, 8)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (24, 32, 40)
+Creating final output store: <scratch>/merged_(10, 12, 12)_0.zarr
+  Shape: (6, 24, 32, 40), Chunks: (1, 10, 12, 12)
+Generated Gaussian map with shape (1, 8, 8, 8), min: 0.0000, max: 1.0000
+Divided volume into 36 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Using cached bounding boxes for 3 parts
+  Filtering to relevant parts based on 36 chunks...
+  Reduced from 3 to 3 relevant parts
+  Loading coordinates and non-empty masks for 3 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 36
+  Skipped (no patches): 0
+  To process: 36
+  Total patch assignments: 654
+  Batches of neighbouring chunks: 36
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 0.1s
+  Chunks processed: 36
+  Chunks skipped (empty): 0
+  Patches processed: 654
+  Workers: 2
+  Avg rate: 387.3 chunks/s
+  Zarr chunk reads: 654
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 12.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.08 GB/s (2 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: <scratch>/merged_(10, 12, 12)_0.zarr
+chunks (10, 12, 12): merge_inference_outputs patch_cache_mb=  0 bit-identical to reference: True
+Generated Gaussian map with shape (1, 8, 8, 8), min: 0.0000, max: 1.0000
+Creating final output store: <scratch>/inmemory_(10, 12, 12).zarr
+  Shape: (6, 24, 32, 40), Chunks: (1, 10, 12, 12)
+chunks (10, 12, 12): InMemoryBlender max |diff| vs staged reference: 0.00000

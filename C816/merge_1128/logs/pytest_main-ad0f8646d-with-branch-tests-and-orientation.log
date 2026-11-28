@@ -1,0 +1,1994 @@
+## main-ad0f8646d-with-branch-tests-and-orientation, tests/models/run, Python 3.13.5, torch 2.14.1+cpu, numpy 2.5.4, zarr 2.18.7 (same environment for every tree)
+.............................................F.......................... [ 38%]
+......................................................................FF [ 77%]
+FFFFFFFFFFFFFFFFFFFFFFFFF.FF.FFFFFFF.FF.FF                               [100%]
+=================================== FAILURES ===================================
+_______________ test_homogeneous_nonzero_class_chunk_is_written ________________
+
+    def test_homogeneous_nonzero_class_chunk_is_written():
+        """A skipped chunk reads back as the fill value 0, i.e. class 0."""
+        logits = np.zeros((NUM_CLASSES, 1, 2, 2), dtype=np.float32)
+        logits[2] = 30.0  # every voxel class 2 with probability 1
+        out, is_empty = apply_finalization(logits, NUM_CLASSES, FinalizeConfig(mode="multiclass", threshold=0.5))
+>       assert not is_empty
+E       assert not True
+
+tests/models/run/test_finalize_multiclass_scale.py:99: AssertionError
+_____________ test_tta_keeps_vector_and_tensor_heads[3-mirroring] ______________
+
+nd = 3, tta_type = 'mirroring'
+
+    @pytest.mark.parametrize("tta_type", ["mirroring", "rotation"])
+    @pytest.mark.parametrize("nd", [3, 2])
+    def test_tta_keeps_vector_and_tensor_heads(nd, tta_type):
+        targets = TARGETS if nd == 3 else TARGETS_2D
+        x = _volume((20, 20, 20) if nd == 3 else (24, 24))[None, None]
+        model, concat = Oracle(), _concat(targets)
+        reference = concat(model(x))
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), nd)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:100: AttributeError
+______________ test_tta_keeps_vector_and_tensor_heads[3-rotation] ______________
+
+nd = 3, tta_type = 'rotation'
+
+    @pytest.mark.parametrize("tta_type", ["mirroring", "rotation"])
+    @pytest.mark.parametrize("nd", [3, 2])
+    def test_tta_keeps_vector_and_tensor_heads(nd, tta_type):
+        targets = TARGETS if nd == 3 else TARGETS_2D
+        x = _volume((20, 20, 20) if nd == 3 else (24, 24))[None, None]
+        model, concat = Oracle(), _concat(targets)
+        reference = concat(model(x))
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), nd)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:100: AttributeError
+_____________ test_tta_keeps_vector_and_tensor_heads[2-mirroring] ______________
+
+nd = 2, tta_type = 'mirroring'
+
+    @pytest.mark.parametrize("tta_type", ["mirroring", "rotation"])
+    @pytest.mark.parametrize("nd", [3, 2])
+    def test_tta_keeps_vector_and_tensor_heads(nd, tta_type):
+        targets = TARGETS if nd == 3 else TARGETS_2D
+        x = _volume((20, 20, 20) if nd == 3 else (24, 24))[None, None]
+        model, concat = Oracle(), _concat(targets)
+        reference = concat(model(x))
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), nd)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:100: AttributeError
+______________ test_tta_keeps_vector_and_tensor_heads[2-rotation] ______________
+
+nd = 2, tta_type = 'rotation'
+
+    @pytest.mark.parametrize("tta_type", ["mirroring", "rotation"])
+    @pytest.mark.parametrize("nd", [3, 2])
+    def test_tta_keeps_vector_and_tensor_heads(nd, tta_type):
+        targets = TARGETS if nd == 3 else TARGETS_2D
+        x = _volume((20, 20, 20) if nd == 3 else (24, 24))[None, None]
+        model, concat = Oracle(), _concat(targets)
+        reference = concat(model(x))
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), nd)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:100: AttributeError
+__________________ test_batched_mirroring_matches_sequential ___________________
+
+    def test_batched_mirroring_matches_sequential():
+        x = _volume((16, 16, 16))[None, None]
+        model, concat = Oracle(), _concat(TARGETS)
+>       groups = tta.tta_channel_groups(TARGETS, _target_info(TARGETS), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:115: AttributeError
+_______________ test_segmentation_only_models_average_as_before ________________
+
+    def test_segmentation_only_models_average_as_before():
+        x = torch.rand(1, 1, 8, 8, 8)
+        model = torch.nn.Conv3d(1, 2, 3, padding=1)
+        flips = [[], [-1], [-2], [-3], [-1, -2], [-1, -3], [-2, -3], [-1, -2, -3]]
+        with torch.no_grad():
+            expected = torch.stack([torch.flip(model(torch.flip(x, f)), f) if f else model(x) for f in flips]).mean(0)
+            assert torch.equal(tta.infer_with_tta(model, x, "mirroring"), expected)
+>       assert tta.tta_channel_groups({"surface": {"out_channels": 2}}, _target_info({"surface": {"out_channels": 2}}), 3) == []
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:131: AttributeError
+_________________ test_predict_keeps_normals_with_default_tta __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc8171c0>
+
+    def test_predict_keeps_normals_with_default_tta(tmp_path, monkeypatch):
+        """vesuvius.predict on a multi-task checkpoint (default mirroring TTA) writes the normals it predicts."""
+        shape, patch = (32, 32, 32), (16, 16, 16)
+        volume = _volume(shape).numpy()
+        writer = ZarrWriter.create(str(tmp_path / "volume.zarr"), shape=shape, chunks=patch, dtype=np.float32)
+        writer[:] = volume
+        (tmp_path / "model.pth").write_bytes(b"")
+        targets = {name: TARGETS[name] for name in ("surface", "normals")}
+    
+        def fake_load(self, checkpoint_path):
+            return {"network": Oracle(), "patch_size": patch, "num_input_channels": 1, "num_seg_heads": 5,
+                    "targets": targets, "normalization_scheme": "none"}
+    
+        monkeypatch.setattr(inference.Inferer, "_load_train_py_model", fake_load)
+    
+        def predict(name, **kwargs):
+            out = tmp_path / name
+            Inferer(model_path=str(tmp_path / "model.pth"), input_dir=str(tmp_path / "volume.zarr"),
+                    output_dir=str(tmp_path / "parts"), model_type="train_py", device="cpu",
+                    num_dataloader_workers=0, in_memory_blend={"output_path": str(out)}, **kwargs).infer()
+            return np.asarray(open_zarr(str(out))[:], dtype=np.float32)
+    
+        with_tta = predict("tta.zarr")
+        without = predict("no_tta.zarr", do_tta=False)
+        mask = _defined(torch.from_numpy(volume)[None, None]).numpy()
+        mask[[0, -1]] = mask[:, [0, -1]] = mask[:, :, [0, -1]] = False
+        length = np.sqrt((with_tta[2:5] ** 2).sum(0))[mask]
+>       assert length.mean() > 0.99, f"TTA normals have mean length {length.mean():.3f}"
+E       AssertionError: TTA normals have mean length 0.000
+E       assert np.float32(0.0) > 0.99
+E        +  where np.float32(0.0) = <built-in method mean of numpy.ndarray object at 0x7ffedc910ab0>()
+E        +    where <built-in method mean of numpy.ndarray object at 0x7ffedc910ab0> = array([0., 0., 0., ..., 0., 0., 0.], shape=(27000,), dtype=float32).mean
+
+tests/models/run/test_tta_vector_heads.py:161: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0/parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0/volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0/volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0/volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.3 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0/tta.zarr
+  Shape: (5, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0/parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache HIT (sidecar:/tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0/volume.zarr/.chunk_occupancy.npz): 8/8 (100.0%) chunks occupied for /tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0/volume.zarr
+In-memory blending: the blend sums need 0.0 GiB (12.3 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_predict_keeps_normals_wit0/no_tta.zarr
+  Shape: (5, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  33%|███▎      | 9/27 [00:00<00:00, 80.71it/s]Inferring Part 0:  67%|██████▋   | 18/27 [00:00<00:00, 78.79it/s]Inferring Part 0:  96%|█████████▋| 26/27 [00:00<00:00, 79.00it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 79.09it/s]
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 379.74it/s]
+______ test_half_precision_sign_alignment_keeps_small_directions[batched] ______
+
+helper = 'batched'
+
+    @pytest.mark.parametrize("helper", ["batched", "sequential"])
+    def test_half_precision_sign_alignment_keeps_small_directions(helper):
+        """CUDA inference runs under autocast: the heads come out in float16. Opposite in-plane
+        vectors of length 1e-4 have a float16 product that rounds to zero."""
+        targets = {name: TARGETS[name] for name in ("surface", "direction")}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:178: AttributeError
+____ test_half_precision_sign_alignment_keeps_small_directions[sequential] _____
+
+helper = 'sequential'
+
+    @pytest.mark.parametrize("helper", ["batched", "sequential"])
+    def test_half_precision_sign_alignment_keeps_small_directions(helper):
+        """CUDA inference runs under autocast: the heads come out in float16. Opposite in-plane
+        vectors of length 1e-4 have a float16 product that rounds to zero."""
+        targets = {name: TARGETS[name] for name in ("surface", "direction")}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:178: AttributeError
+_________ test_component_transform_keeps_peak_memory[normals-batched] __________
+
+helper = 'batched', head = 'normals'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedca80750>
+
+    @pytest.mark.parametrize("helper", ["batched", "sequential"])
+    @pytest.mark.parametrize("head", ["normals", "direction"])
+    def test_component_transform_keeps_peak_memory(helper, head, monkeypatch):
+        """Undoing the component change works on the variants in place: no extra full-size copies
+        of the output beyond what the plain mirroring average already holds. An axis head's
+        orientation tensors are reduced a slab of rows at a time (here one 32 x 32 row), so their
+        float32 temporaries do not grow with the patch."""
+        monkeypatch.setattr(orientation, "_SLAB_VOXELS", 32 * 32)
+        targets = {name: TARGETS[name] for name in ("surface", head)}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:211: AttributeError
+________ test_component_transform_keeps_peak_memory[normals-sequential] ________
+
+helper = 'sequential', head = 'normals'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedca80de0>
+
+    @pytest.mark.parametrize("helper", ["batched", "sequential"])
+    @pytest.mark.parametrize("head", ["normals", "direction"])
+    def test_component_transform_keeps_peak_memory(helper, head, monkeypatch):
+        """Undoing the component change works on the variants in place: no extra full-size copies
+        of the output beyond what the plain mirroring average already holds. An axis head's
+        orientation tensors are reduced a slab of rows at a time (here one 32 x 32 row), so their
+        float32 temporaries do not grow with the patch."""
+        monkeypatch.setattr(orientation, "_SLAB_VOXELS", 32 * 32)
+        targets = {name: TARGETS[name] for name in ("surface", head)}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:211: AttributeError
+________ test_component_transform_keeps_peak_memory[direction-batched] _________
+
+helper = 'batched', head = 'direction'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffefa811b00>
+
+    @pytest.mark.parametrize("helper", ["batched", "sequential"])
+    @pytest.mark.parametrize("head", ["normals", "direction"])
+    def test_component_transform_keeps_peak_memory(helper, head, monkeypatch):
+        """Undoing the component change works on the variants in place: no extra full-size copies
+        of the output beyond what the plain mirroring average already holds. An axis head's
+        orientation tensors are reduced a slab of rows at a time (here one 32 x 32 row), so their
+        float32 temporaries do not grow with the patch."""
+        monkeypatch.setattr(orientation, "_SLAB_VOXELS", 32 * 32)
+        targets = {name: TARGETS[name] for name in ("surface", head)}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:211: AttributeError
+_______ test_component_transform_keeps_peak_memory[direction-sequential] _______
+
+helper = 'sequential', head = 'direction'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedca81320>
+
+    @pytest.mark.parametrize("helper", ["batched", "sequential"])
+    @pytest.mark.parametrize("head", ["normals", "direction"])
+    def test_component_transform_keeps_peak_memory(helper, head, monkeypatch):
+        """Undoing the component change works on the variants in place: no extra full-size copies
+        of the output beyond what the plain mirroring average already holds. An axis head's
+        orientation tensors are reduced a slab of rows at a time (here one 32 x 32 row), so their
+        float32 temporaries do not grow with the patch."""
+        monkeypatch.setattr(orientation, "_SLAB_VOXELS", 32 * 32)
+        targets = {name: TARGETS[name] for name in ("surface", head)}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:211: AttributeError
+_____________ test_overlapping_patches_keep_a_sign_ambiguous_axis ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_overlapping_patches_keep_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc817620>
+
+    def test_overlapping_patches_keep_a_sign_ambiguous_axis(tmp_path, monkeypatch):
+        """Two patches (50% overlap) predict the x axis with opposite signs; blending must keep it.
+    
+        The second patch's first voxel is dark, so it reports -x unmirrored and +x in the mirrored
+        variants. A sign chosen per patch made the two cancel where they overlap (0 at x = 12, where
+        both weigh the same)."""
+        volume = np.full((16, 16, 24), 0.9, dtype=np.float32) + np.linspace(0, 0.01, 24, dtype=np.float32)
+        volume[0, 0, 8] = 0.0
+        targets = {name: TARGETS[name] for name in ("surface", "direction")}
+        out = _predict(tmp_path, monkeypatch, volume, AxisWithPatchSign(), targets, (16, 16, 16), "seam")
+        direction = out[2:5].astype(np.float32)
+>       assert direction[0, 8, 8, 12] > 0.99, f"x component at the seam {direction[0, 8, 8, 12]:.3f}"
+E       AssertionError: x component at the seam 0.875
+E       assert np.float32(0.875) > 0.99
+
+tests/models/run/test_tta_vector_heads.py:268: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_overlapping_patches_keep_0/seam_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_overlapping_patches_keep_0/seam_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_overlapping_patches_keep_0/seam_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_overlapping_patches_keep_0/seam_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.3 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_overlapping_patches_keep_0/seam.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 273.13it/s]
+_________ test_predict_multiclass_classes_come_from_segmentation_heads _________
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_predict_multiclass_classe0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc816e40>
+
+    def test_predict_multiclass_classes_come_from_segmentation_heads(tmp_path, monkeypatch):
+        """--blend_in_memory --mode multiclass with default TTA: the restored normal components
+        (up to 1.0) are not class scores; class 1 (score 0.5) wins everywhere."""
+        from vesuvius.models.run.finalize_outputs import FinalizeConfig
+    
+        targets = {name: TARGETS[name] for name in ("surface", "normals")}
+        out = _predict(tmp_path, monkeypatch, _volume((32, 32, 32)).numpy(), ConstantScores(), targets,
+                       (16, 16, 16), "multiclass",
+                       in_memory_blend={"finalize_config": FinalizeConfig(mode="multiclass")})
+>       assert out.shape == (3, 32, 32, 32)  # softmax class 0, class 1, argmax
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert (6, 32, 32, 32) == (3, 32, 32, 32)
+E         
+E         At index 0 diff: 6 != 3
+E         Use -v to get more diff
+
+tests/models/run/test_tta_vector_heads.py:292: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_predict_multiclass_classe0/multiclass_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_predict_multiclass_classe0/multiclass_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_predict_multiclass_classe0/multiclass_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_predict_multiclass_classe0/multiclass_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.3 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (6, 32, 32, 32)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_predict_multiclass_classe0/multiclass.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  30%|██▉       | 8/27 [00:00<00:00, 71.09it/s]Inferring Part 0:  59%|█████▉    | 16/27 [00:00<00:00, 75.50it/s]Inferring Part 0:  93%|█████████▎| 25/27 [00:00<00:00, 78.35it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 77.48it/s]
+______________ test_multiclass_finalization_skips_auxiliary_heads ______________
+
+    def test_multiclass_finalization_skips_auxiliary_heads():
+        """Three class scores and a normal, no TTA: the class is the best score, not the normal's x."""
+        from vesuvius.models.run.finalize_outputs import (FinalizeConfig, apply_finalization,
+                                                          compute_finalized_shape)
+    
+        config = FinalizeConfig(mode="multiclass", is_multi_task=True, target_info=_seg_and_normals_info(3))
+        logits = np.zeros((6, 1, 1, 2), dtype=np.float32)
+        logits[:, 0, 0, 0] = [0.0, 0.5, 0.2, 1.0, 0.0, 0.0]
+        logits[:, 0, 0, 1] = [0.3, 0.0, 0.1, 0.0, 0.0, -1.0]
+        out, is_empty = apply_finalization(logits, 6, config)
+        assert not is_empty
+>       assert out.shape == compute_finalized_shape((1, 1, 2), 6, config) == (4, 1, 1, 2)
+E       assert (7, 1, 1, 2) == (4, 1, 1, 2)
+E         
+E         At index 0 diff: 7 != 4
+E         Use -v to get more diff
+
+tests/models/run/test_tta_vector_heads.py:313: AssertionError
+____________ test_finalize_logits_multiclass_skips_auxiliary_heads _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_finalize_logits_multiclas0')
+
+    def test_finalize_logits_multiclass_skips_auxiliary_heads(tmp_path):
+        """The staged path (blend_logits, then finalize_outputs) reads the heads from the logits attrs."""
+        from vesuvius.models.run.finalize_outputs import finalize_logits
+    
+        logits = np.zeros((5, 4, 4, 4), dtype=np.float32)
+        logits[1], logits[2] = 0.5, 1.0  # class 1 beats class 0; the normal's x is larger still
+        writer = ZarrWriter.create(str(tmp_path / "logits.zarr"), shape=logits.shape, chunks=(5, 4, 4, 4),
+                                   dtype=np.float32)
+        writer[:] = logits
+        writer.attrs["is_multi_task"] = True
+        writer.attrs["target_info"] = _seg_and_normals_info(2)
+        finalize_logits(str(tmp_path / "logits.zarr"), str(tmp_path / "final.zarr"), mode="multiclass",
+                        num_workers=1, verbose=False)
+        out = np.asarray(open_zarr(str(tmp_path / "final.zarr"))[:])
+>       assert out.shape == (3, 4, 4, 4)
+E       assert (6, 4, 4, 4) == (3, 4, 4, 4)
+E         
+E         At index 0 diff: 6 != 3
+E         Use -v to get more diff
+
+tests/models/run/test_tta_vector_heads.py:334: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Using 1 worker processes
+Opening input logits: /tmp/pytest-of-pi/pytest-70/test_finalize_logits_multiclas0/logits.zarr
+Mode: multiclass, Threshold: off
+Input shape: (5, 4, 4, 4), Num classes: 5
+Multi-task model detected with targets: ['normals', 'surface']
+Output will have 6 channels: [softmax_c0...softmax_cN, argmax]
+Creating output store: /tmp/pytest-of-pi/pytest-70/test_finalize_logits_multiclas0/final.zarr
+  Shape: (6, 4, 4, 4), Chunks: (1, 4, 4, 4)
+Processing data in 1 chunks using 1 worker processes...
+
+Output processing complete. Processed 1 chunks, skipped 0 empty chunks (0.00%).
+Final output saved to: /tmp/pytest-of-pi/pytest-70/test_finalize_logits_multiclas0/final.zarr
+_______ test_direction_kind_comes_from_the_training_losses[head0-axial] ________
+
+head = {'out_channels': 4, 'auxiliary_task': True, 'task_type': 'nearest_component', 'losses': [{'name': 'ChannelSelectLoss',...: 'ChannelSelectLoss', 'weight': 1.0, 'kwargs': {'channels': 'last', 'base': {'name': 'SmoothL1Loss', 'kwargs': {}}}}]}
+kind = 'axial'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_direction_kind_comes_from_the_training_losses[head1-vector] _______
+
+head = {'out_channels': 4, 'auxiliary_task': True, 'task_type': 'nearest_component', 'losses': [{'name': 'ChannelSelectLoss',...: 'ChannelSelectLoss', 'weight': 1.0, 'kwargs': {'channels': 'last', 'base': {'name': 'SmoothL1Loss', 'kwargs': {}}}}]}
+kind = 'vector'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_direction_kind_comes_from_the_training_losses[head2-vector] _______
+
+head = {'out_channels': 4, 'auxiliary_task': True, 'task_type': 'nearest_component', 'losses': [{'name': 'ChannelSelectLoss',...: 'ChannelSelectLoss', 'weight': 1.0, 'kwargs': {'channels': 'last', 'base': {'name': 'SmoothL1Loss', 'kwargs': {}}}}]}
+kind = 'vector'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_direction_kind_comes_from_the_training_losses[head3-vector] _______
+
+head = {'out_channels': 4, 'auxiliary_task': True, 'task_type': 'nearest_component', 'losses': [{'name': 'ChannelSelectLoss',...: 'ChannelSelectLoss', 'weight': 1.0, 'kwargs': {'channels': 'last', 'base': {'name': 'SmoothL1Loss', 'kwargs': {}}}}]}
+kind = 'vector'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_direction_kind_comes_from_the_training_losses[head4-vector] _______
+
+head = {'out_channels': 4, 'auxiliary_task': True, 'task_type': 'nearest_component'}
+kind = 'vector'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_direction_kind_comes_from_the_training_losses[head5-axial] ________
+
+head = {'out_channels': 3, 'auxiliary_task': True, 'task_type': 'inplane_direction', 'losses': [{'name': 'SignInvariantCosineLoss'}]}
+kind = 'axial'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_direction_kind_comes_from_the_training_losses[head6-vector] _______
+
+head = {'out_channels': 3, 'auxiliary_task': True, 'task_type': 'inplane_direction', 'losses': [{'name': 'CosineSimilarityLoss'}]}
+kind = 'vector'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_direction_kind_comes_from_the_training_losses[head7-axial] ________
+
+head = {'out_channels': 3, 'auxiliary_task': True, 'task_type': 'inplane_direction'}
+kind = 'axial'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_direction_kind_comes_from_the_training_losses[head8-vector] _______
+
+head = {'out_channels': 3, 'auxiliary_task': True, 'task_type': 'inplane_direction', 'losses': [{'name': 'SignInvariantCosineLoss'}, {'name': 'ChannelSelectLoss', 'kwargs': {'channels': 'last', 'base': {'name': 'MSELoss'}}}]}
+kind = 'vector'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_direction_kind_comes_from_the_training_losses[head9-axial] ________
+
+head = {'out_channels': 4, 'auxiliary_task': True, 'task_type': 'nearest_component', 'losses': [{'name': 'ChannelSelectLoss',...InvariantCosineLoss'}}}, {'name': 'ChannelSelectLoss', 'kwargs': {'channels': [3], 'base': {'name': 'SmoothL1Loss'}}}]}
+kind = 'axial'
+
+    @pytest.mark.parametrize(("head", "kind"), [
+        (_shipped_nearest_component(), "axial"),  # SignInvariantCosineLoss on the direction
+        (_nearest_component("CosineSimilarityLoss"), "vector"),
+        # orientation supervised by any loss: signed, also next to a sign-invariant loss
+        (_nearest_component("SignInvariantCosineLoss", "CosineSimilarityLoss"), "vector"),
+        (_nearest_component("SignInvariantCosineLoss", "MSELoss"), "vector"),
+        ({**TARGETS["nearest"]}, "vector"),  # no losses configured: the task's default
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "CosineSimilarityLoss"}]}, "vector"),
+        ({**TARGETS["direction"]}, "axial"),
+        ({**TARGETS["direction"], "losses": [{"name": "SignInvariantCosineLoss"}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "last", "base": {"name": "MSELoss"}}}]}, "vector"),
+        ({**TARGETS["nearest"], "losses": [{
+            "name": "ChannelSelectLoss", "kwargs": {"channels": "all_but_last", "base": {"name": "SignInvariantCosineLoss"}}}, {
+            "name": "ChannelSelectLoss", "kwargs": {"channels": [3], "base": {"name": "SmoothL1Loss"}}}]}, "axial"),
+    ])
+    def test_direction_kind_comes_from_the_training_losses(head, kind):
+        targets = {"surface": TARGETS["surface"], "h": head}
+>       groups = tta.tta_channel_groups(targets, _target_info(targets), 3)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'vesuvius.models.run.tta' has no attribute 'tta_channel_groups'
+
+tests/models/run/test_tta_vector_heads.py:376: AttributeError
+_______ test_predict_never_reverses_a_signed_nearest_component[losses0] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc824670>
+losses = ('CosineSimilarityLoss',)
+
+    @pytest.mark.parametrize("losses", [("CosineSimilarityLoss",), ("SignInvariantCosineLoss", "CosineSimilarityLoss")])
+    def test_predict_never_reverses_a_signed_nearest_component(tmp_path, monkeypatch, losses):
+        """With a signed loss on the direction (alone or next to a sign-invariant one), TTA and blending
+        keep the predicted orientation, also where it points out of the half-space axes are written in."""
+        targets = {"surface": TARGETS["surface"], "nearest": _nearest_component(*losses)}
+        volume = _volume((32, 32, 32)).numpy()
+        with_tta = _predict(tmp_path, monkeypatch, volume, Oracle(), targets, (16, 16, 16), "tta").astype(np.float32)
+        without = _predict(tmp_path, monkeypatch, volume, Oracle(), targets, (16, 16, 16), "no_tta",
+                           do_tta=False).astype(np.float32)
+        mask = _defined(torch.from_numpy(volume)[None, None]).numpy()
+        mask[[0, -1]] = mask[:, [0, -1]] = mask[:, :, [0, -1]] = False
+>       assert np.abs(with_tta[2:6] - without[2:6])[:, mask].max() < 1e-2
+E       assert np.float32(0.9995117) < 0.01
+E        +  where np.float32(0.9995117) = <built-in method max of numpy.ndarray object at 0x7ffedc7d12f0>()
+E        +    where <built-in method max of numpy.ndarray object at 0x7ffedc7d12f0> = array([[0.29516602, 0.45996094, 0.49023438, ..., 0.52001953, 0.5488281 ,\n        0.5727539 ],\n       [0.29516602, 0.49...0.        , 0.        , 0.        , ..., 0.        , 0.        ,\n        0.        ]], shape=(4, 27000), dtype=float32).max
+
+tests/models/run/test_tta_vector_heads.py:415: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/tta_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/tta_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/tta_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/tta_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/tta.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/no_tta_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/no_tta_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/no_tta_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/no_tta_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_0/no_tta.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  30%|██▉       | 8/27 [00:00<00:00, 74.70it/s]Inferring Part 0:  63%|██████▎   | 17/27 [00:00<00:00, 77.91it/s]Inferring Part 0:  96%|█████████▋| 26/27 [00:00<00:00, 79.07it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 78.49it/s]
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 361.49it/s]
+_______ test_predict_never_reverses_a_signed_nearest_component[losses1] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc816c80>
+losses = ('SignInvariantCosineLoss', 'CosineSimilarityLoss')
+
+    @pytest.mark.parametrize("losses", [("CosineSimilarityLoss",), ("SignInvariantCosineLoss", "CosineSimilarityLoss")])
+    def test_predict_never_reverses_a_signed_nearest_component(tmp_path, monkeypatch, losses):
+        """With a signed loss on the direction (alone or next to a sign-invariant one), TTA and blending
+        keep the predicted orientation, also where it points out of the half-space axes are written in."""
+        targets = {"surface": TARGETS["surface"], "nearest": _nearest_component(*losses)}
+        volume = _volume((32, 32, 32)).numpy()
+        with_tta = _predict(tmp_path, monkeypatch, volume, Oracle(), targets, (16, 16, 16), "tta").astype(np.float32)
+        without = _predict(tmp_path, monkeypatch, volume, Oracle(), targets, (16, 16, 16), "no_tta",
+                           do_tta=False).astype(np.float32)
+        mask = _defined(torch.from_numpy(volume)[None, None]).numpy()
+        mask[[0, -1]] = mask[:, [0, -1]] = mask[:, :, [0, -1]] = False
+>       assert np.abs(with_tta[2:6] - without[2:6])[:, mask].max() < 1e-2
+E       assert np.float32(0.9995117) < 0.01
+E        +  where np.float32(0.9995117) = <built-in method max of numpy.ndarray object at 0x7ffedc7d1890>()
+E        +    where <built-in method max of numpy.ndarray object at 0x7ffedc7d1890> = array([[0.29516602, 0.45996094, 0.49023438, ..., 0.52001953, 0.5488281 ,\n        0.5727539 ],\n       [0.29516602, 0.49...0.        , 0.        , 0.        , ..., 0.        , 0.        ,\n        0.        ]], shape=(4, 27000), dtype=float32).max
+
+tests/models/run/test_tta_vector_heads.py:415: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/tta_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/tta_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/tta_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/tta_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/tta.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/no_tta_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/no_tta_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/no_tta_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/no_tta_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_predict_never_reverses_a_1/no_tta.zarr
+  Shape: (6, 32, 32, 32), Chunks: (1, 16, 16, 16)
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0:  30%|██▉       | 8/27 [00:00<00:00, 78.55it/s]Inferring Part 0:  59%|█████▉    | 16/27 [00:00<00:00, 76.57it/s]Inferring Part 0:  89%|████████▉ | 24/27 [00:00<00:00, 76.06it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 76.43it/s]
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 364.41it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-opposite on the plane] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedca81b70>
+do_tta = True, head = 'direction', case = 'opposite on the plane'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.00000 at the seam
+E           assert np.float32(0.0) > 0.99
+E            +  where np.float32(0.0) = <function norm at 0x7fff23c77630>(array([0., 0., 0.], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th0/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 203.50it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 209.02it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-either side of the plane] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffefa811b00>
+do_tta = True, head = 'direction', case = 'either side of the plane'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.00000 at the seam
+E           assert np.float32(0.0) > 0.99
+E            +  where np.float32(0.0) = <function norm at 0x7fff23c77630>(array([0., 0., 0.], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th1/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 207.86it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 206.87it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-opposite, tilted] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc987460>
+do_tta = True, head = 'direction', case = 'opposite, tilted'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.00000 at the seam
+E           assert np.float32(0.0) > 0.99
+E            +  where np.float32(0.0) = <function norm at 0x7fff23c77630>(array([0., 0., 0.], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th2/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 199.11it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 206.25it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-opposite on the plane] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc987c40>
+do_tta = True, head = 'nearest', case = 'opposite on the plane'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.00000 at the seam
+E           assert np.float32(0.0) > 0.99
+E            +  where np.float32(0.0) = <function norm at 0x7fff23c77630>(array([0., 0., 0.], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th3/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 194.97it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 212.05it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-either side of the plane] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc9864a0>
+do_tta = True, head = 'nearest', case = 'either side of the plane'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.00000 at the seam
+E           assert np.float32(0.0) > 0.99
+E            +  where np.float32(0.0) = <function norm at 0x7fff23c77630>(array([0., 0., 0.], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th4/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 211.57it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 211.68it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-opposite, tilted] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc986190>
+do_tta = True, head = 'nearest', case = 'opposite, tilted'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.00000 at the seam
+E           assert np.float32(0.0) > 0.99
+E            +  where np.float32(0.0) = <function norm at 0x7fff23c77630>(array([0., 0., 0.], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th5/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 214.28it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 211.76it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-opposite on the plane] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedca41be0>
+do_tta = False, head = 'direction', case = 'opposite on the plane'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.00000 at the seam
+E           assert np.float32(0.0) > 0.99
+E            +  where np.float32(0.0) = <function norm at 0x7fff23c77630>(array([0., 0., 0.], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.2 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th6/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 637.34it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 590.12it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-opposite, tilted] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc8252b0>
+do_tta = False, head = 'direction', case = 'opposite, tilted'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.02235 at the seam
+E           assert np.float32(0.022354126) > 0.99
+E            +  where np.float32(0.022354126) = <function norm at 0x7fff23c77630>(array([0.        , 0.        , 0.02235413], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/in_memory.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged_parts/logits_part_0.zarr with shape (2, 5, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 5, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 5
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged.zarr
+  Shape: (5, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 80.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th8/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 625.36it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 604.37it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-opposite on the plane] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc986dd0>
+do_tta = False, head = 'nearest', case = 'opposite on the plane'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.00000 at the seam
+E           assert np.float32(0.0) > 0.99
+E            +  where np.float32(0.0) = <function norm at 0x7fff23c77630>(array([0., 0., 0.], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.3 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th9/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 600.22it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 577.61it/s]
+_ test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-opposite, tilted] _
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc9874d0>
+do_tta = False, head = 'nearest', case = 'opposite, tilted'
+
+    @pytest.mark.parametrize("case", list(SEAM_CASES))
+    @pytest.mark.parametrize("head", ["direction", "nearest"])
+    @pytest.mark.parametrize("do_tta", [True, False])
+    def test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign(tmp_path, monkeypatch, do_tta, head, case):
+        """Both blenders average an axis head as the orientation tensor v v^T: at the equally weighted
+        seam voxel two patches that agree on the axis (up to sign, or nearly) add up instead of
+        cancelling. The nearest_component distance is averaged as a scalar."""
+        first, second = SEAM_CASES[case]
+        targets = {"surface": TARGETS["surface"],
+                   head: TARGETS["direction"] if head == "direction" else _shipped_nearest_component()}
+        volume, model = _seam_volume(), PatchAxes(first, second, head)
+        in_memory = _predict(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "in_memory",
+                             do_tta=do_tta)[2:].astype(np.float32)
+        staged = _predict_staged(tmp_path, monkeypatch, volume, model, targets, (16, 16, 16), "staged",
+                                 do_tta=do_tta)[0][2:].astype(np.float32)
+        units = [np.array(v) / np.linalg.norm(v) for v in (first, second)]
+        shared = np.linalg.eigh(sum(np.outer(u, u) for u in units) / 2)[1][:, -1]
+        for name, out in (("in-memory", in_memory), ("staged", staged)):
+            seam = out[(slice(0, 3), *SEAM_VOXEL)]
+>           assert np.linalg.norm(seam) > 0.99, f"{name}: length {np.linalg.norm(seam):.5f} at the seam"
+E           AssertionError: in-memory: length 0.02235 at the seam
+E           assert np.float32(0.022354126) > 0.99
+E            +  where np.float32(0.022354126) = <function norm at 0x7fff23c77630>(array([0.        , 0.        , 0.02235413], dtype=float32))
+E            +    where <function norm at 0x7fff23c77630> = <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'>.norm
+E            +      where <module 'numpy.linalg' from '<venv>/lib/python3.13/site-packages/numpy/linalg/__init__.py'> = np.linalg
+
+tests/models/run/test_tta_vector_heads.py:514: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/in_memory_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/in_memory.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged_volume.zarr (grid (1, 1, 2), separator '.', 1 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged_parts/logits_part_0.zarr with shape (2, 6, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged_parts/coordinates_part_0.zarr with shape (2, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 6, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 6
+  Original Volume Shape (Z,Y,X): (16, 16, 24)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged.zarr
+  Shape: (6, 16, 16, 24), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 2 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 2 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 2
+  Skipped (no patches): 0
+  To process: 2
+  Total patch assignments: 3
+  Batches of neighbouring chunks: 2
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 2
+  Chunks skipped (empty): 0
+  Patches processed: 3
+  Workers: 1
+  Avg rate: 0.9 chunks/s
+  Zarr chunk reads: 3
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 96.0 KB
+  Total data (uncompressed): 0.00 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_blending_keeps_an_axis_th11/staged.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 601.12it/s]
+Inferring Part 0:   0%|          | 0/2 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 2/2 [00:00<00:00, 566.34it/s]
+________ test_multiclass_threshold_writes_uniform_nonzero_class_chunks _________
+
+tmp_path = PosixPath('/tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffedc984e50>
+
+    def test_multiclass_threshold_writes_uniform_nonzero_class_chunks(tmp_path, monkeypatch):
+        """--mode multiclass --threshold, default mirroring: every voxel is class 1. A chunk of class 1
+        only was treated as empty and read back as class 0, in-memory, staged and fused."""
+        targets = {"surface": TARGETS["surface"], "st": TARGETS["st"]}
+        volume = _volume((32, 32, 32)).numpy()
+        assert (3 * volume > 0.5).any() and (3 * volume < 0.5).any()
+    
+        in_memory = _predict(tmp_path, monkeypatch, volume, ClassOneAndLargeTensor(), targets, (16, 16, 16),
+                             "in_memory", in_memory_blend={"finalize_config": FinalizeConfig("multiclass", 0.5)})
+        _, parts = _predict_staged(tmp_path, monkeypatch, volume, ClassOneAndLargeTensor(), targets,
+                                   (16, 16, 16), "staged")
+        finalize_logits(str(tmp_path / "staged.zarr"), str(tmp_path / "staged_final.zarr"), mode="multiclass",
+                        threshold=0.5, num_workers=1, verbose=False, delete_intermediates=True)
+        assert not (tmp_path / "staged.zarr").exists()  # removed only after every chunk was written
+        staged = np.asarray(open_zarr(str(tmp_path / "staged_final.zarr"))[:])
+        monkeypatch.setattr(sys, "argv", ["vesuvius.blend_and_finalize", str(parts), str(tmp_path / "fused.zarr"),
+                                          "--mode", "multiclass", "--threshold", "--num_workers", "1", "--quiet"])
+        assert blending.blend_and_finalize_main() == 0
+        fused = np.asarray(open_zarr(str(tmp_path / "fused.zarr"))[:])
+    
+        for name, out in (("in-memory", in_memory), ("staged finalize", staged), ("blend_and_finalize", fused)):
+            assert out.shape == (1, 32, 32, 32), name
+>           assert np.unique(out).tolist() == [1], f"{name}: classes {np.unique(out).tolist()}"
+E           AssertionError: in-memory: classes [1, 2]
+E           assert [1, 2] == [1]
+E             
+E             Left contains one more item: 2
+E             Use -v to get more diff
+
+tests/models/run/test_tta_vector_heads.py:557: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/in_memory_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/in_memory_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/in_memory_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/in_memory_volume.zarr/.chunk_occupancy.npz
+In-memory blending: the blend sums need 0.0 GiB (12.1 GiB available)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+  Finalized output shape: (1, 32, 32, 32)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/in_memory.zarr
+  Shape: (1, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Initializing Inferer with output_dir: '/tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_parts'
+Using model-declared normalization 'none' instead of CLI/default 'instance_zscore'.
+  Chunk occupancy cache MISS for /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_volume.zarr (will build and cache)
+  Building chunk occupancy index for /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_volume.zarr (grid (2, 2, 2), separator '.', 2 rows)...
+  Chunk occupancy cache SAVED to sidecar: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_volume.zarr/.chunk_occupancy.npz
+Creating output store at: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_parts/logits_part_0.zarr
+Created zarr array at /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_parts/logits_part_0.zarr with shape (27, 8, 16, 16, 16)
+Creating coordinates store at: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_parts/coordinates_part_0.zarr
+Created coordinates zarr array at /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_parts/coordinates_part_0.zarr with shape (27, 3)
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 8, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 8
+  Original Volume Shape (Z,Y,X): (32, 32, 32)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged.zarr
+  Shape: (8, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 8 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Loading/computing bounding boxes for 1 parts...
+  Filtering to relevant parts based on 8 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 8
+  Skipped (no patches): 0
+  To process: 8
+  Total patch assignments: 64
+  Batches of neighbouring chunks: 8
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.2s
+  Chunks processed: 8
+  Chunks skipped (empty): 0
+  Patches processed: 64
+  Workers: 1
+  Avg rate: 3.7 chunks/s
+  Zarr chunk reads: 64
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 128.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged.zarr
+Using 1 worker processes
+Opening input logits: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged.zarr
+Mode: multiclass, Threshold: 0.5
+Input shape: (8, 32, 32, 32), Num classes: 8
+Multi-task model detected with targets: ['st', 'surface']
+Output will have 1 channel: [argmax]
+Creating output store: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_final.zarr
+  Shape: (1, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Processing data in 8 chunks using 1 worker processes...
+
+Output processing complete. Processed 8 chunks, skipped 0 empty chunks (0.00%).
+Deleting intermediate logits: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged.zarr
+Successfully deleted intermediate logits (local path)
+Final output saved to: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_final.zarr
+Using 1 worker processes (half of CPU count for memory efficiency)
+Scanning for parts in: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/staged_parts
+Found 1 parts (IDs 0..0)
+Reading metadata from part 0...
+Input zarr chunk size: (1, 8, 16, 16, 16)
+  Patch Size: (16, 16, 16)
+  Num Classes: 8
+  Original Volume Shape (Z,Y,X): (32, 32, 32)
+Fused blend+finalize mode: multiclass, threshold=0.5
+  Finalized output shape: (1, 32, 32, 32)
+Creating final output store: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/fused.zarr
+  Shape: (1, 32, 32, 32), Chunks: (1, 16, 16, 16)
+Generated Gaussian map with shape (1, 16, 16, 16), min: 0.0000, max: 1.0000
+Divided volume into 8 chunks for parallel processing
+
+--- Building Spatial Patch Index ---
+  Using cached bounding boxes for 1 parts
+  Filtering to relevant parts based on 8 chunks...
+  Reduced from 1 to 1 relevant parts
+  Loading coordinates and non-empty masks for 1 relevant parts...
+  Building spatial grid (cell size 1000^3, non-empty patches only)...
+
+--- Precomputing Patch Assignments per Chunk ---
+Total chunks: 8
+  Skipped (no patches): 0
+  To process: 8
+  Total patch assignments: 64
+  Batches of neighbouring chunks: 8
+
+--- Accumulating Weighted Patches ---
+
+============================================================
+=== FINAL STATISTICS ===
+============================================================
+  Wall time: 2.3s
+  Chunks processed: 8
+  Chunks skipped (empty): 0
+  Patches processed: 64
+  Workers: 1
+  Avg rate: 3.5 chunks/s
+  Zarr chunk reads: 64
+  Patches reused from the batch cache: 0
+  Avg chunk size (uncompressed): 128.0 KB
+  Total data (uncompressed): 0.01 GB
+  Wall throughput: 0.00 GB/s (1 workers)
+============================================================
+
+--- Merging Finished ---
+Final merged output saved to: /tmp/pytest-of-pi/pytest-70/test_multiclass_threshold_writ0/fused.zarr
+----------------------------- Captured stderr call -----------------------------
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 305.91it/s]
+Inferring Part 0:   0%|          | 0/27 [00:00<?, ?it/s]Inferring Part 0: 100%|██████████| 27/27 [00:00<00:00, 313.53it/s]
+=========================== short test summary info ============================
+FAILED tests/models/run/test_finalize_multiclass_scale.py::test_homogeneous_nonzero_class_chunk_is_written
+FAILED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[3-mirroring]
+FAILED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[3-rotation]
+FAILED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[2-mirroring]
+FAILED tests/models/run/test_tta_vector_heads.py::test_tta_keeps_vector_and_tensor_heads[2-rotation]
+FAILED tests/models/run/test_tta_vector_heads.py::test_batched_mirroring_matches_sequential
+FAILED tests/models/run/test_tta_vector_heads.py::test_segmentation_only_models_average_as_before
+FAILED tests/models/run/test_tta_vector_heads.py::test_predict_keeps_normals_with_default_tta
+FAILED tests/models/run/test_tta_vector_heads.py::test_half_precision_sign_alignment_keeps_small_directions[batched]
+FAILED tests/models/run/test_tta_vector_heads.py::test_half_precision_sign_alignment_keeps_small_directions[sequential]
+FAILED tests/models/run/test_tta_vector_heads.py::test_component_transform_keeps_peak_memory[normals-batched]
+FAILED tests/models/run/test_tta_vector_heads.py::test_component_transform_keeps_peak_memory[normals-sequential]
+FAILED tests/models/run/test_tta_vector_heads.py::test_component_transform_keeps_peak_memory[direction-batched]
+FAILED tests/models/run/test_tta_vector_heads.py::test_component_transform_keeps_peak_memory[direction-sequential]
+FAILED tests/models/run/test_tta_vector_heads.py::test_overlapping_patches_keep_a_sign_ambiguous_axis
+FAILED tests/models/run/test_tta_vector_heads.py::test_predict_multiclass_classes_come_from_segmentation_heads
+FAILED tests/models/run/test_tta_vector_heads.py::test_multiclass_finalization_skips_auxiliary_heads
+FAILED tests/models/run/test_tta_vector_heads.py::test_finalize_logits_multiclass_skips_auxiliary_heads
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head0-axial]
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head1-vector]
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head2-vector]
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head3-vector]
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head4-vector]
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head5-axial]
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head6-vector]
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head7-axial]
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head8-vector]
+FAILED tests/models/run/test_tta_vector_heads.py::test_direction_kind_comes_from_the_training_losses[head9-axial]
+FAILED tests/models/run/test_tta_vector_heads.py::test_predict_never_reverses_a_signed_nearest_component[losses0]
+FAILED tests/models/run/test_tta_vector_heads.py::test_predict_never_reverses_a_signed_nearest_component[losses1]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-opposite on the plane]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-either side of the plane]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-direction-opposite, tilted]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-opposite on the plane]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-either side of the plane]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[True-nearest-opposite, tilted]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-opposite on the plane]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-direction-opposite, tilted]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-opposite on the plane]
+FAILED tests/models/run/test_tta_vector_heads.py::test_blending_keeps_an_axis_the_patches_agree_on_up_to_sign[False-nearest-opposite, tilted]
+FAILED tests/models/run/test_tta_vector_heads.py::test_multiclass_threshold_writes_uniform_nonzero_class_chunks
+41 failed, 145 passed in 104.01s (0:01:44)

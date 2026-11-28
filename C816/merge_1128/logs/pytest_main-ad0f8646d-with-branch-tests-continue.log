@@ -1,0 +1,30 @@
+## main-ad0f8646d-with-branch-tests-continue, tests/models/run, Python 3.13.5, torch 2.14.1+cpu, numpy 2.5.4, zarr 2.18.7 (same environment for every tree)
+.............................................F.......................... [ 50%]
+......................................................................   [100%]
+==================================== ERRORS ====================================
+__________ ERROR collecting tests/models/run/test_tta_vector_heads.py __________
+ImportError while importing test module '<work>/main_branch_tests/vesuvius/tests/models/run/test_tta_vector_heads.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/models/run/test_tta_vector_heads.py:21: in <module>
+    from vesuvius.models.run import blending, inference, orientation, tta
+E   ImportError: cannot import name 'orientation' from 'vesuvius.models.run' (<work>/main_branch_tests/vesuvius/src/vesuvius/models/run/__init__.py)
+=================================== FAILURES ===================================
+_______________ test_homogeneous_nonzero_class_chunk_is_written ________________
+
+    def test_homogeneous_nonzero_class_chunk_is_written():
+        """A skipped chunk reads back as the fill value 0, i.e. class 0."""
+        logits = np.zeros((NUM_CLASSES, 1, 2, 2), dtype=np.float32)
+        logits[2] = 30.0  # every voxel class 2 with probability 1
+        out, is_empty = apply_finalization(logits, NUM_CLASSES, FinalizeConfig(mode="multiclass", threshold=0.5))
+>       assert not is_empty
+E       assert not True
+
+tests/models/run/test_finalize_multiclass_scale.py:99: AssertionError
+=========================== short test summary info ============================
+FAILED tests/models/run/test_finalize_multiclass_scale.py::test_homogeneous_nonzero_class_chunk_is_written
+ERROR tests/models/run/test_tta_vector_heads.py
+1 failed, 141 passed, 1 error in 65.55s (0:01:05)

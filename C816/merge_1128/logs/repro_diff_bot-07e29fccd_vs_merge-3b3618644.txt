@@ -1,0 +1,38 @@
+0a1
+> ## merge 3b3618644 (07e29fccd + main ad0f8646d), revision_1122 repro suite
+19,24c20,25
+< batched    plain              peak over baseline 612.6 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+< batched    surface_normals    peak over baseline 612.5 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+< batched    inplane_direction  peak over baseline 642.8 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+< sequential plain              peak over baseline 860.0 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+< sequential surface_normals    peak over baseline 860.0 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+< sequential inplane_direction  peak over baseline 874.5 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+---
+> batched    plain              peak over baseline 800.1 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+> batched    surface_normals    peak over baseline 799.3 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+> batched    inplane_direction  peak over baseline 800.2 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+> sequential plain              peak over baseline 880.9 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+> sequential surface_normals    peak over baseline 871.9 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+> sequential inplane_direction  peak over baseline 886.9 MiB  (output (1, 5, 128, 128, 128) torch.float16)
+53,62c54,63
+< batched    plain              peak 384.0 MiB live tensors,   0.94 s  (groups: -)
+< batched    surface_normals    peak 384.0 MiB live tensors,   0.98 s  (groups: vector)
+< batched    inplane_direction  peak 384.0 MiB live tensors,   2.37 s  (groups: axial)
+< batched    plain_6ch          peak 448.0 MiB live tensors,   1.13 s  (groups: -)
+< batched    nearest_component  peak 448.0 MiB live tensors,   2.53 s  (groups: axial)
+< sequential plain              peak 480.0 MiB live tensors,   0.93 s  (groups: -)
+< sequential surface_normals    peak 480.0 MiB live tensors,   0.98 s  (groups: vector)
+< sequential inplane_direction  peak 480.0 MiB live tensors,   2.33 s  (groups: axial)
+< sequential plain_6ch          peak 576.0 MiB live tensors,   1.07 s  (groups: -)
+< sequential nearest_component  peak 576.0 MiB live tensors,   2.46 s  (groups: axial)
+---
+> batched    plain              peak 384.0 MiB live tensors,   0.82 s  (groups: -)
+> batched    surface_normals    peak 384.0 MiB live tensors,   0.84 s  (groups: vector)
+> batched    inplane_direction  peak 384.0 MiB live tensors,   2.07 s  (groups: axial)
+> batched    plain_6ch          peak 448.0 MiB live tensors,   1.01 s  (groups: -)
+> batched    nearest_component  peak 448.0 MiB live tensors,   2.31 s  (groups: axial)
+> sequential plain              peak 480.0 MiB live tensors,   0.86 s  (groups: -)
+> sequential surface_normals    peak 480.0 MiB live tensors,   0.87 s  (groups: vector)
+> sequential inplane_direction  peak 480.0 MiB live tensors,   2.13 s  (groups: axial)
+> sequential plain_6ch          peak 576.0 MiB live tensors,   0.97 s  (groups: -)
+> sequential nearest_component  peak 576.0 MiB live tensors,   2.24 s  (groups: axial)

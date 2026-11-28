@@ -1,0 +1,8 @@
+ vesuvius/src/vesuvius/models/run/blending.py       |  94 +++-
+ .../src/vesuvius/models/run/finalize_outputs.py    |  50 +-
+ vesuvius/src/vesuvius/models/run/inference.py      |  27 +-
+ vesuvius/src/vesuvius/models/run/orientation.py    | 112 +++++
+ vesuvius/src/vesuvius/models/run/tta.py            | 218 +++++++-
+ .../models/run/test_finalize_multiclass_scale.py   |  13 +-
+ vesuvius/tests/models/run/test_tta_vector_heads.py | 557 +++++++++++++++++++++
+ 7 files changed, 1019 insertions(+), 52 deletions(-)

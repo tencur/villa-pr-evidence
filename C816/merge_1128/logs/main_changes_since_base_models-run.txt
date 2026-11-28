@@ -1,0 +1,11 @@
+ vesuvius/src/vesuvius/models/run/blending.py       | 441 +++++++++++++++++---
+ .../models/run/external_models/load_resnet.py      |   4 +-
+ .../src/vesuvius/models/run/finalize_outputs.py    |  92 +++-
+ vesuvius/src/vesuvius/models/run/inference.py      |   7 +-
+ vesuvius/src/vesuvius/models/run/patch_writer.py   |   2 +
+ .../models/run/test_blend_finalize_bit_identity.py | 462 +++++++++++++++++++++
+ .../models/run/test_inference_legacy_checkpoint.py |  24 ++
+ vesuvius/tests/models/run/test_patch_writer.py     |  44 ++
+ vesuvius/tests/models/run/test_pipeline_cli.py     |   2 +
+ 9 files changed, 1008 insertions(+), 70 deletions(-)
+713b20609 2026-11-26 vesuvius blending & finalize_outputs: 1.55-1.62x faster PHerc0139 blending (-33.4% reads), 1.38x faster finalize_logits (#2684)
